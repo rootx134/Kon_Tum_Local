@@ -1265,35 +1265,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.createElement('div');
                 card.className = `bg-white dark:bg-darkCard rounded-2xl border ${canRedeem ? 'border-[#ff5500]/20' : 'border-gray-100 dark:border-gray-800'} overflow-hidden shadow-sm transition-all`;
 
-                // Choose an icon based on reward type
+                // Image section: use image_url if available, else fallback icon
                 let typeIcon = 'fa-gift';
-                if (reward.type === 'voucher') typeIcon = 'fa-ticket';
-                else if (reward.type === 'physical') typeIcon = 'fa-box';
-                else if (reward.type === 'experience') typeIcon = 'fa-star';
+                if (reward.category === 'voucher') typeIcon = 'fa-ticket';
+                else if (reward.category === 'physical') typeIcon = 'fa-box';
+                else if (reward.category === 'experience') typeIcon = 'fa-star';
 
-                card.innerHTML = `
-                    <div class="p-3">
-                        <div class="w-full h-24 rounded-xl ${canRedeem ? 'bg-gradient-to-br from-orange-50 to-amber-50 dark:from-[#2c1a12] dark:to-[#1f1612]' : 'bg-gray-50 dark:bg-gray-800'} flex items-center justify-center mb-3">
-                            <i class="fa-solid ${typeIcon} text-3xl ${canRedeem ? 'text-[#ff5500]' : 'text-gray-300 dark:text-gray-600'}"></i>
-                        </div>
-                        <h4 class="font-bold text-[13px] text-gray-900 dark:text-white line-clamp-2 leading-tight min-h-[2.5rem]">${reward.title || reward.name || 'Phần thưởng'}</h4>
-                        <p class="text-[11px] text-gray-400 mt-1 line-clamp-1">${reward.description || ''}</p>
-                        <div class="flex items-center justify-between mt-3">
-                            <div class="flex items-center gap-1">
-                                <i class="fa-solid fa-coins text-amber-500 text-xs"></i>
-                                <span class="text-sm font-black ${canRedeem ? 'text-[#ff5500]' : 'text-gray-400'}">${reward.points_required}</span>
-                            </div>
-                            <span class="text-[10px] ${outOfStock ? 'text-red-400' : 'text-gray-400'}">${outOfStock ? 'Hết hàng' : unlimited ? '∞ Không giới hạn' : `Còn ${reward.stock}`}</span>
-                        </div>
-                        <button onclick="redeemReward('${reward.id}', '${(reward.title || reward.name || '').replace(/'/g, "\\'")}', ${reward.points_required})"
-                            class="w-full mt-3 py-2 rounded-xl text-xs font-bold transition-all ${canRedeem
-                                ? 'bg-[#ff5500] text-white hover:bg-[#e04d00] active:scale-95'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'}"
-                            ${!canRedeem ? 'disabled' : ''}>
-                            ${outOfStock ? 'Hết hàng' : (canRedeem ? '<i class="fa-solid fa-gift mr-1"></i>Đổi ngay' : 'Chưa đủ điểm')}
-                        </button>
-                    </div>
-                `;
+                // Build image or icon block
+                const imageBlock = document.createElement('div');
+                if (reward.image_url) {
+                    imageBlock.className = 'w-full h-32 overflow-hidden bg-gray-100 dark:bg-gray-800';
+                    const img = document.createElement('img');
+                    img.src = reward.image_url;
+                    img.alt = reward.name || '';
+                    img.className = 'w-full h-full object-cover';
+                    img.onerror = function() {
+                        imageBlock.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-700"><i class="fa-solid ' + typeIcon + ' text-3xl text-[#ff5500]"></i></div>';
+                    };
+                    imageBlock.appendChild(img);
+                } else {
+                    imageBlock.className = 'w-full h-32 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center';
+                    imageBlock.innerHTML = '<i class="fa-solid ' + typeIcon + ' text-3xl text-[#ff5500]"></i>';
+                }
+                card.appendChild(imageBlock);
+
+                // Card body
+                const body = document.createElement('div');
+                body.className = 'p-3';
+
+                // Name
+                const nameEl = document.createElement('h4');
+                nameEl.className = 'font-bold text-sm text-gray-900 dark:text-white mb-1 line-clamp-2';
+                nameEl.textContent = reward.name || reward.title || '(Chưa có tên)';
+                body.appendChild(nameEl);
+
+                // Points badge
+                const pointsBadge = document.createElement('div');
+                pointsBadge.className = 'flex items-center gap-1 mb-2';
+                pointsBadge.innerHTML = '<i class="fa-solid fa-coins text-amber-500 text-xs"></i><span class="text-xs font-bold text-[#ff5500]">' + (reward.points_required || 0) + ' điểm</span>';
+                body.appendChild(pointsBadge);
+
+                // Stock status
+                const stockEl = document.createElement('div');
+                stockEl.className = 'text-xs text-gray-400 dark:text-gray-500 mb-3';
+                if (reward.stock === -1) {
+                    stockEl.textContent = 'Không giới hạn';
+                } else {
+                    stockEl.textContent = 'Còn lại: ' + (reward.stock || 0);
+                }
+                body.appendChild(stockEl);
+
+                // Redeem button
+                const btn = document.createElement('button');
+                if (outOfStock) {
+                    btn.className = 'w-full py-2 text-xs rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed font-semibold';
+                    btn.textContent = 'Hết hàng';
+                    btn.disabled = true;
+                } else if (!canRedeem) {
+                    btn.className = 'w-full py-2 text-xs rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed font-semibold';
+                    btn.textContent = 'Chưa đủ điểm';
+                    btn.disabled = true;
+                } else {
+                    btn.className = 'w-full py-2 text-xs rounded-xl bg-[#ff5500] text-white font-bold hover:bg-[#e04d00] active:scale-95 transition-all';
+                    btn.innerHTML = '<i class="fa-solid fa-gift mr-1"></i>Đổi ngay';
+                    btn.onclick = function() {
+                        window.redeemReward(reward.id, reward.name, reward.points_required, reward.image_url || null);
+                    };
+                }
+                body.appendChild(btn);
+
+                card.appendChild(body);
                 list.appendChild(card);
             });
         } catch (e) {
@@ -1305,13 +1346,43 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Redeem a reward - deduct points and create redemption record
      */
-    window.redeemReward = async function (rewardId, rewardName, pointsRequired) {
+    window.redeemReward = async function (rewardId, rewardName, pointsRequired, imageUrl) {
         const user = JSON.parse(localStorage.getItem('user_vtkt'));
         if (!user) return showToast("Vui lòng đăng nhập", "error");
         if (!window.supabaseClient) return showToast("Lỗi kết nối", "error");
 
-        // Confirm dialog
-        if (!confirm(`Bạn muốn đổi ${pointsRequired} điểm lấy "${rewardName}"?`)) return;
+        // Custom confirm modal
+        const confirmed = await new Promise(resolve => {
+            // Ensure modal container exists
+            let modal = document.getElementById('redeemConfirmModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'redeemConfirmModal';
+                document.body.appendChild(modal);
+            }
+            modal.innerHTML = `
+                <div class="fixed inset-0 z-[9999] flex items-end justify-center" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px)">
+                    <div class="bg-white dark:bg-darkCard w-full max-w-sm rounded-t-3xl p-6 animate-slide-up shadow-2xl">
+                        ${imageUrl ? `<div class="w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-4 shadow-md"><img src="${imageUrl}" class="w-full h-full object-cover"></div>` 
+                                   : `<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-gift text-2xl text-[#ff5500]"></i></div>`}
+                        <h3 class="text-center font-black text-gray-900 dark:text-white text-lg">Đổi quà tặng</h3>
+                        <p class="text-center text-gray-600 dark:text-gray-400 text-sm mt-1 mb-4">${rewardName}</p>
+                        <div class="bg-orange-50 dark:bg-[#2c1a12] rounded-2xl p-4 flex items-center justify-between mb-5">
+                            <span class="text-sm text-gray-600 dark:text-gray-300">Sẽ sử dụng</span>
+                            <span class="font-black text-[#ff5500] text-base"><i class="fa-solid fa-coins text-amber-500 mr-1"></i>${pointsRequired} điểm</span>
+                        </div>
+                        <div class="flex gap-3">
+                            <button id="redeemCancelBtn" class="flex-1 py-3 rounded-2xl text-sm font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition-all">Huỷ</button>
+                            <button id="redeemConfirmBtn" class="flex-1 py-3 rounded-2xl text-sm font-bold bg-[#ff5500] text-white hover:bg-[#e04d00] active:scale-95 transition-all">
+                                <i class="fa-solid fa-gift mr-1"></i>Xác nhận
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            modal.querySelector('#redeemConfirmBtn').onclick = () => { modal.innerHTML = ''; resolve(true); };
+            modal.querySelector('#redeemCancelBtn').onclick = () => { modal.innerHTML = ''; resolve(false); };
+        });
+        if (!confirmed) return;
 
         try {
             // 1. Re-check user points (prevent race condition)
@@ -1323,11 +1394,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (profileErr) throw profileErr;
             if ((profile.points || 0) < pointsRequired) {
-                showToast("Bạn không đủ điểm để đổi!", "error");
+                showToast("Điểm của bạn không đủ!", "error");
                 return;
             }
 
-            // 2. Check stock
+            // 2. Check stock (treat -1 as unlimited)
             const { data: reward, error: rewardErr } = await window.supabaseClient
                 .from('rewards')
                 .select('stock')
@@ -1335,8 +1406,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 .single();
 
             if (rewardErr) throw rewardErr;
-            if ((reward.stock || 0) <= 0) {
-                showToast("Quà tặng này đã hết!", "error");
+            if (reward.stock !== -1 && (reward.stock || 0) <= 0) {
+                showToast("Đã hết hàng!", "error");
                 return;
             }
 
@@ -1347,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     user_id: user.id,
                     reward_id: rewardId,
                     points_spent: pointsRequired,
-                    status: 'pending'
+                    status: 'active'
                 });
 
             if (insertErr) throw insertErr;
@@ -1361,11 +1432,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (updateErr) throw updateErr;
 
-            // 5. Decrease stock
-            await window.supabaseClient
-                .from('rewards')
-                .update({ stock: reward.stock - 1 })
-                .eq('id', rewardId);
+            // 5. Decrease stock (skip if unlimited: stock === -1)
+            if (reward.stock !== -1) {
+                await window.supabaseClient
+                    .from('rewards')
+                    .update({ stock: reward.stock - 1 })
+                    .eq('id', rewardId);
+            }
+
 
             // 6. Update local state
             user.points = newPoints;
@@ -1403,7 +1477,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const { data: redemptions, error } = await window.supabaseClient
                 .from('redemptions')
-                .select('*, rewards(name, type)')
+                .select('*, rewards(name, title, type)')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
@@ -1421,24 +1495,48 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = '';
             redemptions.forEach(r => {
                 const el = document.createElement('div');
-                el.className = 'bg-white dark:bg-darkCard rounded-2xl p-4 border border-gray-100 dark:border-gray-800 flex items-center gap-3';
+                const isActive = r.status === 'active';
+                
+                if (isActive) {
+                    el.className = 'bg-white dark:bg-darkCard rounded-2xl p-4 border border-orange-100 dark:border-orange-900 flex items-center gap-3 cursor-pointer hover:shadow-md transition-all active:scale-[0.98] relative overflow-hidden';
+                    // Optional flash effect or indicator
+                    el.innerHTML = '<div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-400 to-amber-500"></div>';
+                    el.onclick = () => window.showVoucherDetail(r);
+                } else {
+                    el.className = 'bg-white dark:bg-darkCard rounded-2xl p-4 border border-gray-100 dark:border-gray-800 flex items-center gap-3 opacity-75';
+                    el.innerHTML = '';
+                }
 
-                let statusColor = 'text-amber-500 bg-amber-50 dark:bg-amber-900/20';
-                let statusText = 'Đang chờ';
-                let statusIcon = 'fa-clock';
-                if (r.status === 'approved') {
+                // Sync status with admin panel
+                let statusColor = 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20';
+                let statusText = 'Sẵn sàng';
+                let statusIcon = 'fa-qrcode';
+
+                if (isActive) {
+                    statusColor = 'text-orange-600 bg-orange-50 dark:bg-orange-900/20 font-bold';
+                    statusText = 'Sử dụng ngay';
+                    statusIcon = 'fa-hand-pointer';
+                } else if (r.status === 'confirmed' || r.status === 'approved') {
                     statusColor = 'text-green-500 bg-green-50 dark:bg-green-900/20';
                     statusText = 'Đã duyệt';
                     statusIcon = 'fa-check-circle';
-                } else if (r.status === 'rejected') {
+                } else if (r.status === 'cancelled' || r.status === 'rejected') {
                     statusColor = 'text-red-500 bg-red-50 dark:bg-red-900/20';
                     statusText = 'Từ chối';
                     statusIcon = 'fa-times-circle';
+                } else if (r.status === 'used') {
+                    statusColor = 'text-slate-500 bg-slate-100 dark:bg-slate-800';
+                    statusText = 'Đã dùng';
+                    statusIcon = 'fa-check-double';
+                } else if (r.status === 'pending') {
+                    statusColor = 'text-amber-500 bg-amber-50 dark:bg-amber-900/20';
+                    statusText = 'Đang chờ';
+                    statusIcon = 'fa-clock';
                 }
 
-                const rewardName = r.rewards ? r.rewards.name : 'Phần thưởng';
+                const rewardName = r.rewards ? (r.rewards.name || r.rewards.title || 'Phần thưởng') : 'Phần thưởng';
 
-                el.innerHTML = `
+                el.innerHTML += `
                     <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-[#2c1a12] flex items-center justify-center flex-shrink-0">
                         <i class="fa-solid fa-gift text-[#ff5500]"></i>
                     </div>
@@ -1459,6 +1557,97 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error('Load redemption history error:', e);
             list.innerHTML = '<div class="text-center text-red-500 py-6 text-sm">Lỗi tải lịch sử đổi thưởng</div>';
+        }
+    }
+
+    window.showVoucherDetail = function(redemption) {
+        // Remove existing modal if any
+        let existing = document.getElementById('voucherDetailModal');
+        if (existing) existing.remove();
+
+        const rewardName = redemption.rewards ? (redemption.rewards.name || redemption.rewards.title || 'Phần thưởng') : 'Phần thưởng';
+        const formattedDate = new Date(redemption.created_at).toLocaleDateString('vi-VN', {
+            hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+        
+        // Use part of the ID as a fake voucher code, e.g. "VOUCHER-XXXX"
+        const pseudoCode = (redemption.id || '').split('-')[0].toUpperCase();
+        
+        const modalHtml = `
+        <div id="voucherDetailModal" class="fixed inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+            <div class="bg-white dark:bg-darkCard w-full max-w-lg mx-auto rounded-t-3xl shadow-2xl pb-safe flex flex-col transform translate-y-full transition-transform duration-300" id="voucherDetailContent">
+                
+                <div class="px-6 pt-5 pb-3">
+                    <div class="w-12 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white pb-2 pr-6 leading-snug">
+                            Voucher của bạn
+                        </h3>
+                        <button onclick="closeVoucherDetail()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="px-6 pb-6 overflow-y-auto max-h-[70vh]">
+                    
+                    <div class="bg-orange-50 dark:bg-orange-900/10 rounded-2xl p-5 mb-6 text-center border overflow-hidden relative border-orange-100 dark:border-orange-800/30">
+                        <div class="absolute -top-10 -right-10 w-24 h-24 bg-orange-200/50 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-rose-200/50 rounded-full blur-xl"></div>
+                        
+                        <div class="w-16 h-16 bg-white dark:bg-dark border border-orange-200 shadow-sm rounded-2xl mx-auto flex items-center justify-center mb-3 relative z-10">
+                            <i class="fa-solid fa-gift text-2xl text-[#ff5500]"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1 relative z-10 leading-snug">${rewardName}</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 relative z-10">Ngày đổi: ${formattedDate}</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-dark border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-6 text-center">
+                        <p class="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">MÃ CHỨNG NHẬN</p>
+                        <div class="bg-gray-50 dark:bg-gray-800/50 py-3 px-4 rounded-xl inline-block mx-auto mb-4">
+                            <span class="text-2xl font-mono font-bold tracking-[0.2em] text-gray-900 dark:text-white">KT-${pseudoCode}</span>
+                        </div>
+                        <!-- Fake QR placeholder -->
+                        <div class="w-36 h-36 mx-auto bg-white border border-gray-200 p-2 rounded-xl" title="Đưa mã này cho nhân viên để quét">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-black">
+                                <path d="M10 10h30v30H10zm5 5v20h20V15zM60 10h30v30H60zm5 5v20h20V15zM10 60h30v30H10zm5 5v20h20V65z" fill="currentColor"/>
+                                <rect x="20" y="20" width="10" height="10" fill="currentColor"/>
+                                <rect x="70" y="20" width="10" height="10" fill="currentColor"/>
+                                <rect x="20" y="70" width="10" height="10" fill="currentColor"/>
+                                <path d="M50 10h5v10h-5zm0 15h10v5H50zm50 5h-10v5h10zm-15 10h15v5H85zm-35 5h10v5H50zm10 10h10v5H60zm-10-25h5v10h-5zm0 25h10v5H50z" fill="currentColor"/>
+                                <path d="M10 50h20v5H10zm40 10h20v20H50V60z" fill="currentColor"/>
+                                <rect x="55" y="65" width="10" height="10" fill="currentColor"/>
+                                <path d="M75 50h15v15H75z" fill="currentColor"/>
+                                <rect x="80" y="55" width="5" height="5" fill="currentColor"/>
+                                <path d="M75 70h20v20H75zM50 85h20v5H50z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-4 leading-relaxed max-w-[240px] mx-auto">Sử dụng tính năng quét QR tại cửa hàng để đổi thưởng</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Animate in
+        requestAnimationFrame(() => {
+            const m = document.getElementById('voucherDetailModal');
+            const c = document.getElementById('voucherDetailContent');
+            if(m && c) {
+                m.classList.remove('opacity-0');
+                c.classList.remove('translate-y-full');
+            }
+        });
+    }
+
+    window.closeVoucherDetail = function() {
+        const m = document.getElementById('voucherDetailModal');
+        const c = document.getElementById('voucherDetailContent');
+        if(m && c) {
+            m.classList.add('opacity-0');
+            c.classList.add('translate-y-full');
+            setTimeout(() => m.remove(), 300);
         }
     }
 

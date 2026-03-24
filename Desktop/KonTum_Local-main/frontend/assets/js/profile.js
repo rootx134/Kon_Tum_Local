@@ -1258,8 +1258,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             list.innerHTML = '';
             rewards.forEach(reward => {
-                const canRedeem = userPoints >= reward.points_required && reward.stock > 0;
-                const outOfStock = reward.stock <= 0;
+                const unlimited = reward.stock === -1;
+                const outOfStock = !unlimited && reward.stock <= 0;
+                const canRedeem = userPoints >= reward.points_required && (unlimited || reward.stock > 0);
 
                 const card = document.createElement('div');
                 card.className = `bg-white dark:bg-darkCard rounded-2xl border ${canRedeem ? 'border-[#ff5500]/20' : 'border-gray-100 dark:border-gray-800'} overflow-hidden shadow-sm transition-all`;
@@ -1282,7 +1283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <i class="fa-solid fa-coins text-amber-500 text-xs"></i>
                                 <span class="text-sm font-black ${canRedeem ? 'text-[#ff5500]' : 'text-gray-400'}">${reward.points_required}</span>
                             </div>
-                            <span class="text-[10px] ${outOfStock ? 'text-red-400' : 'text-gray-400'}">${outOfStock ? 'Hết hàng' : `Còn ${reward.stock}`}</span>
+                            <span class="text-[10px] ${outOfStock ? 'text-red-400' : 'text-gray-400'}">${outOfStock ? 'Hết hàng' : unlimited ? '∞ Không giới hạn' : `Còn ${reward.stock}`}</span>
                         </div>
                         <button onclick="redeemReward('${reward.id}', '${reward.title.replace(/'/g, "\\'")}', ${reward.points_required})"
                             class="w-full mt-3 py-2 rounded-xl text-xs font-bold transition-all ${canRedeem

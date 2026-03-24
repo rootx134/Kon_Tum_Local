@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản trị - Kontum Places</title>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#ed1c24' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 99px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.5); }
+        .main-scroll::-webkit-scrollbar { width: 6px; }
+        .main-scroll::-webkit-scrollbar-track { background: transparent; }
+        .main-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 99px; }
+
+        /* Sidebar Premium */
+        .sidebar-premium { background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); }
+        .sidebar-premium::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 200px; background: radial-gradient(ellipse at top left, rgba(237,28,36,0.08) 0%, transparent 70%); pointer-events: none; }
+        .nav-item { position: relative; overflow: hidden; }
+        .nav-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: transparent; border-radius: 0 4px 4px 0; transition: all 0.3s ease; }
+        .nav-item.active { background: linear-gradient(135deg, rgba(237,28,36,0.9), rgba(239,68,68,0.8)); color: white; box-shadow: 0 4px 20px rgba(237,28,36,0.35), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .nav-item.active::before { background: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.6); }
+        .nav-item:not(.active):hover::before { background: rgba(237,28,36,0.5); }
+        .logo-glow { animation: logoGlow 3s ease-in-out infinite alternate; }
+        @keyframes logoGlow { from { box-shadow: 0 4px 15px rgba(237,28,36,0.3); } to { box-shadow: 0 4px 25px rgba(237,28,36,0.6), 0 0 40px rgba(237,28,36,0.15); } }
+        .badge-pulse { animation: badgePulse 2s ease-in-out infinite; }
+        @keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+        /* Floating Header */
+        .glass-header { background: rgba(255,255,255,0.82); backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); border: 1px solid rgba(226,232,240,0.6); }
+
+        /* Stat Cards */
+        .stat-card { position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+        .stat-card .stat-bg { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .stat-card:hover .stat-bg { transform: scale(1.8); }
+
+        /* Stagger Animation */
+        .stagger-item { opacity: 0; transform: translateY(20px); animation: staggerIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .stagger-item:nth-child(1) { animation-delay: 0.05s; }
+        .stagger-item:nth-child(2) { animation-delay: 0.1s; }
+        .stagger-item:nth-child(3) { animation-delay: 0.15s; }
+        .stagger-item:nth-child(4) { animation-delay: 0.2s; }
+        @keyframes staggerIn { to { opacity: 1; transform: translateY(0); } }
+
+        /* Skeleton Loading */
+        .skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 0.5rem; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* Table Enhancement */
+        .table-premium tbody tr { transition: all 0.2s ease; }
+        .table-premium tbody tr:nth-child(even) { background: rgba(248,250,252,0.5); }
+        .table-premium tbody tr:hover { background: rgba(237,28,36,0.03); box-shadow: inset 3px 0 0 #ed1c24; }
+
+        /* Button Enhancements */
+        .btn-premium { position: relative; overflow: hidden; }
+        .btn-premium::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); transform: translateX(-100%); transition: transform 0.5s; }
+        .btn-premium:hover::after { transform: translateX(100%); }
+
+        /* Counter Animation */
+        .count-up { display: inline-block; }
+
+        /* Status Dot */
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .status-dot.approved { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.4); }
+        .status-dot.pending { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+        .status-dot.rejected { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+
+        /* Toast Notification */
+        .toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem; pointer-events: none; }
+        .toast-item { pointer-events: auto; display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; border-radius: 1rem; background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px); color: #fff; font-size: 0.875rem; font-weight: 500; box-shadow: 0 20px 40px rgba(0,0,0,0.3); transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); max-width: 400px; border: 1px solid rgba(255,255,255,0.08); }
+        .toast-item.show { transform: translateX(0); opacity: 1; }
+        .toast-item.toast-success { border-left: 4px solid #10b981; }
+        .toast-item.toast-error { border-left: 4px solid #ef4444; }
+        .toast-item.toast-warning { border-left: 4px solid #f59e0b; }
+        .toast-item.toast-info { border-left: 4px solid #3b82f6; }
+        .toast-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.875rem; }
+        .toast-success .toast-icon { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .toast-error .toast-icon { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .toast-warning .toast-icon { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .toast-info .toast-icon { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .toast-item .toast-close { margin-left: auto; cursor: pointer; opacity: 0.5; transition: opacity 0.2s; padding: 0.25rem; }
+        .toast-item .toast-close:hover { opacity: 1; }
+
+        /* Confirm Modal */
+        .confirm-overlay { position: fixed; inset: 0; z-index: 9998; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .confirm-overlay.show { opacity: 1; visibility: visible; }
+        .confirm-box { background: white; border-radius: 1.5rem; padding: 2.5rem; max-width: 420px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05); transform: scale(0.9) translateY(20px); transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .confirm-overlay.show .confirm-box { transform: scale(1) translateY(0); }
+        .confirm-icon-wrap { width: 3.5rem; height: 3.5rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; }
+        .confirm-icon-danger { background: #fef2f2; color: #ef4444; }
+        .confirm-icon-warning { background: #fffbeb; color: #f59e0b; }
+        .confirm-icon-info { background: #eff6ff; color: #3b82f6; }
+        .confirm-title { font-size: 1.125rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 0.5rem; }
+        .confirm-message { font-size: 0.875rem; color: #64748b; text-align: center; line-height: 1.5; margin-bottom: 1.5rem; }
+        .confirm-actions { display: flex; gap: 0.75rem; }
+        .confirm-actions button { flex: 1; padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+        .confirm-btn-cancel { background: #f1f5f9; color: #475569; }
+        .confirm-btn-cancel:hover { background: #e2e8f0; }
+        .confirm-btn-danger { background: #ef4444; color: white; box-shadow: 0 4px 14px rgba(239,68,68,0.3); }
+        .confirm-btn-danger:hover { background: #dc2626; }
+        .confirm-btn-primary { background: #ed1c24; color: white; box-shadow: 0 4px 14px rgba(237,28,36,0.3); }
+        .confirm-btn-primary:hover { background: #d91920; }
+
+        /* Responsive Mobile Sidebar */
+        @media (max-width: 767px) {
+            .sidebar-mobile-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 30; opacity: 0; visibility: hidden; transition: all 0.3s; }
+            .sidebar-mobile-overlay.show { opacity: 1; visibility: visible; }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased h-screen flex overflow-hidden">
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Confirm Modal -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-icon-wrap" id="confirmIcon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="confirm-title" id="confirmTitle">Xác nhận</h3>
+            <p class="confirm-message" id="confirmMessage">Bạn có chắc chắn?</p>
+            <div class="confirm-actions">
+                <button class="confirm-btn-cancel" id="confirmCancelBtn">Huỷ bỏ</button>
+                <button class="confirm-btn-danger" id="confirmOkBtn">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Premium -->
+    <aside class="sidebar-premium w-64 text-slate-300 flex flex-col hidden md:flex transition-all duration-300 relative z-20">
+        <div class="h-16 flex items-center px-6 border-b border-white/5 gap-3">
+            <div class="logo-glow w-9 h-9 rounded-xl bg-gradient-to-br from-primary via-rose-500 to-orange-500 flex items-center justify-center text-white font-bold text-xl">K</div>
+            <div class="flex flex-col">
+                <span class="font-bold tracking-wider text-white text-base leading-tight">Admin Pro</span>
+                <span class="text-[10px] text-slate-500 font-medium tracking-widest uppercase">KonTum Plus</span>
+            </div>
+        </div>
+
+        <div class="px-5 pt-5 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Tổng quan</div>
+        <nav class="flex-1 px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar">
+            <a href="#" data-target="dashboard" class="nav-item active flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all hover:bg-white/5 hover:text-white group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 group-[.active]:bg-white/10 flex items-center justify-center"><i class="fa-solid fa-chart-pie text-sm"></i></div>
+                <span>Tổng quan</span>
+            </a>
+            <a href="#" data-target="users" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all hover:bg-white/5 hover:text-white group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i class="fa-solid fa-users text-sm"></i></div>
+                <span>Người dùng</span>
+            </a>
+
+            <div class="mt-5 mb-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Địa điểm</div>
+            <a href="#" data-target="places_pending" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all hover:bg-white/5 hover:text-white group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i class="fa-solid fa-clock text-sm"></i></div>
+                <span>Chờ duyệt</span>
+                <span class="badge-pulse ml-auto bg-gradient-to-r from-primary to-rose-500 text-[10px] text-white w-5 h-5 flex items-center justify-center rounded-full shadow-lg shadow-red-500/20 font-bold" id="pendingCounter">0</span>
+            </a>
+            <a href="#" data-target="places_all" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all hover:bg-white/5 hover:text-white group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i class="fa-solid fa-map-location-dot text-sm"></i></div>
+                <span>Tất cả</span>
+            </a>
+            <a href="#" data-target="categories" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all hover:bg-white/5 hover:text-white group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i class="fa-solid fa-tags text-sm"></i></div>
+                <span>Danh mục</span>
+            </a>
+
+            <div class="mt-5 mb-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Marketing & CSKH</div>
+            <a href="#" data-target="banners" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all hover:bg-white/5 hover:text-white group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i class="fa-solid fa-panorama text-sm"></i></div>
+                <span>Banners</span>
+            </a>
+            <a href="#" data-target="reports" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all hover:bg-white/5 hover:text-white group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i class="fa-solid fa-flag text-sm"></i></div>
+                <span>Báo cáo</span>
+            </a>
+            <a href="#" data-target="rewards_manage" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition-all hover:bg-white/5 hover:text-white group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i class="fa-solid fa-gift text-sm"></i></div>
+                <span>Quà tặng</span>
+            </a>
+        </nav>
+
+        <div class="p-3 mx-3 mb-3 rounded-xl bg-white/5 border border-white/5">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-9 h-9 bg-gradient-to-br from-primary to-rose-400 rounded-lg flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-solid fa-user-shield text-xs"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-sm font-semibold text-white truncate" id="sidebarAdminName">Admin</div>
+                    <div class="text-[10px] text-emerald-400 font-medium flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full inline-block"></span> Online</div>
+                </div>
+            </div>
+            <button id="logoutBtn" class="flex items-center justify-center gap-2 w-full py-2 text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
+                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+
+        <!-- Content scrollable -->
+        <div class="flex-1 overflow-y-auto bg-slate-50/50 relative">
+
+        <!-- Floating Header -->
+        <div class="sticky top-0 z-10 px-3 pt-3 pb-2">
+        <header class="glass-header h-14 flex items-center justify-between px-6 rounded-2xl shadow-sm">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition-colors" id="mobileSidebarToggle"><i class="fa-solid fa-bars text-sm"></i></button>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-slate-800" id="sectionTitle">Tổng quan Hệ thống</h2>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="initDashboard()" class="w-9 h-9 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all" title="Làm mới dữ liệu">
+                    <i class="fa-solid fa-arrows-rotate text-sm"></i>
+                </button>
+                <div class="hidden sm:flex items-center gap-2 text-xs text-slate-400 font-medium">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="lastUpdated">--:--</span>
+                </div>
+                <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+                <div class="flex items-center gap-2.5 bg-slate-50 pl-1.5 pr-3 py-1 rounded-full border border-slate-100">
+                    <div class="w-7 h-7 bg-gradient-to-r from-primary to-rose-400 rounded-full flex items-center justify-center text-white shadow-sm">
+                        <i class="fa-solid fa-user-shield text-[10px]"></i>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-700" id="adminName">Admin</span>
+                </div>
+            </div>
+        </header>
+        </div>
+
+        <div class="p-6 lg:p-8 relative">
+
+            <!-- Login Overlay -->
+            <div id="adminLoginOverlay" class="absolute inset-0 z-50 bg-slate-900 flex items-center justify-center" style="display:none;">
+                <div class="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-sm relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-orange-500"></div>
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 mx-auto rounded-xl bg-gradient-to-br from-primary to-orange-500 text-white flex items-center justify-center text-3xl font-bold mb-4 shadow-lg shadow-red-500/30">K</div>
+                        <h2 class="text-2xl font-extrabold text-slate-800">Khóa Quyền</h2>
+                        <p class="text-slate-500 text-sm mt-1">Đăng nhập tài khoản quản trị viên</p>
+                    </div>
+                    <form id="adminLoginForm" class="space-y-5">
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="adminUsername" placeholder="Email hoặc Tên đăng nhập" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-slate-800" required>
+                        </div>
+                        <div class="relative">
+                            <i class="fa-solid fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <input type="password" id="adminPassword" placeholder="Mật khẩu" class="w-full pl-11 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-slate-800" required>
+                            <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition-all elevate shadow-lg hover:shadow-xl mt-2 flex justify-center items-center gap-2">
+                            Mở Khóa <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </form>
+                    <p id="adminLoginError" class="bg-red-50 py-2 text-red-600 font-medium text-sm mt-4 text-center border border-red-100 rounded-lg hidden"></p>
+                </div>
+            </div>
+
+            <!-- TAB: Dashboard -->
+            <section id="tab-dashboard" class="tab-content active">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card stagger-item bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg p-6 text-white">
+                        <div class="stat-bg absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold uppercase tracking-wider mb-1 text-blue-100">Users</p>
+                                <h3 class="text-3xl font-extrabold count-up" id="statUsers">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card stagger-item bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white">
+                        <div class="stat-bg absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold uppercase tracking-wider mb-1 text-amber-100">Chờ Duyệt</p>
+                                <h3 class="text-3xl font-extrabold count-up" id="statPending">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card stagger-item bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg p-6 text-white">
+                        <div class="stat-bg absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold uppercase tracking-wider mb-1 text-emerald-100">Tất cả bài</p>
+                                <h3 class="text-3xl font-extrabold count-up" id="statTotalPlaces">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card stagger-item bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
+                        <div class="stat-bg absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-semibold uppercase tracking-wider mb-1 text-violet-100">Đánh giá</p>
+                                <h3 class="text-3xl font-extrabold count-up" id="statReviews">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow">
+                        <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-rose-400 flex items-center justify-center text-white text-xs"><i class="fa-solid fa-chart-bar"></i></div> Phân bổ dữ liệu</h3>
+                        <div class="relative h-64 w-full flex items-center justify-center">
+                            <canvas id="overviewChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl shadow-lg border border-slate-800 p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-8 opacity-10"><i class="fa-solid fa-bullhorn text-8xl text-white"></i></div>
+                        <h3 class="text-lg font-bold text-white mb-6 relative z-10 flex items-center gap-2"><i class="fa-solid fa-bell text-indigo-400"></i> Đẩy thông báo</h3>
+                        <div class="flex flex-col gap-4 relative z-10 h-full">
+                            <textarea id="adminNotifContent" rows="4" placeholder="Nhập nội dung thông báo sẽ gửi tới toàn bộ thiết bị..." class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 resize-none text-white placeholder-slate-400 font-medium"></textarea>
+                            <button id="btnAdminPushNotif" class="bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_15px_rgba(99,102,241,0.5)] flex items-center justify-center gap-2 mt-auto">
+                                <i class="fa-solid fa-paper-plane"></i> Phát đi ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Users -->
+            <section id="tab-users" class="tab-content">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white">
+                        <h3 class="font-bold text-lg text-slate-800">Quản lý Thành Viên</h3>
+                        <div class="relative">
+                            <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" placeholder="Tìm kiếm user..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-primary w-64">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table-premium w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="px-6 py-4">Tài khoản</th>
+                                    <th class="px-6 py-4">Vai trò</th>
+                                    <th class="px-6 py-4">Điểm Uy tín</th>
+                                    <th class="px-6 py-4">Ngày tham gia</th>
+                                    <th class="px-6 py-4 text-right">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Pending Places -->
+            <section id="tab-places_pending" class="tab-content">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white">
+                        <h3 class="font-bold text-lg text-slate-800">Địa Điểm Chờ Duyệt</h3>
+                    </div>
+                    <div class="p-6 bg-slate-50/50">
+                        <div id="pendingPlacesList" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: All Places -->
+            <section id="tab-places_all" class="tab-content">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white">
+                        <h3 class="font-bold text-lg text-slate-800">Tất cả Địa Điểm</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table-premium w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="px-6 py-4">ID</th>
+                                    <th class="px-6 py-4 w-1/3">Tên / Địa chỉ</th>
+                                    <th class="px-6 py-4">Danh mục</th>
+                                    <th class="px-6 py-4">Trạng thái</th>
+                                    <th class="px-6 py-4">Tác giả</th>
+                                    <th class="px-6 py-4 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allPlacesTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Categories -->
+            <section id="tab-categories" class="tab-content">
+                <div class="flex flex-col xl:flex-row gap-6">
+                    <div class="w-full xl:w-1/3 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-fit">
+                        <h3 class="font-bold text-lg text-slate-800 mb-6 pb-4 border-b border-slate-100">Thêm Danh Mục</h3>
+                        <form id="addCategoryForm" class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tên hiển thị</label>
+                                <input type="text" id="catName" placeholder="Vd: Quán Nhậu" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Slug (Mã ngầm định)</label>
+                                <input type="text" id="catSlug" placeholder="Vd: quan-nhau" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-slate-500 font-mono text-sm" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Biểu tượng (FontAwesome)</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm">fa-</span>
+                                    <input type="text" id="catIcon" placeholder="beer-mug-empty" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-mono text-sm" required>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">Dùng class icon FA6 solid. Không gõ tiền tố fa-solid fa-</p>
+                            </div>
+                            <button type="submit" class="btn-premium w-full bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white font-bold py-3 rounded-xl transition-all mt-2 shadow-lg hover:shadow-xl">Tạo Mới</button>
+                        </form>
+                    </div>
+                    <div class="w-full xl:w-2/3 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <table class="table-premium w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="px-6 py-4 w-20">Icon</th>
+                                    <th class="px-6 py-4">Tên danh mục / Slug</th>
+                                    <th class="px-6 py-4 text-right">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoriesTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Banners -->
+            <section id="tab-banners" class="tab-content">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6">
+                    <h3 class="font-bold text-lg text-slate-800 mb-4 pb-4 border-b border-slate-100">Tải lên Banner Mới</h3>
+                    <form id="addBannerForm" class="flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Đường dẫn Hình ảnh (URL)</label>
+                            <input type="url" id="bannerImgUrl" placeholder="https://..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary" required>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Đường dẫn Đích khi Click (Tuỳ chọn)</label>
+                            <input type="url" id="bannerLinkUrl" placeholder="https://..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary">
+                        </div>
+                        <button type="submit" class="btn-premium bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white font-bold py-2.5 px-6 rounded-xl transition-all shrink-0 shadow-lg hover:shadow-xl">Thêm Banner</button>
+                    </form>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="bannersList">
+                    <!-- JS Banners -->
+                </div>
+            </section>
+
+            <!-- TAB: Reports (Tên cũ là Feedbacks) -->
+            <section id="tab-reports" class="tab-content">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-white">
+                        <h3 class="font-bold text-lg text-slate-800">Danh sách Báo cáo Vi phạm</h3>
+                    </div>
+                    <div class="p-6 bg-slate-50/50">
+                        <div id="feedbacksList" class="grid grid-cols-1 gap-4"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Rewards Manage -->
+            <section id="tab-rewards_manage" class="tab-content">
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+                    <!-- Form Add/Edit Reward -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-fit">
+                        <h3 class="font-bold text-lg text-slate-800 mb-6 pb-4 border-b border-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle text-emerald-500"></i>
+                            <span id="rewardFormTitle">Thêm Phần Thưởng</span>
+                        </h3>
+                        <form id="addRewardForm" class="space-y-4">
+                            <input type="hidden" id="editRewardId" value="">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tên phần thưởng *</label>
+                                <input type="text" id="rewardTitle" placeholder="VD: Voucher Grab 50K" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Mô tả</label>
+                                <textarea id="rewardDesc" rows="2" placeholder="Mô tả chi tiết về phần thưởng..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ảnh (URL)</label>
+                                <input type="url" id="rewardImage" placeholder="https://..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Điểm cần *</label>
+                                    <input type="number" id="rewardPoints" min="1" value="100" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Số lượng</label>
+                                    <input type="number" id="rewardQuantity" value="-1" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary">
+                                    <p class="text-xs text-slate-400 mt-1">-1 = không giới hạn</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Loại</label>
+                                    <select id="rewardCategory" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary">
+                                        <option value="voucher">🎫 Voucher</option>
+                                        <option value="gift">🎁 Quà tặng</option>
+                                        <option value="discount">💰 Giảm giá</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Hết hạn</label>
+                                    <input type="date" id="rewardExpires" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary">
+                                </div>
+                            </div>
+                            <div class="flex gap-3 pt-2">
+                                <button type="submit" class="flex-1 btn-premium bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-xl">Lưu</button>
+                                <button type="button" onclick="resetRewardForm()" class="px-4 py-3 bg-slate-100 text-slate-600 font-semibold rounded-xl hover:bg-slate-200 transition-all">Huỷ</button>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Rewards List -->
+                    <div class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                            <h3 class="font-bold text-lg text-slate-800">Danh sách Phần Thưởng</h3>
+                            <span class="text-xs text-slate-400" id="rewardsCount">0 phần thưởng</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table-premium w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                                    <tr>
+                                        <th class="px-6 py-4">Phần thưởng</th>
+                                        <th class="px-6 py-4">Điểm</th>
+                                        <th class="px-6 py-4">SL còn</th>
+                                        <th class="px-6 py-4">Loại</th>
+                                        <th class="px-6 py-4">Trạng thái</th>
+                                        <th class="px-6 py-4 text-right">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rewardsTableBody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- Redemption Requests -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2"><i class="fa-solid fa-clipboard-list text-amber-500"></i> Yêu cầu Đổi Thưởng</h3>
+                        <span class="text-xs text-slate-400" id="redemptionsCount">0 yêu cầu</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table-premium w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+                                <tr>
+                                    <th class="px-6 py-4">Người đổi</th>
+                                    <th class="px-6 py-4">Phần thưởng</th>
+                                    <th class="px-6 py-4">Điểm</th>
+                                    <th class="px-6 py-4">Mã voucher</th>
+                                    <th class="px-6 py-4">Trạng thái</th>
+                                    <th class="px-6 py-4">Ngày</th>
+                                    <th class="px-6 py-4 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="redemptionsTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div> <!-- end padding wrapper -->
+        </div> <!-- end scroll wrapper -->
+    </main>
+
+    <!-- JS Application Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api_service.js"></script>
+    <script>
+        const API_URL = 'https://local.kontumplus.com/api';
+        let adminUser = null; 
+        
+        let chartInstance = null; // Chart instance
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const stored = localStorage.getItem('admin_vtkt');
+            if(stored) adminUser = JSON.parse(stored);
+
+            if (!adminUser || adminUser.is_admin != 1) {
+                document.getElementById('adminLoginOverlay').style.display = 'flex';
+            } else {
+                initDashboard();
+            }
+
+            // Toggle password visibility for admin
+            document.addEventListener('click', function (e) {
+                const toggleBtn = e.target.closest('.toggle-password');
+                if (toggleBtn) {
+                    const input = toggleBtn.parentElement.querySelector('input');
+                    const icon = toggleBtn.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                }
+            });
+
+            document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const u = document.getElementById('adminUsername').value.trim();
+                const p = document.getElementById('adminPassword').value;
+                const btn = e.target.querySelector('button');
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Chờ...';
+                
+                try {
+                    let loginEmail = u;
+                    if (!u.includes('@')) {
+                        const { data: emailData, error: emailErr } = await window.supabaseClient.rpc('get_email_by_username', { p_username: u });
+                        if (emailErr || !emailData) {
+                            throw new Error("Tên đăng nhập không tồn tại hoặc lỗi kết nối");
+                        }
+                        loginEmail = emailData;
+                    }
+
+                    const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                        email: loginEmail,
+                        password: p
+                    });
+                    if (error) throw error;
+                    
+                    if (data.user) {
+                        const { data: profile } = await window.supabaseClient.from('profile').select('*').eq('id', data.user.id).single();
+                        
+                        // Check if admin
+                        if (profile && profile.is_admin === 1) {
+                            const adminData = { ...data.user, ...profile };
+                            localStorage.setItem('admin_vtkt', JSON.stringify(adminData));
+                            adminUser = adminData;
+                            document.getElementById('adminLoginOverlay').style.display = 'none';
+                            initDashboard();
+                        } else {
+                            // Sign out if not admin
+                            await window.supabaseClient.auth.signOut();
+                            throw new Error('Không đủ quyền!');
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                    const msg = document.getElementById('adminLoginError');
+                    msg.textContent = "Sai thông tin hoặc không đủ quyền truy cập!";
+                    msg.classList.remove('hidden');
+                } finally {
+                    btn.innerHTML = 'Mở Khóa <i class="fa-solid fa-arrow-right"></i>';
+                }
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('admin_vtkt');
+                window.location.reload();
+            });
+
+            // Tabs Logic
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = item.getAttribute('data-target');
+
+                    navItems.forEach(nav => {
+                        nav.classList.remove('active', 'bg-primary', 'text-white', 'shadow-md');
+                        nav.classList.add('text-slate-400');
+                    });
+
+                    item.classList.add('active', 'bg-primary', 'text-white', 'shadow-md');
+                    item.classList.remove('text-slate-400');
+
+                    tabContents.forEach(tab => tab.classList.remove('active'));
+                    document.getElementById('tab-' + targetId).classList.add('active');
+                    document.getElementById('sectionTitle').textContent = item.textContent.trim();
+
+                    // Load specific data
+                    if (targetId === 'dashboard') loadStats();
+                    else if (targetId === 'users') loadUsers();
+                    else if (targetId === 'places_pending') loadPendingPlaces();
+                    else if (targetId === 'places_all') loadAllPlaces();
+                    else if (targetId === 'categories') loadCategories();
+                    else if (targetId === 'banners') loadBanners();
+                    else if (targetId === 'reports') loadFeedbacks();
+                    else if (targetId === 'rewards_manage') { loadAdminRewards(); loadAdminRedemptions(); }
+                });
+            });
+        });
+
+        async function initDashboard() {
+            document.getElementById('adminName').textContent = adminUser.fullname;
+            document.getElementById('sidebarAdminName').textContent = adminUser.fullname;
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
+            loadStats();
+            loadPendingPlaces();
+        }
+
+        async function _fetch(action, body = {}) {
+            const sc = window.supabaseClient;
+            if (!sc) return { status: 'error', message: 'Supabase not initialized' };
+            
+            try {
+                switch(action) {
+                    case 'dashboard_stats': {
+                        const { count: uCount } = await sc.from('profile').select('*', { count: 'exact', head: true });
+                        const { count: pCount } = await sc.from('places').select('*', { count: 'exact', head: true });
+                        const { count: pendCount } = await sc.from('places').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+                        const { count: rCount } = await sc.from('reviews').select('*', { count: 'exact', head: true });
+                        const res = { users: uCount||0, places: pCount||0, pending: pendCount||0, reviews: rCount||0 };
+                        return { status: 'success', data: res };
+                    }
+                    case 'get_users': {
+                        const { data } = await sc.from('profile').select('*').order('created_at', { ascending: false });
+                        return { status: 'success', data: data || [] };
+                    }
+                    case 'get_pending_places': {
+                        const { data } = await sc.from('places').select(`*, profile(fullname)`).eq('status', 'pending').order('created_at', { ascending: false });
+                        const mapped = (data || []).map(p => ({...p, author_name: p.profile ? p.profile.fullname : 'Trống'}));
+                        return { status: 'success', data: mapped };
+                    }
+                    case 'get_all_places': {
+                        const { data } = await sc.from('places').select(`*, profile(fullname)`).order('created_at', { ascending: false });
+                        const mapped = (data || []).map(p => ({...p, author_name: p.profile ? p.profile.fullname : 'Trống'}));
+                        return { status: 'success', data: mapped };
+                    }
+                    case 'categories_list': {
+                        const { data } = await sc.from('categories').select('*').order('id', { ascending: true });
+                        return { status: 'success', data: data || [] };
+                    }
+                    case 'get_banners': {
+                        const { data } = await sc.from('banners').select('*').order('created_at', { ascending: false });
+                        return { status: 'success', data: data || [] };
+                    }
+                    case 'get_reports': {
+                        const { data } = await sc.from('reports').select(`*, profile(fullname), places(name)`).order('created_at', { ascending: false });
+                        const mapped = (data || []).map(r => ({
+                            ...r, 
+                            user_name: r.profile ? r.profile.fullname : 'Trống', 
+                            place_name: r.places ? r.places.name : 'Địa điểm đã xóa'
+                        }));
+                        return { status: 'success', data: mapped };
+                    }
+                    case 'admin_approve_place': {
+                        const { error } = await sc.from('places').update({ status: 'approved' }).eq('id', body.place_id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Place approved' };
+                    }
+                    case 'admin_reject_place': {
+                        const { error } = await sc.from('places').update({ status: 'rejected' }).eq('id', body.place_id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Place rejected' };
+                    }
+                    case 'admin_delete_place': {
+                        const { error } = await sc.from('places').delete().eq('id', body.id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Place deleted' };
+                    }
+                    case 'grant_admin': {
+                        const { error } = await sc.from('profile').update({ is_admin: 1 }).eq('id', body.user_id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Granted admin' };
+                    }
+                    case 'revoke_admin': {
+                        const { error } = await sc.from('profile').update({ is_admin: 0 }).eq('id', body.user_id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Revoked admin' };
+                    }
+                    case 'delete_user': {
+                        const { error } = await sc.from('profile').delete().eq('id', body.user_id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'User deleted' };
+                    }
+                    case 'resolve_report': {
+                        const { error } = await sc.from('reports').update({ status: 'resolved' }).eq('id', body.report_id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Report resolved' };
+                    }
+                    case 'delete_banner': {
+                        const { error } = await sc.from('banners').delete().eq('id', body.banner_id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Banner deleted' };
+                    }
+                    case 'add_category': {
+                        // In case DB has a slug field, we provide it. If not, Supabase ignores it if strict=false or we can just omit it if it fails.
+                        // Assuming categories = { name, icon, slug }
+                        const { error } = await sc.from('categories').insert([{ name: body.name, icon: body.icon, slug: body.slug }]);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Category added' };
+                    }
+                    case 'add_banner': {
+                        const { error } = await sc.from('banners').insert([{ image_url: body.image_url, target_url: body.link_url, is_active: 1 }]);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Banner added' };
+                    }
+                    case 'push_notification': {
+                        // Get all users to send notification to everyone
+                        const { data: allUsers, error: usersErr } = await sc.from('profile').select('id');
+                        if (usersErr) throw usersErr;
+                        
+                        if (allUsers && allUsers.length > 0) {
+                            const notifRows = allUsers.map(u => ({
+                                user_id: u.id,
+                                type: 'system',
+                                title: 'Thông báo hệ thống',
+                                content: body.message,
+                                is_read: 0
+                            }));
+                            const { error: insertErr } = await sc.from('notifications').insert(notifRows);
+                            if (insertErr) throw insertErr;
+                        }
+                        return { status: 'success', message: `Đã gửi thông báo tới ${allUsers ? allUsers.length : 0} người dùng!` };
+                    }
+                    // ===== REWARDS MANAGEMENT =====
+                    case 'get_rewards': {
+                        const { data } = await sc.from('rewards').select('*').order('created_at', { ascending: false });
+                        return { status: 'success', data: data || [] };
+                    }
+                    case 'add_reward': {
+                        const row = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, quantity: body.quantity, category: body.category, is_active: true };
+                        if (body.expires_at) row.expires_at = body.expires_at;
+                        const { error } = await sc.from('rewards').insert([row]);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Đã thêm phần thưởng' };
+                    }
+                    case 'update_reward': {
+                        const upd = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, quantity: body.quantity, category: body.category };
+                        if (body.expires_at) upd.expires_at = body.expires_at;
+                        else upd.expires_at = null;
+                        const { error } = await sc.from('rewards').update(upd).eq('id', body.id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Đã cập nhật phần thưởng' };
+                    }
+                    case 'toggle_reward': {
+                        const { error } = await sc.from('rewards').update({ is_active: body.is_active }).eq('id', body.id);
+                        if (error) throw error;
+                        return { status: 'success', message: body.is_active ? 'Đã kích hoạt' : 'Đã tắt' };
+                    }
+                    case 'delete_reward': {
+                        const { error } = await sc.from('rewards').delete().eq('id', body.id);
+                        if (error) throw error;
+                        return { status: 'success', message: 'Đã xoá phần thưởng' };
+                    }
+                    case 'get_redemptions': {
+                        const { data } = await sc.from('redemptions').select('*, profile(fullname, avatar_url), rewards(title)').order('created_at', { ascending: false });
+                        return { status: 'success', data: data || [] };
+                    }
+                    case 'update_redemption': {
+                        const upd2 = { status: body.status };
+                        if (body.voucher_code) upd2.voucher_code = body.voucher_code;
+                        const { error } = await sc.from('redemptions').update(upd2).eq('id', body.id);
+                        if (error) throw error;
+                        return { status: 'success', message: `Đã ${body.status === 'confirmed' ? 'duyệt' : 'từ chối'} yêu cầu` };
+                    }
+                    default:
+                        console.warn('Unknown admin action:', action);
+                        return { status: 'error', message: 'Unknown action' };
+                }
+            } catch(e) { 
+                console.error(e);
+                return {status: 'error', message: e.message || 'Network error'}; 
+            }
+        }
+
+        // Count-up animation helper
+        function animateCounter(el, target, duration = 800) {
+            const start = parseInt(el.textContent) || 0;
+            if (start === target) return;
+            const range = target - start;
+            const startTime = performance.now();
+            function step(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                el.textContent = Math.round(start + range * eased);
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        async function loadStats() {
+            const data = await _fetch('dashboard_stats');
+            if (data.status === 'success') {
+                const d = data.data;
+                animateCounter(document.getElementById('statUsers'), d.users);
+                animateCounter(document.getElementById('statPending'), d.pending);
+                document.getElementById('pendingCounter').textContent = d.pending;
+                animateCounter(document.getElementById('statTotalPlaces'), d.places);
+                animateCounter(document.getElementById('statReviews'), d.reviews);
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
+
+                renderChart(d.users, d.pending, d.places, d.reviews);
+            }
+        }
+
+        function renderChart(u, p, t, r) {
+            const ctx = document.getElementById('overviewChart');
+            if(chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Users', 'Pending', 'Places', 'Reviews'],
+                    datasets: [{
+                        label: 'Số lượng',
+                        data: [u, p, t, r],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(139, 92, 246, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(139, 92, 246, 1)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 12,
+                        borderSkipped: false,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: {display: false} },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Inter', size: 11 } } },
+                        x: { grid: { display: false }, ticks: { font: { family: 'Inter', weight: '600', size: 11 } } }
+                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' }
+                }
+            });
+        }
+
+        async function loadUsers() {
+            const data = await _fetch('get_users');
+            if(data.status==='success') {
+                const tBody = document.getElementById('usersTableBody');
+                tBody.innerHTML = data.data.map(u => `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=${u.fullname}&background=random&color=fff" class="w-10 h-10 rounded-full shadow-sm">
+                            <div>
+                                <div class="font-bold text-slate-800">${u.fullname} <span class="text-xs text-primary ml-1">${u.is_admin==1?'(ADMIN)':''}</span></div>
+                                <div class="text-xs text-slate-500 font-mono">@${u.username}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-widest">${u.is_admin==1?'Admin':'User'}</td>
+                        <td class="px-6 py-4 font-bold text-amber-500">${u.points} pts</td>
+                        <td class="px-6 py-4 text-slate-500 text-sm">${u.created_at.split(' ')[0]}</td>
+                        <td class="px-6 py-4 text-right">
+                            ${u.id != adminUser.id ? `
+                                <button onclick="window.grantAdmin(${u.id}, ${u.is_admin})" class="text-xs font-medium px-3 py-1.5 rounded-lg ${u.is_admin==1?'bg-slate-100 text-slate-600 hover:bg-slate-200':'bg-blue-50 text-blue-600 hover:bg-blue-100'} mr-2">${u.is_admin==1?'Hạ quyền':'Cấp Admin'}</button>
+                                <button onclick="window.deleteUser(${u.id})" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"><i class="fa-solid fa-trash"></i></button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function loadPendingPlaces() {
+            const data = await _fetch('get_pending_places');
+            if(data.status==='success') {
+                document.getElementById('pendingCounter').textContent = data.data.length;
+                const list = document.getElementById('pendingPlacesList');
+                if(data.data.length === 0) list.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400 font-medium"><i class="fa-solid fa-check-circle text-4xl mb-3 opacity-50 block"></i> Tốt quá, mọi thứ đã được giải quyết!</div>`;
+                else list.innerHTML = data.data.map(p => `
+                    <div class="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col pt-6 relative">
+                        <div class="absolute top-0 right-6 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-b-lg shadow-sm tracking-wide">PENDING</div>
+                        <h4 class="font-bold text-slate-800 text-xl leading-tight mb-1">${p.name}</h4>
+                        <p class="text-sm text-slate-500 mb-3"><i class="fa-solid fa-location-dot w-4 bg-slate-100 rounded p-1 mr-1"></i> ${p.address}</p>
+                        <p class="text-sm text-slate-600 font-medium bg-slate-50 border border-slate-100 p-3 rounded-xl mb-4 line-clamp-3">${p.description || 'Không mô tả'}</p>
+                        <div class="mt-auto flex justify-between items-center border-t border-slate-100 pt-4">
+                            <div class="text-xs text-slate-400 font-medium">Bởi: <span class="text-slate-700 font-bold">${p.author_name || 'Khách'}</span></div>
+                            <div class="flex gap-2">
+                                <button onclick="updatePlace(${p.id}, 'admin_approve_place')" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-bold shadow-sm transition-colors">Duyệt</button>
+                                <button onclick="updatePlace(${p.id}, 'admin_reject_place')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-bold transition-colors">Bỏ qua</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function loadAllPlaces() {
+            const data = await _fetch('get_all_places');
+            if(data.status==='success') {
+                const tBody = document.getElementById('allPlacesTableBody');
+                tBody.innerHTML = data.data.map(p => `
+                    <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50">
+                        <td class="px-6 py-4 font-mono text-xs text-slate-400">#${p.id}</td>
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-800 text-sm truncate max-w-xs">${p.name}</div>
+                            <div class="text-xs text-slate-400 truncate max-w-xs mt-0.5"><i class="fa-solid fa-location-dot"></i> ${p.address}</div>
+                        </td>
+                        <td class="px-6 py-4 text-xs font-semibold text-slate-600">${p.category_name||'N/A'}</td>
+                        <td class="px-6 py-4 text-xs">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full font-bold ${p.status=='approved'?'bg-emerald-100 text-emerald-700':p.status=='pending'?'bg-amber-100 text-amber-700':'bg-red-100 text-red-700'} uppercase text-[10px] tracking-wide"><span class="status-dot ${p.status=='approved'?'approved':p.status=='pending'?'pending':'rejected'}"></span>${p.status}</span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${p.sumitted_by_name || 'System'}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="deletePlaceAdmin(${p.id})" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 shadow-sm transition-colors border border-red-100">Xoá hoàn toàn</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function loadCategories() {
+            const data = await _fetch('categories_list');
+            if(data.status === 'success') {
+                const tBody = document.getElementById('categoriesTableBody');
+                tBody.innerHTML = data.data.map(c => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4"><div class="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-xl text-primary shadow-sm text-lg"><i class="fa-solid fa-${c.icon}"></i></div></td>
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-800">${c.name}</div>
+                            <div class="font-mono text-xs text-slate-400">${c.slug}</div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="window.deleteCategory(${c.id})" class="text-xs text-red-500 hover:text-red-700 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 font-medium">Xoá</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function loadBanners() {
+            const data = await _fetch('get_banners');
+            const list = document.getElementById('bannersList');
+            if(data.status === 'success' && data.data.length > 0) {
+                list.innerHTML = data.data.map(b => `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden group">
+                        <div class="h-32 bg-slate-100 relative overflow-hidden">
+                            <img src="${b.image_url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="p-4 bg-white flex justify-between items-center">
+                            <p class="text-xs text-slate-400 truncate max-w-[200px]"><i class="fa-solid fa-link mr-1"></i> ${b.link_url || 'Không có Link'}</p>
+                            <button onclick="window.deleteBanner(${b.id})" class="text-xs bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 px-3 py-1 rounded-lg">Gỡ bỏ</button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = `<div class="col-span-full py-10 text-center text-slate-400">Chưa có banner nào. Hãy tải lên Banner Quảng cáo mới.</div>`;
+            }
+        }
+
+        async function loadFeedbacks() {
+            const data = await _fetch('get_reports');
+            if(data.status==='success') {
+                const list = document.getElementById('feedbacksList');
+                if(data.data.length === 0) list.innerHTML = `<div class="py-10 text-center text-slate-400">Không có báo cáo nào chưa xử lý.</div>`;
+                else list.innerHTML = data.data.map(r => `
+                    <div class="bg-white rounded-2xl border ${r.status=='resolved'?'border-slate-100':'border-rose-200'} p-5 flex flex-col md:flex-row gap-4 justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs px-2 py-0.5 rounded-md font-bold uppercase tracking-wide ${r.entity_type=='place'?'bg-blue-100 text-blue-700':r.entity_type=='review'?'bg-purple-100 text-purple-700':'bg-slate-100 text-slate-700'}">${r.entity_type} ID: ${r.entity_id}</span>
+                                <span class="text-xs text-slate-500">${r.created_at}</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base mb-1">Lý do: <span class="text-rose-600 font-normal">${r.reason}</span></h4>
+                            <p class="text-sm border-l-4 border-slate-200 pl-3 py-1 text-slate-600">${r.details||'Không có chi tiết'}</p>
+                        </div>
+                        <div class="flex-shrink-0 flex gap-2">
+                            ${r.status != 'resolved' ? `<button onclick="window.resolveReport(${r.id})" class="bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 font-semibold px-4 py-2 rounded-xl border text-sm transition-colors"><i class="fa-solid fa-check mr-1"></i> Xử lý xong</button>`: `<span class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-400 text-sm font-semibold"><i class="fa-solid fa-check mr-1"></i> Đã đóng</span>`}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // === Toast & Confirm Utilities ===
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            const icons = { success: 'fa-check', error: 'fa-xmark', warning: 'fa-exclamation', info: 'fa-info' };
+            const toast = document.createElement('div');
+            toast.className = `toast-item toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fa-solid ${icons[type] || icons.info}"></i></div>
+                <span>${message}</span>
+                <span class="toast-close" onclick="this.parentElement.classList.remove('show');setTimeout(()=>this.parentElement.remove(),400)">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </span>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, duration);
+        }
+
+        function showConfirm({ title = 'Xác nhận', message = 'Bạn có chắc chắn?', type = 'danger', confirmText = 'Xác nhận', cancelText = 'Huỷ bỏ' } = {}) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('confirmOverlay');
+                const iconWrap = document.getElementById('confirmIcon');
+                const okBtn = document.getElementById('confirmOkBtn');
+                document.getElementById('confirmTitle').textContent = title;
+                document.getElementById('confirmMessage').textContent = message;
+                document.getElementById('confirmCancelBtn').textContent = cancelText;
+                okBtn.textContent = confirmText;
+
+                const iconMap = { danger: 'fa-trash-can', warning: 'fa-triangle-exclamation', info: 'fa-circle-question' };
+                const classMap = { danger: 'confirm-icon-danger', warning: 'confirm-icon-warning', info: 'confirm-icon-info' };
+                const btnMap = { danger: 'confirm-btn-danger', warning: 'confirm-btn-primary', info: 'confirm-btn-primary' };
+                iconWrap.className = `confirm-icon-wrap ${classMap[type] || classMap.danger}`;
+                iconWrap.innerHTML = `<i class="fa-solid ${iconMap[type] || iconMap.danger}"></i>`;
+                okBtn.className = `${btnMap[type] || btnMap.danger}`;
+
+                overlay.classList.add('show');
+
+                function cleanup(result) {
+                    overlay.classList.remove('show');
+                    okBtn.removeEventListener('click', onOk);
+                    document.getElementById('confirmCancelBtn').removeEventListener('click', onCancel);
+                    overlay.removeEventListener('click', onOverlay);
+                    resolve(result);
+                }
+                function onOk() { cleanup(true); }
+                function onCancel() { cleanup(false); }
+                function onOverlay(e) { if (e.target === overlay) cleanup(false); }
+
+                okBtn.addEventListener('click', onOk);
+                document.getElementById('confirmCancelBtn').addEventListener('click', onCancel);
+                overlay.addEventListener('click', onOverlay);
+            });
+        }
+
+        // Action Handlers
+        window.updatePlace = async function(id, action) {
+            const data = await _fetch(action, { place_id: id });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            loadPendingPlaces(); loadStats();
+        }
+        window.deletePlaceAdmin = async function(id) {
+            const ok = await showConfirm({ title: 'Xoá địa điểm', message: 'Địa điểm sẽ bị xoá vĩnh viễn. Bạn chắc chắn?', type: 'danger', confirmText: 'Xoá luôn' });
+            if(!ok) return;
+            const data = await _fetch('admin_delete_place', { id: id });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            loadAllPlaces(); loadStats();
+        }
+        window.grantAdmin = async function(id, cur) {
+            const ok = await showConfirm({ title: 'Phân quyền', message: cur==1 ? 'Hạ quyền admin về user thường?' : 'Cấp quyền Admin cho user này?', type: 'warning', confirmText: cur==1 ? 'Hạ quyền' : 'Cấp Admin' });
+            if(!ok) return;
+            const data = await _fetch(cur==1?'revoke_admin':'grant_admin', { user_id: id });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            loadUsers();
+        }
+        window.deleteUser = async function(id) {
+            const ok = await showConfirm({ title: 'Xoá người dùng', message: 'User sẽ bị XOÁ VĨNH VIỄN khỏi hệ thống. Hành động này không thể hoàn tác!', type: 'danger', confirmText: 'Xoá vĩnh viễn' });
+            if(!ok) return;
+            const data = await _fetch('delete_user', { user_id: id });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            loadUsers(); loadStats();
+        }
+        window.resolveReport = async function(id) {
+            const data = await _fetch('resolve_report', { report_id: id });
+            showToast('Đã xử lý báo cáo', 'success');
+            loadFeedbacks();
+        }
+        window.deleteBanner = async function(id) {
+            const ok = await showConfirm({ title: 'Xoá banner', message: 'Xoá banner này khỏi hệ thống?', type: 'warning', confirmText: 'Xoá banner' });
+            if(!ok) return;
+            const data = await _fetch('delete_banner', { banner_id: id });
+            showToast('Đã xoá banner', data.status === 'success' ? 'success' : 'error');
+            loadBanners();
+        }
+
+        // Form Submit
+        document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = await _fetch('add_category', {
+                name: document.getElementById('catName').value,
+                slug: document.getElementById('catSlug').value,
+                icon: document.getElementById('catIcon').value
+            });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            if(data.status==='success'){ e.target.reset(); loadCategories(); }
+        });
+
+        document.getElementById('addBannerForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = await _fetch('add_banner', {
+                image_url: document.getElementById('bannerImgUrl').value,
+                link_url: document.getElementById('bannerLinkUrl').value
+            });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            if(data.status==='success'){ e.target.reset(); loadBanners(); }
+        });
+
+        document.getElementById('btnAdminPushNotif')?.addEventListener('click', async (e) => {
+            const val = document.getElementById('adminNotifContent').value;
+            if(!val) return showToast('Chưa có nội dung', 'warning');
+            const ok = await showConfirm({ title: 'Phát thông báo', message: 'Gửi thông báo tới TOÀN BỘ NGƯỜI DÙNG?', type: 'warning', confirmText: 'Phát ngay' });
+            if(!ok) return;
+            
+            e.target.disabled=true;
+            const o = e.target.innerHTML;
+            e.target.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang phát...';
+            
+            const data = await _fetch('push_notification', { message: val });
+            showToast(data.message || 'Đã phát thông báo', 'success');
+            document.getElementById('adminNotifContent').value = '';
+            
+            e.target.innerHTML = o;
+            e.target.disabled=false;
+        });
+
+        // ===== REWARDS ADMIN FUNCTIONS =====
+        document.getElementById('addRewardForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editRewardId').value;
+            const payload = {
+                title: document.getElementById('rewardTitle').value,
+                description: document.getElementById('rewardDesc').value,
+                image_url: document.getElementById('rewardImage').value,
+                points_required: parseInt(document.getElementById('rewardPoints').value) || 100,
+                quantity: parseInt(document.getElementById('rewardQuantity').value) || -1,
+                category: document.getElementById('rewardCategory').value,
+                expires_at: document.getElementById('rewardExpires').value || null
+            };
+            let data;
+            if (editId) {
+                payload.id = editId;
+                data = await _fetch('update_reward', payload);
+            } else {
+                data = await _fetch('add_reward', payload);
+            }
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            if (data.status === 'success') { resetRewardForm(); loadAdminRewards(); }
+        });
+
+        function resetRewardForm() {
+            document.getElementById('addRewardForm').reset();
+            document.getElementById('editRewardId').value = '';
+            document.getElementById('rewardFormTitle').textContent = 'Thêm Phần Thưởng';
+            document.getElementById('rewardQuantity').value = '-1';
+            document.getElementById('rewardPoints').value = '100';
+        }
+
+        window.editReward = function(r) {
+            document.getElementById('editRewardId').value = r.id;
+            document.getElementById('rewardTitle').value = r.title || '';
+            document.getElementById('rewardDesc').value = r.description || '';
+            document.getElementById('rewardImage').value = r.image_url || '';
+            document.getElementById('rewardPoints').value = r.points_required;
+            document.getElementById('rewardQuantity').value = r.quantity;
+            document.getElementById('rewardCategory').value = r.category || 'voucher';
+            if (r.expires_at) document.getElementById('rewardExpires').value = r.expires_at.split('T')[0];
+            document.getElementById('rewardFormTitle').textContent = 'Sửa Phần Thưởng';
+            document.getElementById('tab-rewards_manage').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.toggleReward = async function(id, current) {
+            const data = await _fetch('toggle_reward', { id, is_active: !current });
+            showToast(data.message, 'success');
+            loadAdminRewards();
+        }
+
+        window.deleteReward = async function(id) {
+            const ok = await showConfirm({ title: 'Xoá phần thưởng', message: 'Xoá phần thưởng này? Hành động không thể hoàn tác.', type: 'warning', confirmText: 'Xoá' });
+            if (!ok) return;
+            const data = await _fetch('delete_reward', { id });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            loadAdminRewards();
+        }
+
+        window.approveRedemption = async function(id) {
+            const code = prompt('Nhập mã voucher cấp cho người dùng (tuỳ chọn):');
+            const data = await _fetch('update_redemption', { id, status: 'confirmed', voucher_code: code || '' });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            loadAdminRedemptions();
+        }
+
+        window.rejectRedemption = async function(id) {
+            const ok = await showConfirm({ title: 'Từ chối đổi thưởng', message: 'Từ chối yêu cầu này? Điểm sẽ không được hoàn lại tự động.', type: 'warning', confirmText: 'Từ chối' });
+            if (!ok) return;
+            const data = await _fetch('update_redemption', { id, status: 'cancelled' });
+            showToast(data.message, data.status === 'success' ? 'success' : 'error');
+            loadAdminRedemptions();
+        }
+
+        async function loadAdminRewards() {
+            const res = await _fetch('get_rewards');
+            const tb = document.getElementById('rewardsTableBody');
+            const list = res.data || [];
+            document.getElementById('rewardsCount').textContent = `${list.length} phần thưởng`;
+            const catIcons = {voucher:'🎫', gift:'🎁', discount:'💰'};
+            tb.innerHTML = list.map(r => {
+                const qty = r.quantity === -1 ? '∞' : r.quantity;
+                const catLabel = catIcons[r.category] || '🎫';
+                const statusBadge = r.is_active
+                    ? '<span class="px-2 py-1 text-xs font-bold bg-emerald-100 text-emerald-700 rounded-full">Hoạt động</span>'
+                    : '<span class="px-2 py-1 text-xs font-bold bg-slate-100 text-slate-500 rounded-full">Tắt</span>';
+                return `<tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center text-lg flex-shrink-0">${r.image_url ? '<img src="'+r.image_url+'" class="w-10 h-10 rounded-xl object-cover">' : '🎁'}</div>
+                            <div class="min-w-0"><div class="font-semibold text-slate-800 truncate max-w-[200px]">${r.title}</div><div class="text-xs text-slate-400 truncate max-w-[200px]">${r.description||''}</div></div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 font-bold text-amber-600">${r.points_required} ⭐</td>
+                    <td class="px-6 py-4 font-medium">${qty}</td>
+                    <td class="px-6 py-4">${catLabel} ${r.category}</td>
+                    <td class="px-6 py-4">${statusBadge}</td>
+                    <td class="px-6 py-4 text-right space-x-1">
+                        <button onclick='editReward(${JSON.stringify(r).replace(/'/g,"&#39;")})' class="px-2 py-1 text-xs bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="toggleReward('${r.id}',${r.is_active})" class="px-2 py-1 text-xs ${r.is_active?'bg-amber-50 text-amber-600':'bg-emerald-50 text-emerald-600'} rounded-lg hover:opacity-80"><i class="fa-solid ${r.is_active?'fa-pause':'fa-play'}"></i></button>
+                        <button onclick="deleteReward('${r.id}')" class="px-2 py-1 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function loadAdminRedemptions() {
+            const res = await _fetch('get_redemptions');
+            const tb = document.getElementById('redemptionsTableBody');
+            const list = res.data || [];
+            document.getElementById('redemptionsCount').textContent = `${list.length} yêu cầu`;
+            const statusMap = { pending: ['Chờ duyệt','bg-amber-100 text-amber-700'], confirmed: ['Đã duyệt','bg-emerald-100 text-emerald-700'], used: ['Đã dùng','bg-blue-100 text-blue-700'], cancelled: ['Đã huỷ','bg-red-100 text-red-700'] };
+            tb.innerHTML = list.length === 0 ? '<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">Chưa có yêu cầu đổi thưởng nào</td></tr>' : list.map(rd => {
+                const [sLabel, sClass] = statusMap[rd.status] || ['N/A','bg-slate-100 text-slate-500'];
+                const uName = rd.profile ? rd.profile.fullname : 'Ẩn';
+                const rTitle = rd.rewards ? rd.rewards.title : 'Đã xoá';
+                const date = new Date(rd.created_at).toLocaleDateString('vi-VN');
+                return `<tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 font-medium">${uName}</td>
+                    <td class="px-6 py-4">${rTitle}</td>
+                    <td class="px-6 py-4 font-bold text-amber-600">${rd.points_spent} ⭐</td>
+                    <td class="px-6 py-4 font-mono text-xs">${rd.voucher_code || '—'}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-bold ${sClass} rounded-full">${sLabel}</span></td>
+                    <td class="px-6 py-4 text-xs text-slate-500">${date}</td>
+                    <td class="px-6 py-4 text-right space-x-1">
+                        ${rd.status === 'pending' ? `
+                            <button onclick="approveRedemption('${rd.id}')" class="px-2 py-1 text-xs bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100"><i class="fa-solid fa-check"></i> Duyệt</button>
+                            <button onclick="rejectRedemption('${rd.id}')" class="px-2 py-1 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100"><i class="fa-solid fa-xmark"></i> Từ chối</button>
+                        ` : '<span class="text-xs text-slate-400">—</span>'}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+    </script>
+</body>
+</html>

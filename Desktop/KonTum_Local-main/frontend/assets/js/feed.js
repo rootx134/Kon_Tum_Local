@@ -369,6 +369,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // Xử lý nút Save Place
         const btnSavePlace = document.getElementById('btnToggleSavePlace');
         if (btnSavePlace) {
+            // Check saved status on load
+            const user = JSON.parse(localStorage.getItem('user_vtkt'));
+            if (user && place.id) {
+                try {
+                    const { data: existing } = await window.supabaseClient
+                        .from('saved')
+                        .select('id')
+                        .eq('user_id', user.id)
+                        .eq('entity_type', 'place')
+                        .eq('entity_id', place.id);
+                    if (existing && existing.length > 0) {
+                        btnSavePlace.querySelector('i').classList.replace('fa-regular', 'fa-solid');
+                        btnSavePlace.classList.add('text-red-500');
+                    } else {
+                        btnSavePlace.querySelector('i').classList.replace('fa-solid', 'fa-regular');
+                        btnSavePlace.classList.remove('text-red-500');
+                    }
+                } catch (e) { console.warn('Check saved status error:', e); }
+            }
+
             btnSavePlace.onclick = async () => {
                 const user = JSON.parse(localStorage.getItem('user_vtkt'));
                 if (!user) return typeof showToast === 'function' ? showToast("Vui lòng đăng nhập!", "error") : alert("Vui lòng đăng nhập!");
@@ -377,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const res = await fetch(`${API_URL}/interactions.php`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'toggle_save', user_id: user.id, place_id: place.id })
+                        body: JSON.stringify({ action: 'toggle_save', user_id: user.id, entity_type: 'place', entity_id: place.id })
                     });
                     const data = await res.json();
                     if (data.status === 'success') {
@@ -389,8 +409,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             btnSavePlace.classList.remove('text-red-500');
                         }
                         if (typeof showToast === 'function') showToast(data.message, "success");
+                    } else {
+                        console.error('Toggle save failed:', data);
+                        if (typeof showToast === 'function') showToast("Lỗi lưu địa điểm", "error");
                     }
-                } catch (e) { }
+                } catch (e) {
+                    console.error('Toggle save error:', e);
+                    if (typeof showToast === 'function') showToast("Lỗi kết nối", "error");
+                }
             };
         }
 

@@ -3,7 +3,7 @@
  * Đặt tại root directory: /sw.js
  */
 
-const CACHE_NAME = 'kontum-plus-v6';
+const CACHE_NAME = 'kontum-plus-v7';
 const ASSETS = [
     '/',
     '/index.html',

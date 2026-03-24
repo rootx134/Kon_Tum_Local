@@ -860,14 +860,14 @@
                         return { status: 'success', data: data || [] };
                     }
                     case 'add_reward': {
-                        const row = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, stock: body.stock, category: body.category, is_active: true };
+                        const row = { name: body.name, description: body.description, image_url: body.image_url, points_required: body.points_required, stock: body.stock, category: body.category, is_active: true };
                         if (body.expires_at) row.expires_at = body.expires_at;
                         const { error } = await sc.from('rewards').insert([row]);
                         if (error) throw error;
                         return { status: 'success', message: 'Đã thêm phần thưởng' };
                     }
                     case 'update_reward': {
-                        const upd = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, stock: body.stock, category: body.category };
+                        const upd = { name: body.name, description: body.description, image_url: body.image_url, points_required: body.points_required, stock: body.stock, category: body.category };
                         if (body.expires_at) upd.expires_at = body.expires_at;
                         else upd.expires_at = null;
                         const { error } = await sc.from('rewards').update(upd).eq('id', body.id);
@@ -885,7 +885,7 @@
                         return { status: 'success', message: 'Đã xoá phần thưởng' };
                     }
                     case 'get_redemptions': {
-                        const { data } = await sc.from('redemptions').select('*, profile(fullname, avatar_url), rewards(title)').order('created_at', { ascending: false });
+                        const { data } = await sc.from('redemptions').select('*, profile(fullname, avatar_url), rewards(name)').order('created_at', { ascending: false });
                         return { status: 'success', data: data || [] };
                     }
                     case 'update_redemption': {
@@ -1252,7 +1252,7 @@
             e.preventDefault();
             const editId = document.getElementById('editRewardId').value;
             const payload = {
-                title: document.getElementById('rewardTitle').value,
+                name: document.getElementById('rewardTitle').value,
                 description: document.getElementById('rewardDesc').value,
                 image_url: document.getElementById('rewardImage').value,
                 points_required: parseInt(document.getElementById('rewardPoints').value) || 100,
@@ -1281,7 +1281,7 @@
 
         window.editReward = function(r) {
             document.getElementById('editRewardId').value = r.id;
-            document.getElementById('rewardTitle').value = r.title || '';
+            document.getElementById('rewardTitle').value = r.name || '';
             document.getElementById('rewardDesc').value = r.description || '';
             document.getElementById('rewardImage').value = r.image_url || '';
             document.getElementById('rewardPoints').value = r.points_required;
@@ -1337,7 +1337,7 @@
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center text-lg flex-shrink-0">${r.image_url ? '<img src="'+r.image_url+'" class="w-10 h-10 rounded-xl object-cover">' : '🎁'}</div>
-                            <div class="min-w-0"><div class="font-semibold text-slate-800 truncate max-w-[200px]">${r.title}</div><div class="text-xs text-slate-400 truncate max-w-[200px]">${r.description||''}</div></div>
+                            <div class="min-w-0"><div class="font-semibold text-slate-800 truncate max-w-[200px]">${r.name}</div><div class="text-xs text-slate-400 truncate max-w-[200px]">${r.description||''}</div></div>
                         </div>
                     </td>
                     <td class="px-6 py-4 font-bold text-amber-600">${r.points_required} ⭐</td>
@@ -1362,7 +1362,7 @@
             tb.innerHTML = list.length === 0 ? '<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">Chưa có yêu cầu đổi thưởng nào</td></tr>' : list.map(rd => {
                 const [sLabel, sClass] = statusMap[rd.status] || ['N/A','bg-slate-100 text-slate-500'];
                 const uName = rd.profile ? rd.profile.fullname : 'Ẩn';
-                const rTitle = rd.rewards ? rd.rewards.title : 'Đã xoá';
+                const rTitle = rd.rewards ? rd.rewards.name : 'Đã xoá';
                 const date = new Date(rd.created_at).toLocaleDateString('vi-VN');
                 return `<tr class="hover:bg-slate-50 transition-colors">
                     <td class="px-6 py-4 font-medium">${uName}</td>

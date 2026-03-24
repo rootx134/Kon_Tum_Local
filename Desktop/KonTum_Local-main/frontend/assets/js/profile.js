@@ -1580,7 +1580,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const pseudoCode = (redemption.id || '').split('-')[0].toUpperCase();
             
             const modalHtml = `
-        <div id="voucherDetailModal" class="fixed inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div id="voucherDetailModal" class="fixed inset-0 z-[1000] flex flex-col justify-end bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
             <div class="bg-white dark:bg-darkCard w-full max-w-lg mx-auto rounded-t-3xl shadow-2xl pb-safe flex flex-col transform translate-y-full transition-transform duration-300" id="voucherDetailContent">
                 
                 <div class="px-6 pt-5 pb-3">

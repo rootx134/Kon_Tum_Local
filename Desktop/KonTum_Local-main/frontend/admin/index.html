@@ -860,14 +860,14 @@
                         return { status: 'success', data: data || [] };
                     }
                     case 'add_reward': {
-                        const row = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, quantity: body.quantity, category: body.category, is_active: true };
+                        const row = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, stock: body.stock, category: body.category, is_active: true };
                         if (body.expires_at) row.expires_at = body.expires_at;
                         const { error } = await sc.from('rewards').insert([row]);
                         if (error) throw error;
                         return { status: 'success', message: 'Đã thêm phần thưởng' };
                     }
                     case 'update_reward': {
-                        const upd = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, quantity: body.quantity, category: body.category };
+                        const upd = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, stock: body.stock, category: body.category };
                         if (body.expires_at) upd.expires_at = body.expires_at;
                         else upd.expires_at = null;
                         const { error } = await sc.from('rewards').update(upd).eq('id', body.id);
@@ -1256,7 +1256,7 @@
                 description: document.getElementById('rewardDesc').value,
                 image_url: document.getElementById('rewardImage').value,
                 points_required: parseInt(document.getElementById('rewardPoints').value) || 100,
-                quantity: parseInt(document.getElementById('rewardQuantity').value) || -1,
+                stock: parseInt(document.getElementById('rewardQuantity').value) || -1,
                 category: document.getElementById('rewardCategory').value,
                 expires_at: document.getElementById('rewardExpires').value || null
             };
@@ -1285,7 +1285,7 @@
             document.getElementById('rewardDesc').value = r.description || '';
             document.getElementById('rewardImage').value = r.image_url || '';
             document.getElementById('rewardPoints').value = r.points_required;
-            document.getElementById('rewardQuantity').value = r.quantity;
+            document.getElementById('rewardQuantity').value = r.stock ?? -1;
             document.getElementById('rewardCategory').value = r.category || 'voucher';
             if (r.expires_at) document.getElementById('rewardExpires').value = r.expires_at.split('T')[0];
             document.getElementById('rewardFormTitle').textContent = 'Sửa Phần Thưởng';

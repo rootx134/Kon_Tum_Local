@@ -1276,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="w-full h-24 rounded-xl ${canRedeem ? 'bg-gradient-to-br from-orange-50 to-amber-50 dark:from-[#2c1a12] dark:to-[#1f1612]' : 'bg-gray-50 dark:bg-gray-800'} flex items-center justify-center mb-3">
                             <i class="fa-solid ${typeIcon} text-3xl ${canRedeem ? 'text-[#ff5500]' : 'text-gray-300 dark:text-gray-600'}"></i>
                         </div>
-                        <h4 class="font-bold text-[13px] text-gray-900 dark:text-white line-clamp-2 leading-tight min-h-[2.5rem]">${reward.title}</h4>
+                        <h4 class="font-bold text-[13px] text-gray-900 dark:text-white line-clamp-2 leading-tight min-h-[2.5rem]">${reward.title || reward.name || 'Phần thưởng'}</h4>
                         <p class="text-[11px] text-gray-400 mt-1 line-clamp-1">${reward.description || ''}</p>
                         <div class="flex items-center justify-between mt-3">
                             <div class="flex items-center gap-1">
@@ -1285,7 +1285,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <span class="text-[10px] ${outOfStock ? 'text-red-400' : 'text-gray-400'}">${outOfStock ? 'Hết hàng' : unlimited ? '∞ Không giới hạn' : `Còn ${reward.stock}`}</span>
                         </div>
-                        <button onclick="redeemReward('${reward.id}', '${reward.title.replace(/'/g, "\\'")}', ${reward.points_required})"
+                        <button onclick="redeemReward('${reward.id}', '${(reward.title || reward.name || '').replace(/'/g, "\\'")}', ${reward.points_required})"
                             class="w-full mt-3 py-2 rounded-xl text-xs font-bold transition-all ${canRedeem
                                 ? 'bg-[#ff5500] text-white hover:bg-[#e04d00] active:scale-95'
                                 : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'}"

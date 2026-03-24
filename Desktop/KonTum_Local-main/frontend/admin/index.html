@@ -861,15 +861,15 @@
                     }
                     case 'add_reward': {
                         const row = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, stock: body.stock, category: body.category, is_active: true };
-                        if (body.expires_at) row.expires_at = body.expires_at;
+                        if (body.expiry_date) row.expiry_date = body.expiry_date;
                         const { error } = await sc.from('rewards').insert([row]);
                         if (error) throw error;
                         return { status: 'success', message: 'Đã thêm phần thưởng' };
                     }
                     case 'update_reward': {
                         const upd = { title: body.title, description: body.description, image_url: body.image_url, points_required: body.points_required, stock: body.stock, category: body.category };
-                        if (body.expires_at) upd.expires_at = body.expires_at;
-                        else upd.expires_at = null;
+                        if (body.expiry_date) upd.expiry_date = body.expiry_date;
+                        else upd.expiry_date = null;
                         const { error } = await sc.from('rewards').update(upd).eq('id', body.id);
                         if (error) throw error;
                         return { status: 'success', message: 'Đã cập nhật phần thưởng' };
@@ -1258,7 +1258,7 @@
                 points_required: parseInt(document.getElementById('rewardPoints').value) || 100,
                 stock: parseInt(document.getElementById('rewardQuantity').value) || -1,
                 category: document.getElementById('rewardCategory').value,
-                expires_at: document.getElementById('rewardExpires').value || null
+                expiry_date: document.getElementById('rewardExpires').value || null
             };
             let data;
             if (editId) {
@@ -1287,7 +1287,7 @@
             document.getElementById('rewardPoints').value = r.points_required;
             document.getElementById('rewardQuantity').value = r.stock ?? -1;
             document.getElementById('rewardCategory').value = r.category || 'voucher';
-            if (r.expires_at) document.getElementById('rewardExpires').value = r.expires_at.split('T')[0];
+            if (r.expiry_date) document.getElementById('rewardExpires').value = r.expiry_date.split('T')[0];
             document.getElementById('rewardFormTitle').textContent = 'Sửa Phần Thưởng';
             document.getElementById('tab-rewards_manage').scrollIntoView({ behavior: 'smooth' });
         }

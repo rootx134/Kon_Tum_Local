@@ -1561,19 +1561,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.showVoucherDetail = function(redemption) {
-        // Remove existing modal if any
-        let existing = document.getElementById('voucherDetailModal');
-        if (existing) existing.remove();
+        // Close rewards modal gracefully if open
+        const closeRewardsBtn = document.getElementById('closeRewardsModal');
+        if (closeRewardsBtn) {
+            closeRewardsBtn.click();
+        }
 
-        const rewardName = redemption.rewards ? (redemption.rewards.name || redemption.rewards.title || 'Phần thưởng') : 'Phần thưởng';
-        const formattedDate = new Date(redemption.created_at).toLocaleDateString('vi-VN', {
-            hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'
-        });
-        
-        // Use part of the ID as a fake voucher code, e.g. "VOUCHER-XXXX"
-        const pseudoCode = (redemption.id || '').split('-')[0].toUpperCase();
-        
-        const modalHtml = `
+        // Wait a small delay to let rewards modal animate out slightly before showing voucher
+        setTimeout(() => {
+            let existing = document.getElementById('voucherDetailModal');
+            if (existing) existing.remove();
+
+            const rewardName = redemption.rewards ? (redemption.rewards.name || redemption.rewards.title || 'Phần thưởng') : 'Phần thưởng';
+            const formattedDate = new Date(redemption.created_at).toLocaleDateString('vi-VN', {
+                hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+            
+            const pseudoCode = (redemption.id || '').split('-')[0].toUpperCase();
+            
+            const modalHtml = `
         <div id="voucherDetailModal" class="fixed inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
             <div class="bg-white dark:bg-darkCard w-full max-w-lg mx-auto rounded-t-3xl shadow-2xl pb-safe flex flex-col transform translate-y-full transition-transform duration-300" id="voucherDetailContent">
                 
@@ -1639,6 +1645,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 c.classList.remove('translate-y-full');
             }
         });
+        }, 200); // Wait for modal to close
     }
 
     window.closeVoucherDetail = function() {

@@ -519,19 +519,39 @@
                                 <textarea id="rewardDesc" rows="2" placeholder="Mô tả chi tiết về phần thưởng..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ảnh (URL)</label>
-                                <input type="url" id="rewardImage" placeholder="https://..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Ảnh phần thưởng</label>
+                                <div class="flex gap-3 items-start">
+                                    <div id="rewardImagePreview" class="w-20 h-20 rounded-xl bg-slate-100 border-2 border-dashed border-slate-300 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        <i class="fa-solid fa-image text-slate-300 text-2xl" id="rewardImageIcon"></i>
+                                        <img id="rewardImagePreviewImg" src="" class="w-full h-full object-cover hidden" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <label for="rewardImageFile" class="flex items-center gap-2 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                                            <i class="fa-solid fa-upload text-slate-400"></i>
+                                            <span id="rewardImageFileName" class="text-sm text-slate-500">Chọn ảnh...</span>
+                                        </label>
+                                        <input type="file" id="rewardImageFile" accept="image/*" class="hidden">
+                                        <input type="hidden" id="rewardImage" value="">
+                                        <p class="text-xs text-slate-400 mt-1">JPG, PNG, WebP • Tối đa 2MB</p>
+                                        <div id="rewardUploadProgress" class="hidden mt-1">
+                                            <div class="w-full bg-slate-100 rounded-full h-1.5">
+                                                <div class="bg-primary h-1.5 rounded-full transition-all" style="width:0%" id="rewardUploadBar"></div>
+                                            </div>
+                                            <p class="text-xs text-slate-400 mt-1">Đang tải lên...</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Điểm cần *</label>
                                     <input type="number" id="rewardPoints" min="1" value="100" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary" required>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Số lượng</label>
-                                    <input type="number" id="rewardQuantity" value="-1" min="-1" step="1" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary">
-                                    <p class="text-xs text-slate-400 mt-1">-1 = không giới hạn</p>
-                                </div>
+                                 <div>
+                                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Số lượng *</label>
+                                     <input type="number" id="rewardQuantity" value="1" min="1" max="9999" step="1" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary" required>
+                                     <p class="text-xs text-slate-400 mt-1">Tối thiểu 1 — tối đa 9,999</p>
+                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
@@ -591,7 +611,8 @@
                                     <th class="px-6 py-4">Điểm</th>
                                     <th class="px-6 py-4">Mã voucher</th>
                                     <th class="px-6 py-4">Trạng thái</th>
-                                    <th class="px-6 py-4">Ngày</th>
+                                    <th class="px-6 py-4">Ngày đổi</th>
+                                     <th class="px-6 py-4">Ngày sử dụng</th>
                                     <th class="px-6 py-4 text-right">Thao tác</th>
                                 </tr>
                             </thead>
@@ -615,15 +636,27 @@
         
         let chartInstance = null; // Chart instance
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const stored = localStorage.getItem('admin_vtkt');
             if(stored) adminUser = JSON.parse(stored);
+
+            // Verify Supabase session is still active (not just localStorage)
+            if (adminUser && adminUser.is_admin == 1) {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                if (!session) {
+                    // Session expired — try to restore or force re-login
+                    console.warn('[Admin] Supabase session expired, clearing admin state');
+                    localStorage.removeItem('admin_vtkt');
+                    adminUser = null;
+                }
+            }
 
             if (!adminUser || adminUser.is_admin != 1) {
                 document.getElementById('adminLoginOverlay').style.display = 'flex';
             } else {
                 initDashboard();
             }
+
 
             // Toggle password visibility for admin
             document.addEventListener('click', function (e) {
@@ -885,16 +918,46 @@
                         return { status: 'success', message: 'Đã xoá phần thưởng' };
                     }
                     case 'get_redemptions': {
-                        const { data } = await sc.from('redemptions').select('*, profile(fullname, avatar_url), rewards(title)').order('created_at', { ascending: false });
-                        return { status: 'success', data: data || [] };
+                        const { data, error: rdErr } = await sc.from('redemptions')
+                            .select('*, rewards(name, title, type)')
+                            .order('created_at', { ascending: false });
+                        if (rdErr) { console.error('[Admin] get_redemptions error:', rdErr); return { status: 'error', message: rdErr.message }; }
+                        const list = data || [];
+                        if (list.length > 0) {
+                            const userIds = [...new Set(list.map(r => r.user_id).filter(Boolean))];
+                            const { data: profs } = await sc.from('profile').select('id, fullname, email').in('id', userIds);
+                            const pm = {};
+                            (profs || []).forEach(p => { pm[p.id] = p; });
+                            // fallback: get emails from auth.users via admin rpc if profile missing
+                            list.forEach(r => { r._profile = pm[r.user_id] || null; });
+                        }
+                        return { status: 'success', data: list };
                     }
-                    case 'update_redemption': {
-                        const upd2 = { status: body.status };
-                        if (body.voucher_code) upd2.voucher_code = body.voucher_code;
-                        const { error } = await sc.from('redemptions').update(upd2).eq('id', body.id);
+
+                    case 'delete_redemption': {
+                        // Get the redemption first
+                        const { data: rdData, error: rdFetchErr } = await sc.from('redemptions').select('id, user_id, points_spent, status').eq('id', body.id).single();
+                        if (rdFetchErr) throw rdFetchErr;
+                        // If not used yet → refund points
+                        if (rdData.status !== 'used') {
+                            const { data: prof } = await sc.from('profile').select('id, points').eq('id', rdData.user_id).single();
+                            if (prof) {
+                                await sc.from('profile').update({ points: (prof.points || 0) + (rdData.points_spent || 0) }).eq('id', rdData.user_id);
+                            }
+                        }
+                        const { error: delErr } = await sc.from('redemptions').delete().eq('id', body.id);
+                        if (delErr) throw delErr;
+                        const refunded = rdData.status !== 'used';
+                        return { status: 'success', message: refunded ? `Đã xoá và hoàn ${rdData.points_spent} điểm` : 'Đã xoá voucher đã dùng' };
+                    }
+
+                    case 'mark_used_redemption': {
+                        const upd = { status: 'used', used_at: new Date().toISOString() };
+                        const { error } = await sc.from('redemptions').update(upd).eq('id', body.id);
                         if (error) throw error;
-                        return { status: 'success', message: `Đã ${body.status === 'confirmed' ? 'duyệt' : 'từ chối'} yêu cầu` };
+                        return { status: 'success', message: 'Đã đánh dấu sử dụng voucher' };
                     }
+
                     default:
                         console.warn('Unknown admin action:', action);
                         return { status: 'error', message: 'Unknown action' };
@@ -1247,6 +1310,56 @@
             e.target.disabled=false;
         });
 
+        // ===== IMAGE UPLOAD FOR REWARDS =====
+        (function() {
+            const fileInput = document.getElementById('rewardImageFile');
+            if (!fileInput) return;
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast('Ảnh quá lớn! Tối đa 2MB.', 'error');
+                    fileInput.value = '';
+                    return;
+                }
+                // Preview
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const img = document.getElementById('rewardImagePreviewImg');
+                    const icon = document.getElementById('rewardImageIcon');
+                    img.src = ev.target.result;
+                    img.classList.remove('hidden');
+                    icon.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+                document.getElementById('rewardImageFileName').textContent = file.name;
+
+                // Upload to Supabase Storage
+                const progress = document.getElementById('rewardUploadProgress');
+                const bar = document.getElementById('rewardUploadBar');
+                progress.classList.remove('hidden');
+                bar.style.width = '30%';
+                try {
+                    const ext = file.name.split('.').pop();
+                    const path = `rewards/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+                    const { data: upData, error: upErr } = await window.supabaseClient.storage
+                        .from('rewards')
+                        .upload(path, file, { upsert: false });
+                    bar.style.width = '80%';
+                    if (upErr) throw upErr;
+                    const { data: urlData } = window.supabaseClient.storage.from('rewards').getPublicUrl(upData.path);
+                    bar.style.width = '100%';
+                    document.getElementById('rewardImage').value = urlData.publicUrl;
+                    setTimeout(() => progress.classList.add('hidden'), 800);
+                } catch (err) {
+                    console.error('Upload ảnh lỗi:', err);
+                    showToast('Tải ảnh thất bại: ' + (err.message || err), 'error');
+                    bar.style.width = '0%';
+                    progress.classList.add('hidden');
+                }
+            });
+        })();
+
         // ===== REWARDS ADMIN FUNCTIONS =====
         document.getElementById('addRewardForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1277,6 +1390,13 @@
             document.getElementById('rewardFormTitle').textContent = 'Thêm Phần Thưởng';
             document.getElementById('rewardQuantity').value = '-1';
             document.getElementById('rewardPoints').value = '100';
+            // Reset image UI
+            document.getElementById('rewardImage').value = '';
+            document.getElementById('rewardImageFile').value = '';
+            document.getElementById('rewardImageFileName').textContent = 'Chọn ảnh...';
+            const img = document.getElementById('rewardImagePreviewImg');
+            img.src = ''; img.classList.add('hidden');
+            document.getElementById('rewardImageIcon').classList.remove('hidden');
         }
 
         window.editReward = function(r) {
@@ -1284,6 +1404,16 @@
             document.getElementById('rewardTitle').value = r.title || '';
             document.getElementById('rewardDesc').value = r.description || '';
             document.getElementById('rewardImage').value = r.image_url || '';
+            // Show existing image preview
+            const imgEl = document.getElementById('rewardImagePreviewImg');
+            const iconEl = document.getElementById('rewardImageIcon');
+            if (r.image_url) {
+                imgEl.src = r.image_url; imgEl.classList.remove('hidden'); iconEl.classList.add('hidden');
+                document.getElementById('rewardImageFileName').textContent = 'Ảnh hiện tại';
+            } else {
+                imgEl.src = ''; imgEl.classList.add('hidden'); iconEl.classList.remove('hidden');
+                document.getElementById('rewardImageFileName').textContent = 'Chọn ảnh...';
+            }
             document.getElementById('rewardPoints').value = r.points_required;
             document.getElementById('rewardQuantity').value = r.stock ?? -1;
             document.getElementById('rewardCategory').value = r.category || 'voucher';
@@ -1306,20 +1436,25 @@
             loadAdminRewards();
         }
 
-        window.approveRedemption = async function(id) {
-            const code = prompt('Nhập mã voucher cấp cho người dùng (tuỳ chọn):');
-            const data = await _fetch('update_redemption', { id, status: 'confirmed', voucher_code: code || '' });
+        window.deleteRedemption = async function(id, isUsed, userName, pointsSpent) {
+            const msg = isUsed
+                ? `Xóa voucher đã dùng của "${userName}"?`
+                : `Xóa voucher chưa dùng của "${userName}"?\nNGƯỜI DÙNG SẼ ĐƯỢC HOÀN LẠI ${pointsSpent} điểm.`;
+            const ok = await showConfirm({ title: 'Xóa voucher', message: msg, type: isUsed ? 'warning' : 'info', confirmText: 'Xóa' });
+            if (!ok) return;
+            const data = await _fetch('delete_redemption', { id });
             showToast(data.message, data.status === 'success' ? 'success' : 'error');
-            loadAdminRedemptions();
+            if (data.status === 'success') loadAdminRedemptions();
         }
 
-        window.rejectRedemption = async function(id) {
-            const ok = await showConfirm({ title: 'Từ chối đổi thưởng', message: 'Từ chối yêu cầu này? Điểm sẽ không được hoàn lại tự động.', type: 'warning', confirmText: 'Từ chối' });
+        window.markAsUsed = async function(id, userName) {
+            const ok = await showConfirm({ title: 'Sử dụng voucher', message: `Đánh dấu voucher của "${userName}" là đã dùng? Hành động này không kèm hoàn điểm.`, type: 'info', confirmText: 'Xác nhận' });
             if (!ok) return;
-            const data = await _fetch('update_redemption', { id, status: 'cancelled' });
+            const data = await _fetch('mark_used_redemption', { id });
             showToast(data.message, data.status === 'success' ? 'success' : 'error');
-            loadAdminRedemptions();
+            if (data.status === 'success') loadAdminRedemptions();
         }
+
 
         async function loadAdminRewards() {
             const res = await _fetch('get_rewards');
@@ -1356,30 +1491,51 @@
         async function loadAdminRedemptions() {
             const res = await _fetch('get_redemptions');
             const tb = document.getElementById('redemptionsTableBody');
+            if (res.status === 'error') {
+                tb.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-red-400">Lỗi tải dữ liệu: ${res.message}</td></tr>`;
+                return;
+            }
             const list = res.data || [];
             document.getElementById('redemptionsCount').textContent = `${list.length} yêu cầu`;
-            const statusMap = { pending: ['Chờ duyệt','bg-amber-100 text-amber-700'], confirmed: ['Đã duyệt','bg-emerald-100 text-emerald-700'], used: ['Đã dùng','bg-blue-100 text-blue-700'], cancelled: ['Đã huỷ','bg-red-100 text-red-700'] };
-            tb.innerHTML = list.length === 0 ? '<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">Chưa có yêu cầu đổi thưởng nào</td></tr>' : list.map(rd => {
-                const [sLabel, sClass] = statusMap[rd.status] || ['N/A','bg-slate-100 text-slate-500'];
-                const uName = rd.profile ? rd.profile.fullname : 'Ẩn';
-                const rTitle = rd.rewards ? rd.rewards.title : 'Đã xoá';
-                const date = new Date(rd.created_at).toLocaleDateString('vi-VN');
-                return `<tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-6 py-4 font-medium">${uName}</td>
-                    <td class="px-6 py-4">${rTitle}</td>
-                    <td class="px-6 py-4 font-bold text-amber-600">${rd.points_spent} ⭐</td>
-                    <td class="px-6 py-4 font-mono text-xs">${rd.voucher_code || '—'}</td>
-                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-bold ${sClass} rounded-full">${sLabel}</span></td>
-                    <td class="px-6 py-4 text-xs text-slate-500">${date}</td>
-                    <td class="px-6 py-4 text-right space-x-1">
-                        ${rd.status === 'pending' ? `
-                            <button onclick="approveRedemption('${rd.id}')" class="px-2 py-1 text-xs bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100"><i class="fa-solid fa-check"></i> Duyệt</button>
-                            <button onclick="rejectRedemption('${rd.id}')" class="px-2 py-1 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100"><i class="fa-solid fa-xmark"></i> Từ chối</button>
-                        ` : '<span class="text-xs text-slate-400">—</span>'}
-                    </td>
-                </tr>`;
-            }).join('');
+
+            const fmtDt = (s) => s ? new Date(s).toLocaleString('vi-VN', {
+                day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+            }) : '—';
+
+            tb.innerHTML = list.length === 0
+                ? '<tr><td colspan="8" class="px-6 py-8 text-center text-slate-400">Chưa có yêu cầu đổi thưởng nào</td></tr>'
+                : list.map(rd => {
+                    const isUsed  = rd.status === 'used';
+                    const uName   = (rd._profile && rd._profile.fullname) || (rd._profile && rd._profile.email) || rd.user_id?.slice(0,8) || 'Ẩn';
+                    const rTitle  = rd.rewards ? (rd.rewards.name || rd.rewards.title || '(Không tên)') : 'Đã xóa';
+                    const badge   = isUsed
+                        ? '<span class="px-2 py-1 text-xs font-bold bg-blue-100 text-blue-700 rounded-full">✅ Đã dùng</span>'
+                        : '<span class="px-2 py-1 text-xs font-bold bg-emerald-100 text-emerald-700 rounded-full">🟢 Còn hiệu lực</span>';
+                    const safeName = uName.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+                    return `<tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 font-medium">${uName}</td>
+                        <td class="px-6 py-4">${rTitle}</td>
+                        <td class="px-6 py-4 font-bold text-amber-600">${rd.points_spent} ⭐</td>
+                        <td class="px-6 py-4 font-mono text-xs">${rd.voucher_code || '—'}</td>
+                        <td class="px-6 py-4">${badge}</td>
+                        <td class="px-6 py-4 text-xs text-slate-500">${fmtDt(rd.created_at)}</td>
+                        <td class="px-6 py-4 text-xs ${isUsed ? 'text-blue-500 font-medium' : 'text-slate-400'}">${fmtDt(rd.used_at)}</td>
+                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                            ${!isUsed ? `<button onclick="markAsUsed('${rd.id}', '${safeName}')"
+                                class="px-2 py-1 text-xs bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 mr-2 transition-colors"
+                                title="Đánh dấu đã sử dụng">
+                                <i class="fa-solid fa-check-circle"></i> Đã dùng
+                            </button>` : ''}
+                            <button onclick="deleteRedemption('${rd.id}', ${isUsed}, '${safeName}', ${rd.points_spent || 0})"
+                                class="px-2 py-1 text-xs ${isUsed ? 'bg-slate-50 text-slate-500' : 'bg-red-50 text-red-600'} rounded-lg hover:opacity-80 transition-colors"
+                                title="${isUsed ? 'Xóa (không hoàn điểm)' : 'Xóa & hoàn điểm'}">
+                                <i class="fa-solid fa-trash"></i> ${isUsed ? 'Xóa' : 'Hoàn điểm'}
+                            </button>
+                        </td>
+                    </tr>`;
+                }).join('');
         }
+
 
     </script>
 </body>

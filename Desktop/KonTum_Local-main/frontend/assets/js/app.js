@@ -1,7 +1,16 @@
 // --- Global
 // API endpoints context
 window.API_URL = window.API_BASE_URL + '/api';
-window.currentUser = JSON.parse(localStorage.getItem('user_vtkt')) || null;
+window.getCurrentUser = window.getCurrentUser || function () {
+    try {
+        const raw = localStorage.getItem('user_vtkt');
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        console.warn('Invalid user_vtkt in localStorage:', e);
+        return null;
+    }
+};
+window.currentUser = window.getCurrentUser();
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- State & Config ---
@@ -13,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navBtns = document.querySelectorAll('.nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
     const darkModeSwitch = document.getElementById('darkModeSwitch');
+    const topStatusBar = document.getElementById('topStatusBar');
 
     // Toast DOM
     const toast = document.getElementById('toast');
@@ -97,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchStats() {
         try {
-            const user = window.currentUser || JSON.parse(localStorage.getItem('user_vtkt'));
+            const user = window.currentUser || (window.getCurrentUser ? window.getCurrentUser() : null);
             if (!user || !window.supabaseClient) return;
             
             // Parallel fetch to optimize load time
@@ -168,6 +178,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function updateTopStatusBarVisibility(activeTab) {
+        if (!topStatusBar) return;
+        if (activeTab === 'home') {
+            topStatusBar.classList.remove('hidden');
+        } else {
+            topStatusBar.classList.add('hidden');
+        }
+    }
+
+    // Ensure correct visibility on first load
+    const initialActiveTab = document.querySelector('.tab-content.active')?.id?.replace('tab-', '') || 'home';
+    updateTopStatusBarVisibility(initialActiveTab);
+
     // Bottom Navigation Logic
     navBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -191,15 +214,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tab.id === `tab-${targetId}`) {
                     tab.classList.add('active');
 
-                    // If tab is profile or notifications, refresh user stats / notifications
                     if (targetId === 'profile' && window.updateProfileView) {
                         window.updateProfileView();
                     }
                     if (targetId === 'notifications' && window.loadNotifications) {
                         window.loadNotifications();
                     }
+                    if (targetId === 'explore' && window.initExploreTab) {
+                        window.initExploreTab();
+                    }
                 }
             });
+
+            updateTopStatusBarVisibility(targetId);
         });
     });
 

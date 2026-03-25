@@ -95,7 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const category_id = document.getElementById('placeCategory').value;
             const address = document.getElementById('placeAddress').value.trim();
             const description = document.getElementById('placeDesc').value.trim();
-            const user = JSON.parse(localStorage.getItem('user_vtkt'));
+            const openingHours = document.getElementById('placeOpeningHours')?.value.trim() || null;
+            const priceRange = document.getElementById('placePriceRange')?.value.trim() || null;
+            const user = (window.getCurrentUser ? window.getCurrentUser() : null);
 
             if (!name || !address) {
                 showToast("Vui lòng nhập tên và địa chỉ!", "error");
@@ -154,6 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         category_id: parseInt(category_id),
                         address: address,
                         description: description,
+                        opening_hours: openingHours,
+                        price_range: priceRange,
                         latitude: parseFloat(latVal) || lat,
                         longitude: parseFloat(lngVal) || lng,
                         thumbnail: coverImage,
@@ -203,6 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('placeName').value = '';
                 document.getElementById('placeAddress').value = '';
                 document.getElementById('placeDesc').value = '';
+                if(document.getElementById('placeOpeningHours')) document.getElementById('placeOpeningHours').value = '';
+                if(document.getElementById('placePriceRange')) document.getElementById('placePriceRange').value = '';
 
                 if (placeImagePreviewContainer) {
                     const btnUpload = `<label class="w-24 h-24 flex-shrink-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-darkCard border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">

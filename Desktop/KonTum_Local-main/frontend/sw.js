@@ -3,7 +3,7 @@
  * Đặt tại root directory: /sw.js
  */
 
-const CACHE_NAME = 'kontum-plus-v7';
+const CACHE_NAME = 'kontum-plus-v11';
 const ASSETS = [
     '/',
     '/index.html',
@@ -46,18 +46,32 @@ self.addEventListener('activate', event => {
 // Fetch dữ liệu từ mạng (Network First, fallback về Cache)
 self.addEventListener('fetch', event => {
     if (event.request.method !== 'GET') return;
+
+    // Bỏ qua các request ngoại lai (Supabase, Map tiles, Analytics...)
+    // Để trình duyệt tự xử lý và tránh lỗi CORS/Response undefined
+    if (!event.request.url.startsWith(self.location.origin)) {
+        return;
+    }
     
     event.respondWith(
         fetch(event.request).then(fetchRes => {
             return caches.open(CACHE_NAME).then(cache => {
-                // Không cache các request API hoặc analytics
-                if (event.request.url.startsWith(self.location.origin) && !event.request.url.includes('/api/')) {
+                // Không cache các request API hoặc analytics nội bộ
+                if (!event.request.url.includes('/api/')) {
                     cache.put(event.request.url, fetchRes.clone());
                 }
                 return fetchRes;
             });
         }).catch(() => {
-            return caches.match(event.request);
+            return caches.match(event.request).then(response => {
+                if (response) return response;
+                // Tránh lỗi TypeError: Failed to convert value to 'Response' khi trả về undefined
+                return new Response('Network error/Offline and no cache available', {
+                    status: 503,
+                    statusText: 'Service Unavailable',
+                    headers: new Headers({ 'Content-Type': 'text/plain' })
+                });
+            });
         })
     );
 });

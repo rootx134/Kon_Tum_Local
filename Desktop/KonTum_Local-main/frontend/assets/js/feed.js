@@ -2,6 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_URL = window.API_BASE_URL + '/api';
     const feedContainer = document.getElementById('feedContainer');
 
+    window.getCurrentUser = function () {
+        try {
+            const raw = localStorage.getItem('user_vtkt');
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+            console.warn('Invalid user_vtkt in localStorage:', e);
+            return null;
+        }
+    };
+
     window.timeAgo = function (dateStr) {
         const date = new Date(dateStr.replace(' ', 'T')); // Fix for Safari/iOS parsing
         const now = new Date();
@@ -22,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Realtime Listeners ---
     function isMyAction(payloadUserId) {
-        const user = JSON.parse(localStorage.getItem('user_vtkt'));
+        const user = window.getCurrentUser ? window.getCurrentUser() : null;
         return user && user.id == payloadUserId;
     }
 
@@ -54,11 +64,188 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Explore State + UI ---
+    const exploreTopicChips = document.getElementById('exploreTopicChips');
+    const toggleNearMeBtn = document.getElementById('toggleNearMe');
+    const toggleOpenNowBtn = document.getElementById('toggleOpenNow');
+    const exploreFeedMeta = document.getElementById('exploreFeedMeta');
+    const exploreCollectionsList = document.getElementById('exploreCollectionsList');
+
+    const exploreState = {
+        topic: 'all',
+        nearMe: false,
+        openNow: false,
+        userLocation: null,
+        allReviews: []
+    };
+
+
+
+    function normalizeText(val) {
+        return String(val || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function haversineKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const toRad = (v) => (v * Math.PI) / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    function isOpenNow(openingHours) {
+        if (!openingHours) return false;
+        const text = String(openingHours).trim().toLowerCase();
+        if (text.includes('24/24') || text.includes('24h')) return true;
+
+        const match = text.match(/(\d{1,2})[:h.](\d{2})\s*[-–]\s*(\d{1,2})[:h.](\d{2})/);
+        if (!match) return false;
+
+        const now = new Date();
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+        const start = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+        const end = parseInt(match[3], 10) * 60 + parseInt(match[4], 10);
+
+        if (end >= start) return nowMinutes >= start && nowMinutes <= end;
+        return nowMinutes >= start || nowMinutes <= end;
+    }
+
+    function reviewMatchesTopic(review, topic) {
+        if (topic === 'all') return true;
+        const text = normalizeText(`${review.content || ''} ${review.place_name || ''} ${review.place_category || ''}`);
+
+        const topicKeywords = {
+            breakfast: ['an sang', 'bun', 'pho', 'xoi', 'banh mi', 'com tam', 'sang'],
+            coffee: ['ca phe', 'cafe', 'tra sua', 'espresso', 'latte', 'chill'],
+            checkin: ['check in', 'song ao', 'view', 'chup anh', 'decor', 'dep'],
+            night: ['dem', 'khuya', '22:', '23:', 'mo cua khuya', 'an dem'],
+            budget: ['re', 'sinh vien', '30k', '40k', '50k', 'gia mem', 'binh dan']
+        };
+
+        return (topicKeywords[topic] || []).some(k => text.includes(k));
+    }
+
+    function applyExploreFilters(reviews) {
+        let result = [...reviews];
+
+        result = result.filter(r => reviewMatchesTopic(r, exploreState.topic));
+
+        if (exploreState.openNow) {
+            result = result.filter(r => isOpenNow(r.opening_hours || r.place_opening_hours));
+        }
+
+        if (exploreState.nearMe && exploreState.userLocation) {
+            result = result.filter(r => {
+                const lat = parseFloat(r.latitude || r.place_latitude);
+                const lon = parseFloat(r.longitude || r.place_longitude);
+                if (Number.isNaN(lat) || Number.isNaN(lon)) return false;
+                const km = haversineKm(exploreState.userLocation.lat, exploreState.userLocation.lon, lat, lon);
+                r._distanceKm = km;
+                return km <= 5;
+            }).sort((a, b) => (a._distanceKm || 999) - (b._distanceKm || 999));
+        }
+
+        if (exploreFeedMeta) {
+            const parts = [`${result.length} bài phù hợp`];
+            if (exploreState.topic !== 'all') parts.push(`chủ đề: ${exploreState.topic}`);
+            if (exploreState.nearMe) parts.push('trong bán kính 5km');
+            if (exploreState.openNow) parts.push('đang mở cửa');
+            exploreFeedMeta.textContent = parts.join(' • ');
+        }
+
+        return result;
+    }
+
+
+
+    function syncExploreTopicUI() {
+        if (!exploreTopicChips) return;
+        exploreTopicChips.querySelectorAll('.explore-chip').forEach(chip => {
+            const isActive = chip.dataset.topic === exploreState.topic;
+            chip.classList.toggle('bg-[#ff5500]', isActive);
+            chip.classList.toggle('text-white', isActive);
+            chip.classList.toggle('bg-gray-100', !isActive);
+            chip.classList.toggle('dark:bg-gray-800', !isActive);
+            chip.classList.toggle('text-gray-600', !isActive);
+            chip.classList.toggle('dark:text-gray-300', !isActive);
+        });
+    }
+
+    function syncExploreToggleUI() {
+        const applyToggle = (btn, active) => {
+            if (!btn) return;
+            btn.classList.toggle('bg-[#ff5500]', active);
+            btn.classList.toggle('text-white', active);
+            btn.classList.toggle('bg-gray-100', !active);
+            btn.classList.toggle('dark:bg-gray-800', !active);
+            btn.classList.toggle('text-gray-600', !active);
+            btn.classList.toggle('dark:text-gray-300', !active);
+        };
+        applyToggle(toggleNearMeBtn, exploreState.nearMe);
+        applyToggle(toggleOpenNowBtn, exploreState.openNow);
+    }
+
+    async function ensureUserLocation() {
+        if (exploreState.userLocation) return true;
+        if (!navigator.geolocation) return false;
+
+        return new Promise(resolve => {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    exploreState.userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                    resolve(true);
+                },
+                () => resolve(false),
+                { enableHighAccuracy: false, timeout: 8000 }
+            );
+        });
+    }
+
+    function bindExploreInteractions() {
+        if (exploreTopicChips) {
+            exploreTopicChips.addEventListener('click', (e) => {
+                const chip = e.target.closest('.explore-chip');
+                if (!chip) return;
+                exploreState.topic = chip.dataset.topic || 'all';
+                syncExploreTopicUI();
+                renderFeed(applyExploreFilters(exploreState.allReviews));
+            });
+        }
+
+        if (toggleOpenNowBtn) {
+            toggleOpenNowBtn.addEventListener('click', () => {
+                exploreState.openNow = !exploreState.openNow;
+                syncExploreToggleUI();
+                renderFeed(applyExploreFilters(exploreState.allReviews));
+            });
+        }
+
+        if (toggleNearMeBtn) {
+            toggleNearMeBtn.addEventListener('click', async () => {
+                if (!exploreState.nearMe) {
+                    const ok = await ensureUserLocation();
+                    if (!ok) {
+                        if (typeof showToast === 'function') showToast('Không lấy được vị trí của bạn', 'error');
+                        return;
+                    }
+                }
+                exploreState.nearMe = !exploreState.nearMe;
+                syncExploreToggleUI();
+                renderFeed(applyExploreFilters(exploreState.allReviews));
+            });
+        }
+    }
+
     // --- Render Explore Feed (Reviews/Posts) ---
     async function loadFeed() {
         if (!feedContainer) return;
         try {
-            const user = JSON.parse(localStorage.getItem('user_vtkt'));
+            const user = window.getCurrentUser ? window.getCurrentUser() : null;
             const uid = user ? user.id : 0;
             
             let data = await window.apiService.getFeed(uid);
@@ -78,7 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (Array.isArray(data)) {
-                renderFeed(data);
+                exploreState.allReviews = data;
+                renderFeed(applyExploreFilters(data));
             }
         } catch (err) {
             console.error("Gặp lỗi tải feed:", err);
@@ -86,7 +274,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderFeed(reviews) {
+        const user = JSON.parse(localStorage.getItem('user_vtkt'));
         feedContainer.innerHTML = '';
+
+        if (!reviews || reviews.length === 0) {
+            feedContainer.innerHTML = `
+                <div class="bg-white dark:bg-darkCard rounded-3xl p-8 text-center border border-gray-100 dark:border-gray-800">
+                    <i class="fa-regular fa-compass text-3xl text-gray-300 mb-3"></i>
+                    <p class="text-sm font-semibold text-gray-500">Chưa có bài phù hợp bộ lọc hiện tại</p>
+                    <p class="text-xs text-gray-400 mt-1">Thử tắt bớt bộ lọc hoặc chọn chủ đề khác</p>
+                </div>
+            `;
+            return;
+        }
 
         reviews.forEach(review => {
             const card = document.createElement('div');
@@ -118,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const likeColor = (review.is_liked || review.liked_by_me == 1 || review.currentUser_liked == 1) ? 'text-[#ff5500]' : 'text-gray-400';
 
             card.innerHTML = `
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 relative">
                     <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-100">
                     <div class="flex-1">
                         <h4 class="font-extrabold text-sm flex items-center gap-2">${review.fullname} <button class="text-[#ff5500] text-[10px] uppercase tracking-wider bg-[#fff5f0] px-2 py-0.5 rounded-full" onclick="window.toggleFollowUser(this, ${review.user_id})"><i class="fa-solid fa-plus mr-1"></i>Follow</button></h4>
@@ -126,8 +326,31 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i class="fa-solid fa-location-dot"></i> <span>Đã đánh giá tại <b class="text-[#ff5500] hover:underline cursor-pointer" onclick="window.openPlaceDetail({id: ${review.place_id}})">${review.place_name}</b></span>
                         </p>
                     </div>
-                    <div class="bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
-                        <i class="fa-solid fa-star"></i> ${review.rating}
+                    <div class="flex items-center gap-2">
+                        <div class="bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-star"></i> ${review.rating}
+                        </div>
+                        <div class="relative">
+                            <button onclick="window.toggleFeedReviewMenu(${review.id}, event)" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-400">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <!-- Dropdown Menu -->
+                            <div id="feedReviewMenu-${review.id}" class="hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-[#3a3a3c] rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1.5 z-50 text-left origin-top-right transition-transform transform scale-95 opacity-0">
+                                ${user && String(user.id) === String(review.user_id) ? `
+                                    <button onclick="window.openEditReviewModal(${review.id}, this.closest('.bg-white')?.querySelector('.place-card-click')?.textContent || '', ${review.rating}, '${review.place_id}'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-pen fa-fw text-blue-500"></i> Sửa bài</button>
+                                    <button onclick="window.deleteOwnReview(${review.id}, '${review.place_id}'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-trash fa-fw text-red-500"></i> Xóa bài</button>
+                                ` : ''}
+                                ${user && user.is_admin == 1 && String(user.id) !== String(review.user_id) ? `
+                                    <button onclick="window.adminDeleteReview(${review.id}, '${review.place_id}', event); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-trash fa-fw text-red-500"></i> Xóa (Admin)</button>
+                                ` : ''}
+                                ${user && String(user.id) !== String(review.user_id) ? `
+                                    <button onclick="if(window.openReportModal) window.openReportModal('review', ${review.id}, 'đánh giá'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-flag fa-fw text-orange-400"></i> Báo cáo</button>
+                                ` : ''}
+                                ${!user ? `
+                                    <button onclick="alert('Vui lòng đăng nhập!'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-flag fa-fw text-orange-400"></i> Báo cáo</button>
+                                ` : ''}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -219,6 +442,8 @@ document.addEventListener('DOMContentLoaded', () => {
             imageContainer.innerHTML = imagesHtml;
         }
         document.getElementById('detailPlaceName').textContent = place.name;
+        document.getElementById('detailPlaceOpeningHours').textContent = place.opening_hours || 'Đang cập nhật';
+        document.getElementById('detailPlacePriceRange').textContent = place.price_range || 'Đang cập nhật';
         const addressEl = document.getElementById('detailPlaceAddress');
         addressEl.querySelector('span').textContent = place.address;
         // Thêm tính năng click để cuộn xuống Map
@@ -478,6 +703,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (catSelect) catSelect.value = place.category_id || 1;
                     const descInput = document.getElementById('editPlaceDesc');
                     if (descInput) descInput.value = place.description || '';
+                    if (document.getElementById('editPlaceOpeningHours')) {
+                        document.getElementById('editPlaceOpeningHours').value = place.opening_hours || '';
+                    }
+                    if (document.getElementById('editPlacePriceRange')) {
+                        document.getElementById('editPlacePriceRange').value = place.price_range || '';
+                    }
 
                     // Load existing images
                     const container = document.getElementById('editPlaceImagePreviewContainer');
@@ -907,6 +1138,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.openPlaceDetail = openPlaceDetail;
 
     // Init
+    bindExploreInteractions();
+    syncExploreTopicUI();
+    syncExploreToggleUI();
+
     loadFeed();
     loadCategories();
     loadHomePlaces();
@@ -1020,21 +1255,60 @@ async function loadComments(reviewId) {
         }
 
         commentsList.innerHTML = '';
+        const userStr = localStorage.getItem('user_vtkt');
+        const currentUser = userStr ? JSON.parse(userStr) : null;
+        const currentUserId = currentUser ? String(currentUser.id) : null;
+
         comments.forEach(c => {
+            const isMine = currentUserId === String(c.user_id);
+            const menuHtml = currentUser ? `
+                <div class="relative">
+                    <button onclick="window.toggleCommentMenu(${c.id}, event)" class="text-gray-400 hover:text-gray-600 px-1 py-0.5 rounded transition active:bg-gray-200">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="commentMenu-${c.id}" class="hidden absolute right-0 top-full mt-1 w-32 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden text-left origin-top-right transition-transform transform scale-95 opacity-0">
+                        ${isMine ? `
+                            <button onclick="window.editComment(${c.id}, this)" data-content="${c.content.replace(/"/g, '&quot;')}" class="w-full px-4 py-2 text-xs text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-pen fa-fw text-gray-400"></i> Sửa</button>
+                            <button onclick="window.deleteComment(${c.id}, ${reviewId})" class="w-full px-4 py-2 text-xs text-left text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-trash fa-fw text-red-400"></i> Xóa</button>
+                        ` : `
+                            <button onclick="window.reportComment(${c.id})" class="w-full px-4 py-2 text-xs text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-flag fa-fw text-gray-400"></i> Báo cáo</button>
+                        `}
+                    </div>
+                </div>
+            ` : '';
+
             const el = document.createElement('div');
             el.className = 'flex gap-3 items-start mb-4';
             el.innerHTML = `
                 <img src="${(c.avatar && c.avatar !== 'default_avatar.png') ? c.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.fullname)}&background=random`}" class="w-8 h-8 rounded-full object-cover shadow-sm bg-gray-200 flex-shrink-0">
-                <div class="flex-1 bg-gray-50 dark:bg-gray-800 p-3 rounded-2xl rounded-tl-none">
-                            <h5 class="font-bold text-xs text-gray-800 dark:text-gray-300 mb-1 flex justify-between items-center">
-                                ${c.fullname}
+                <div class="flex-1">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-2xl rounded-tl-none">
+                        <h5 class="font-bold text-xs text-gray-800 dark:text-gray-300 mb-1 flex justify-between items-center">
+                            <span>${c.fullname}</span>
+                            <div class="flex items-center gap-2">
                                 <span class="font-normal text-[10px] text-gray-400">${window.timeAgo(c.created_at)}</span>
-                            </h5>
-                    <p class="text-sm text-gray-700 dark:text-gray-200">${c.content}</p>
+                                ${menuHtml}
+                            </div>
+                        </h5>
+                        <p class="text-sm text-gray-700 dark:text-gray-200" id="commentText-${c.id}">${c.content}</p>
+                    </div>
                 </div>
             `;
             commentsList.appendChild(el);
         });
+
+        // Add document click listener to close comment menus
+        if (!window.__hasCommentMenuListener) {
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('[id^="commentMenu-"]') && !e.target.closest('button[onclick^="window.toggleCommentMenu"]')) {
+                    document.querySelectorAll('[id^="commentMenu-"]').forEach(m => {
+                        m.classList.add('hidden', 'scale-95', 'opacity-0');
+                    });
+                }
+            });
+            window.__hasCommentMenuListener = true;
+        }
 
         // Scroll to bottom
         setTimeout(() => commentsList.scrollTop = commentsList.scrollHeight, 100);
@@ -1042,6 +1316,99 @@ async function loadComments(reviewId) {
         commentsList.innerHTML = '<p class="text-center text-red-500">Lỗi tải bình luận</p>';
     }
 }
+
+window.toggleFeedReviewMenu = function(reviewId, e) {
+    e.stopPropagation();
+    const menu = document.getElementById(`feedReviewMenu-${reviewId}`);
+    if (menu) {
+        if (menu.classList.contains('hidden')) {
+            // close others
+            document.querySelectorAll('[id^="feedReviewMenu-"]').forEach(m => {
+                m.classList.add('hidden', 'scale-95', 'opacity-0');
+            });
+            menu.classList.remove('hidden');
+            setTimeout(() => {
+                menu.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        } else {
+            menu.classList.add('hidden', 'scale-95', 'opacity-0');
+        }
+    }
+};
+
+window.toggleCommentMenu = function(commentId, e) {
+    e.stopPropagation();
+    const menu = document.getElementById(`commentMenu-${commentId}`);
+    if (menu) {
+        if (menu.classList.contains('hidden')) {
+            // close others
+            document.querySelectorAll('[id^="commentMenu-"]').forEach(m => {
+                m.classList.add('hidden', 'scale-95', 'opacity-0');
+            });
+            menu.classList.remove('hidden');
+            setTimeout(() => {
+                menu.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        } else {
+            menu.classList.add('hidden', 'scale-95', 'opacity-0');
+        }
+    }
+};
+
+window.editComment = async function(commentId, btnEl) {
+    const currentContent = btnEl.getAttribute('data-content');
+    const newContent = prompt('Nhập nội dung mới:', currentContent);
+    if (newContent !== null && newContent.trim() !== '' && newContent !== currentContent) {
+        const user = JSON.parse(localStorage.getItem('user_vtkt'));
+        const res = await window.apiService.editComment(user.id, commentId, newContent.trim());
+        if (res.status === 'success') {
+            document.getElementById(`commentText-${commentId}`).textContent = newContent.trim();
+            btnEl.setAttribute('data-content', newContent.trim());
+            if (typeof showToast === 'function') showToast('Đã sửa bình luận', 'success');
+        } else {
+            if (typeof showToast === 'function') showToast(res.message || 'Lỗi khi sửa', 'error');
+        }
+    }
+};
+
+window.deleteComment = async function(commentId, reviewId) {
+    if (confirm('Bạn có chắc chắn muốn xóa bình luận này?')) {
+        const user = JSON.parse(localStorage.getItem('user_vtkt'));
+        const res = await window.apiService.deleteComment(user.id, commentId);
+        if (res.status === 'success') {
+            await loadComments(reviewId);
+            if (typeof showToast === 'function') showToast('Đã xóa bình luận', 'success');
+            
+            // update local comment count
+            const commentCountSpan = document.getElementById(`comment-count-${reviewId}`);
+            if (commentCountSpan) {
+                const count = parseInt(commentCountSpan.textContent) || 0;
+                commentCountSpan.textContent = Math.max(0, count - 1);
+            }
+        } else {
+            if (typeof showToast === 'function') showToast(res.message || 'Lỗi khi xóa', 'error');
+        }
+    }
+};
+
+window.reportComment = async function(commentId) {
+    const userStr = localStorage.getItem('user_vtkt');
+    if (!userStr) {
+        if (typeof showToast === 'function') showToast('Vui lòng đăng nhập', 'error');
+        return;
+    }
+    const user = JSON.parse(userStr);
+    
+    const reason = prompt('Lý do báo cáo:');
+    if (reason && reason.trim()) {
+        const res = await window.apiService.reportComment(user.id, commentId, reason.trim());
+        if (res.status === 'success') {
+            if (typeof showToast === 'function') showToast('Cảm ơn bạn! Báo cáo đã được ghi lại.', 'success');
+        } else {
+            if (typeof showToast === 'function') showToast(res.message || 'Lỗi khi báo cáo', 'error');
+        }
+    }
+};
 
 window.openReviewComments = function (reviewId) {
     if (typeof window.openComments === 'function') {
@@ -1100,47 +1467,75 @@ window.toggleLikeReview = async (btn, reviewId) => {
         return;
     }
 
+    const btns = document.querySelectorAll(`[data-like-btn-id="${reviewId}"]`);
+    const elementsToUpdate = Array.from(new Set([...Array.from(btns), btn]));
+    let wasLiked = false;
+
+    // 1. Optimistic UI update
+    elementsToUpdate.forEach(b => {
+        const icon = b.querySelector(`[data-like-icon-id="${reviewId}"]`) || b.querySelector('i');
+        const span = b.querySelector(`[data-like-count-id="${reviewId}"]`) || b.querySelector('span');
+        let count = parseInt(span.textContent || "0");
+
+        const isCurrentlyLiked = icon.classList.contains('fa-solid');
+        if (b === btn) wasLiked = isCurrentlyLiked;
+
+        if (!isCurrentlyLiked) {
+            icon.classList.replace('fa-regular', 'fa-solid');
+            b.classList.add('text-[#ff5500]');
+            b.classList.remove('text-gray-400');
+            icon.classList.remove('text-gray-500');
+            icon.classList.add('text-red-500');
+            span.classList.remove('text-gray-500');
+            span.classList.add('text-red-500');
+            count++;
+        } else {
+            icon.classList.replace('fa-solid', 'fa-regular');
+            b.classList.remove('text-[#ff5500]');
+            b.classList.add('text-gray-400');
+            icon.classList.remove('text-red-500');
+            icon.classList.add('text-gray-500');
+            span.classList.remove('text-red-500');
+            span.classList.add('text-gray-500');
+            count = Math.max(0, count - 1);
+        }
+        span.textContent = count;
+    });
+
+    // 2. Call API
     try {
         const res = await window.apiService.toggleLike(user.id, reviewId);
-        if (res.status === 'success') {
-            const btns = document.querySelectorAll(`[data-like-btn-id="${reviewId}"]`);
-            // include the clicked btn explicitly if missing from query
-            const elementsToUpdate = Array.from(new Set([...Array.from(btns), btn]));
+        if (res.status !== 'success') throw new Error('API failed');
+    } catch (e) { 
+        console.error("Lỗi thả tim, Rollback giao diện", e); 
+        // Rollback on fail
+        elementsToUpdate.forEach(b => {
+            const icon = b.querySelector(`[data-like-icon-id="${reviewId}"]`) || b.querySelector('i');
+            const span = b.querySelector(`[data-like-count-id="${reviewId}"]`) || b.querySelector('span');
+            let count = parseInt(span.textContent || "0");
 
-            elementsToUpdate.forEach(b => {
-                const icon = b.querySelector(`[data-like-icon-id="${reviewId}"]`) || b.querySelector('i');
-                const span = b.querySelector(`[data-like-count-id="${reviewId}"]`) || b.querySelector('span');
-                let count = parseInt(span.textContent || "0");
-
-                if (res.liked) {
-                    icon.classList.replace('fa-regular', 'fa-solid');
-                    b.classList.add('text-[#ff5500]');
-                    b.classList.remove('text-gray-400');
-                    
-                    // Detail view logic specifically
-                    icon.classList.remove('text-gray-500');
-                    icon.classList.add('text-red-500');
-                    span.classList.remove('text-gray-500');
-                    span.classList.add('text-red-500');
-
-                    count++;
-                } else {
-                    icon.classList.replace('fa-solid', 'fa-regular');
-                    b.classList.remove('text-[#ff5500]');
-                    b.classList.add('text-gray-400');
-                    
-                    // Detail view logic specifically
-                    icon.classList.remove('text-red-500');
-                    icon.classList.add('text-gray-500');
-                    span.classList.remove('text-red-500');
-                    span.classList.add('text-gray-500');
-                    
-                    count = Math.max(0, count - 1);
-                }
-                span.textContent = count;
-            });
-        }
-    } catch (e) { console.error(e); }
+            if (wasLiked) {
+                icon.classList.replace('fa-regular', 'fa-solid');
+                b.classList.add('text-[#ff5500]');
+                b.classList.remove('text-gray-400');
+                icon.classList.remove('text-gray-500');
+                icon.classList.add('text-red-500');
+                span.classList.remove('text-gray-500');
+                span.classList.add('text-red-500');
+                count++;
+            } else {
+                icon.classList.replace('fa-solid', 'fa-regular');
+                b.classList.remove('text-[#ff5500]');
+                b.classList.add('text-gray-400');
+                icon.classList.remove('text-red-500');
+                icon.classList.add('text-gray-500');
+                span.classList.remove('text-red-500');
+                span.classList.add('text-gray-500');
+                count = Math.max(0, count - 1);
+            }
+            span.textContent = count;
+        });
+    }
 };
 
 window.toggleSaveReview = async (btn, reviewId) => {
@@ -1317,7 +1712,10 @@ window.openCategoryPlacesModal = function (categoryId, categoryName) {
 
             let html = '<div class="grid grid-cols-2 gap-3 pb-8">';
             data.forEach(place => {
-                const img = (place.images && place.images.length > 0) ? `${API_URL}/../${place.images[0]}` : 'https://placehold.co/400x300?text=No+Image';
+                let img = 'https://placehold.co/400x300?text=No+Image';
+                if (place.thumbnail && place.thumbnail !== 'default_place.jpg') {
+                    img = place.thumbnail.startsWith('http') ? place.thumbnail : `${API_URL}/../${place.thumbnail}`;
+                }
                 html += `
                     <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm overflow-hidden flex flex-col active:scale-95 transition-transform cursor-pointer border border-gray-100 dark:border-gray-800" onclick="window.openPlaceDetail({id: ${place.id}})">
                         <div class="h-32 w-full relative">
@@ -1746,6 +2144,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const address = document.getElementById('editPlaceAddress').value.trim();
             const category_id = document.getElementById('editPlaceCategory').value;
             const description = document.getElementById('editPlaceDesc').value.trim();
+            const opening_hours = document.getElementById('editPlaceOpeningHours')?.value.trim() || null;
+            const price_range = document.getElementById('editPlacePriceRange')?.value.trim() || null;
 
             if (!name || !address) {
                 if (window.showToast) showToast("Vui lòng điền tên và địa chỉ", "error");
@@ -1779,7 +2179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     action: 'admin_edit_place',
                     admin_id: currentUser ? currentUser.id : null,
                     place_id: placeId,
-                    name, address, category_id, description
+                    name, address, category_id, description, opening_hours, price_range
                 };
                 
                 fetch(`${window.API_URL || '/api'}/admin.php`, {

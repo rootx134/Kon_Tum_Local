@@ -91,7 +91,44 @@ window.apiService = {
             .select();
 
         if (error) { console.error('Error adding comment:', error); return { status: 'error', message: 'Lỗi khi bình luận' }; }
+        
+        // Notification - bắn thông báo cho chủ sở hữu bài đánh giá
+        try {
+            const { data: actorUser } = await window.supabaseClient.from('profiles').select('fullname, avatar').eq('id', userId).single();
+            const { data: review } = await window.supabaseClient.from('reviews').select('user_id').eq('id', reviewId).single();
+            if (actorUser && review && String(review.user_id) !== String(userId)) {
+                await this.addNotification(review.user_id, 'comment', reviewId, `${actorUser.fullname || 'Ai đó'} đã bình luận về đánh giá của bạn: "${content.substring(0, 30)}${content.length > 30 ? '...' : ''}"`, actorUser.fullname, actorUser.avatar);
+            }
+        } catch (e) { console.error('Error adding comment notification:', e); }
+
         return { status: 'success', message: 'Đã bình luận' };
+    },
+
+    editComment: async function(userId, commentId, content) {
+        // Verify owner
+        const { data: cData } = await window.supabaseClient.from('comments').select('user_id').eq('id', commentId).single();
+        if (!cData || String(cData.user_id) !== String(userId)) return { status: 'error', message: 'Unauthorized' };
+
+        const { error } = await window.supabaseClient.from('comments').update({ content: content }).eq('id', commentId);
+        if (error) return { status: 'error', message: 'Lỗi khi sửa bình luận' };
+        return { status: 'success', message: 'Đã sửa bình luận' };
+    },
+
+    deleteComment: async function(userId, commentId) {
+        // Verify owner
+        const { data: cData } = await window.supabaseClient.from('comments').select('user_id').eq('id', commentId).single();
+        if (!cData || String(cData.user_id) !== String(userId)) return { status: 'error', message: 'Unauthorized' };
+
+        const { error } = await window.supabaseClient.from('comments').delete().eq('id', commentId);
+        if (error) return { status: 'error', message: 'Lỗi khi xóa bình luận' };
+        return { status: 'success', message: 'Đã xóa bình luận' };
+    },
+
+    reportComment: async function(userId, commentId, reason) {
+        // For now just mock report
+        const { error } = await window.supabaseClient.from('reports').insert([{ reporter_id: userId, entity_type: 'comment', entity_id: commentId, reason: reason }]);
+        if (error) return { status: 'error', message: 'Lỗi khi gửi báo cáo' };
+        return { status: 'success', message: 'Đã gửi báo cáo' };
     },
 
     toggleLike: async function(userId, reviewId) {
@@ -232,7 +269,7 @@ window.apiService = {
     getPlaces: async function(params = {}) {
         let query = window.supabaseClient
             .from('places')
-            .select('*, reviews(rating)');
+            .select('*, reviews(rating), place_images(id, image_url)');
             
         if (params.category_id) query = query.eq('category_id', params.category_id);
         
@@ -246,6 +283,7 @@ window.apiService = {
             const avg = revs.length > 0 ? revs.reduce((sum, r) => sum + r.rating, 0) / revs.length : 0;
             return {
                 ...p,
+                image_objects: p.place_images ? p.place_images.map(img => ({ id: img.id, url: img.image_url })) : [],
                 review_count: revs.length,
                 average_rating: avg
             };
@@ -263,7 +301,7 @@ window.apiService = {
     getPlaceDetail: async function(placeId) {
         const { data: place, error } = await window.supabaseClient
             .from('places')
-            .select('*, categories (name), place_images (image_url), reviews(rating)')
+            .select('*, categories (name), place_images (id, image_url), reviews(rating)')
             .eq('id', placeId)
             .single();
 
@@ -284,6 +322,7 @@ window.apiService = {
                 ...place,
                 category_name: place.categories?.name,
                 images: images,
+                image_objects: place.place_images ? place.place_images.map(img => ({ id: img.id, url: img.image_url })) : [],
                 review_count: revs.length,
                 average_rating: avg
             }
@@ -341,7 +380,9 @@ window.apiService = {
             address: updateData.address,
             category_id: updateData.category_id ? parseInt(updateData.category_id, 10) : null
         };
-        if (updateData.description) updatePayload.description = updateData.description;
+        if (updateData.description !== undefined) updatePayload.description = updateData.description;
+        if (updateData.opening_hours !== undefined) updatePayload.opening_hours = updateData.opening_hours;
+        if (updateData.price_range !== undefined) updatePayload.price_range = updateData.price_range;
 
         const { error } = await window.supabaseClient.from('places').update(updatePayload).eq('id', placeId);
 
@@ -440,6 +481,12 @@ window.fetch = async function(resource, config) {
                 return new Response(JSON.stringify(await window.apiService.getComments(urlObj.searchParams.get('review_id'))));
             case 'add_comment':
                 return new Response(JSON.stringify(await window.apiService.addComment(bodyObj.user_id, bodyObj.review_id, bodyObj.content)));
+            case 'edit_comment':
+                return new Response(JSON.stringify(await window.apiService.editComment(bodyObj.user_id, bodyObj.comment_id, bodyObj.content)));
+            case 'delete_comment':
+                return new Response(JSON.stringify(await window.apiService.deleteComment(bodyObj.user_id, bodyObj.comment_id)));
+            case 'report_comment':
+                return new Response(JSON.stringify(await window.apiService.reportComment(bodyObj.user_id, bodyObj.comment_id, bodyObj.reason)));
             case 'toggle_like':
                 return new Response(JSON.stringify(await window.apiService.toggleLike(bodyObj.user_id, bodyObj.review_id)));
             case 'toggle_save':

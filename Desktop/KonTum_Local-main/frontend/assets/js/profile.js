@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 1. Lắng nghe Dark Mode đổi trạng thái ---
     if (darkModeSwitch) {
         // Init state from localstorage
-        const user = JSON.parse(localStorage.getItem('user_vtkt'));
+        const user = (window.getCurrentUser ? window.getCurrentUser() : null);
         if (user && user.dark_mode == 1) {
             darkModeSwitch.checked = true;
             document.documentElement.classList.add('dark');
@@ -780,6 +780,14 @@ document.addEventListener('DOMContentLoaded', () => {
         list.innerHTML = '<div class="text-center py-6"><i class="fa-solid fa-spinner fa-spin text-2xl text-primary"></i></div>';
 
         try {
+            // Tự động xoá thông báo đã đọc sau 3 ngày
+            const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+            window.supabaseClient.from('notifications')
+                .delete()
+                .eq('is_read', 1)
+                .lt('created_at', threeDaysAgo)
+                .then(() => {});
+
             // Note: We might not have actor_name/actor_avatar directly if we don't join profile.
             // But we can just fetch notifications and assume basic info or join if configured.
             // Using a simple query for now. If table is missing, it will handle error gracefully.
@@ -891,7 +899,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (unread > 0 && notifBadge) {
                 notifBadge.classList.remove('hidden');
-                notifBadge.querySelector('span:last-child').textContent = unread > 9 ? '9+' : unread;
+                notifBadge.textContent = unread > 9 ? '9+' : unread;
             } else if (notifBadge) {
                 notifBadge.classList.add('hidden');
             }

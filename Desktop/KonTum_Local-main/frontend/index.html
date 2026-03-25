@@ -299,7 +299,7 @@
     class="bg-white dark:bg-darkBg text-gray-900 dark:text-gray-100 antialiased h-screen flex flex-col overflow-hidden relative">
 
     <!-- Top Status Bar -->
-    <div
+    <div id="topStatusBar"
         class="px-6 py-4 flex justify-between items-center bg-white dark:bg-darkBg sticky top-0 z-40 shadow-sm border-b border-gray-100 dark:border-gray-800">
         <h1 class="font-black text-xl tracking-tight flex items-center gap-2"><img
                 src="https://fc.kontumplus.com/favicon.png" class="w-6 h-6 rounded"> Địa Điểm Kon Tum</h1>
@@ -386,10 +386,46 @@
         </section>
 
         <!-- Tab: Khám Phá -->
-        <section id="tab-explore" class="tab-content px-4 space-y-4">
-            <h2 class="text-2xl font-bold p-2">Cộng đồng</h2>
-            <div id="feedContainer" class="space-y-4 pb-10">
-                <!-- Feed articles loaded via JS -->
+        <section id="tab-explore" class="tab-content w-full max-w-md mx-auto h-full relative pb-20">
+            <div class="w-full h-full flex flex-col pt-4 overflow-hidden relative">
+                <div class="px-4 flex justify-between items-center mb-3 shrink-0">
+                    <h2 class="text-2xl font-black tracking-tight dark:text-gray-100">Khám Phá</h2>
+                <div class="flex gap-2">
+                    <button id="btnExploreRadar" class="bg-[#ff5500]/10 text-[#ff5500] px-3 py-2 rounded-full font-bold shadow-sm active:scale-95 transition-transform flex items-center gap-2 text-sm z-10 backdrop-blur-md">
+                        <i class="fa-solid fa-satellite-dish"></i> Gần tôi
+                    </button>
+                    <button id="btnExploreToggleView" class="bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm rounded-full text-gray-700 dark:text-gray-200 font-bold shadow-sm active:scale-95 transition-transform flex items-center gap-2 z-10 backdrop-blur-md">
+                        <i class="fa-solid fa-list"></i> Danh sách
+                    </button>
+                </div>
+            </div>
+
+            <!-- Map View Container -->
+            <div id="explore-map-view" class="flex-1 w-full relative">
+                <div id="exploreMap" class="absolute inset-0 w-full h-full rounded-t-3xl shadow-inner overflow-hidden"></div>
+                
+                <!-- Bottom Sheet for Place Preview -->
+                <div id="exploreMapPreview" class="absolute bottom-4 left-4 right-4 bg-white dark:bg-gray-800 rounded-3xl p-3 shadow-xl transform translate-y-[200%] transition-transform duration-300 z-[1000] flex gap-3 items-center cursor-pointer active:scale-[0.98]">
+                    <!-- Render via JS -->
+                </div>
+            </div>
+            
+            <!-- List View Container -->
+            <div id="explore-list-view" class="flex-1 w-full overflow-y-auto px-4 pb-24 hidden space-y-4">
+                <div id="exploreQuickFilters" class="space-y-3 sticky top-0 bg-white/90 dark:bg-darkBg/90 backdrop-blur-md z-10 py-2">
+                    <div id="exploreTopicChips" class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-[#ff5500] text-white" data-topic="all">Tất cả</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="breakfast">Ăn sáng</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="coffee">Cafe chill</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="checkin">Check-in đẹp</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="night">Mở khuya</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="budget">Sinh viên rẻ</button>
+                    </div>
+                </div>
+                <div id="feedContainer" class="space-y-4 pb-10">
+                    <!-- Feed articles loaded via JS feed.js -->
+                </div>
+            </div>
             </div>
         </section>
 
@@ -531,8 +567,7 @@
                 <!-- Header Info -->
                 <div class="bg-white dark:bg-darkCard px-6 pt-10 pb-8 rounded-b-[40px] shadow-sm relative">
                     <div class="flex items-center gap-5">
-                        <div class="relative group cursor-pointer"
-                            onclick="document.getElementById('avatarUploadInput').click()">
+                        <div class="relative group cursor-pointer">
                             <img src="https://images.unsplash.com/photo-1544005313-94ff6a00c24c?auto=format&fit=crop&q=80&w=150"
                                 id="profileAvatar"
                                 class="w-20 h-20 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-md transition-opacity group-hover:opacity-70"
@@ -724,6 +759,18 @@
                     <textarea id="editPlaceDesc" rows="3" placeholder="..."
                         class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-medium resize-none"></textarea>
                 </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Giờ mở cửa</label>
+                        <input type="text" id="editPlaceOpeningHours" placeholder="08:00 - 22:00"
+                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Mức giá</label>
+                        <input type="text" id="editPlacePriceRange" placeholder="50k - 200k"
+                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                    </div>
+                </div>
                 <!-- Ảnh đính kèm -->
                 <div>
                     <label class="block text-xs font-black uppercase text-gray-400 tracking-widest pl-1 mb-2">Chỉnh sửa ảnh</label>
@@ -790,6 +837,19 @@
                         class="absolute z-10 w-full bg-white dark:bg-darkCard mt-1 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-800 text-sm font-medium">
                     </ul>
                 </div>
+                <!-- Giờ mở cửa và Khoảng giá -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Giờ mở cửa</label>
+                        <input type="text" id="placeOpeningHours" placeholder="VD: 07:00 - 22:00"
+                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Khoảng giá</label>
+                        <input type="text" id="placePriceRange" placeholder="VD: 30k - 50k"
+                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                    </div>
+                </div>
                 <div class="space-y-2">
                     <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Mô tả ngắn</label>
                     <textarea id="placeDesc" rows="3" placeholder="Chia sẻ thêm về không gian, món ăn..."
@@ -852,10 +912,7 @@
                     data-target="notifications">
                     <i class="fa-solid fa-bell text-xl mb-1.5 transition-transform group-active:scale-90"></i>
                     <span class="text-[9px] font-bold uppercase tracking-tight">Thông báo</span>
-                    <span id="navNotifBadge" class="absolute top-1 right-2 flex h-2.5 w-2.5 hidden">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                    </span>
+                    <span id="navNotifBadge" class="absolute top-0 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white hidden px-1 border-2 border-white dark:border-[#1c1c1e]"></span>
                 </button>
                 <button
                     class="nav-btn flex flex-col items-center justify-center text-gray-400 transition-all duration-300"
@@ -934,6 +991,26 @@
                 <div>
                     <h3 class="font-bold mb-2">Giới thiệu</h3>
                     <p id="detailPlaceDesc" class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed"></p>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 text-[#ff5500] flex items-center justify-center shrink-0">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="text-[10px] font-black uppercase text-gray-400">Giờ mở cửa</p>
+                            <p id="detailPlaceOpeningHours" class="font-bold text-sm truncate">Đang cập nhật</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-500 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="text-[10px] font-black uppercase text-gray-400">Mức giá</p>
+                            <p id="detailPlacePriceRange" class="font-bold text-sm truncate">Đang cập nhật</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-4">
                     <h3 class="font-bold mb-2">Vị trí</h3>
@@ -1548,6 +1625,7 @@
     <script src="assets/js/api_service.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/feed.js"></script>
+    <script src="assets/js/explore.js"></script>
     <script src="assets/js/place.js"></script>
     <script src="assets/js/review.js"></script>
     <script src="assets/js/profile.js"></script>

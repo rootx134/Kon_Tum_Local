@@ -58,6 +58,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (currentUser) {
             // Logged in: show profile, hide guest view
+
+        // --- SEO Routing check ---
+        setTimeout(() => {
+            const path = window.location.pathname;
+            if (path.startsWith('/place/')) {
+                const match = path.match(/place\/([0-9a-fA-F\-]+)/);
+                if (match && match[1]) {
+                    if (typeof window.openPlaceDetail === 'function') {
+                        window.openPlaceDetail({ id: match[1] });
+                    }
+                }
+            } else if (path.startsWith('/review/')) {
+                const match = path.match(/review\/([0-9a-fA-F\-]+)/);
+                if (match && match[1]) {
+                    if (typeof window.openReviewComments === 'function') {
+                        window.openReviewComments(match[1]);
+                    }
+                }
+            }
+        }, 500);
+
+        // Xử lý nút Back/Forward của trình duyệt
+        window.addEventListener('popstate', (e) => {
+            const path = window.location.pathname;
+            if (path === '/' || path === '') {
+                const placeDetailModal = document.getElementById('placeDetailModal');
+                const reviewModal = document.getElementById('reviewCommentsModal') || document.getElementById('reviewModal'); // tuỳ ID chứa reviews comment
+                const closeReviewModal = document.getElementById('closeReviewCommentsBtn') || document.getElementById('closeReviewModal');
+                const closePlaceDetail = document.getElementById('closePlaceDetail');
+                
+                if (placeDetailModal && !placeDetailModal.classList.contains('hidden') && closePlaceDetail) {
+                    placeDetailModal.classList.add('translate-y-full');
+                    setTimeout(() => placeDetailModal.classList.add('hidden'), 300);
+                    document.title = 'Kon Tum Local';
+                }
+                if (reviewModal && !reviewModal.classList.contains('hidden') && closeReviewModal) {
+                    reviewModal.classList.add('translate-y-full');
+                    setTimeout(() => reviewModal.classList.add('hidden'), 300);
+                    document.title = 'Kon Tum Local';
+                }
+            } else if (path.startsWith('/place/')) {
+                const match = path.match(/place\/([0-9a-fA-F\-]+)/);
+                if (match && match[1] && typeof window.openPlaceDetail === 'function') {
+                    window.openPlaceDetail({ id: match[1] }, null, null, null, false);
+                }
+            } else if (path.startsWith('/review/')) {
+                const match = path.match(/review\/([0-9a-fA-F\-]+)/);
+                if (match && match[1] && typeof window.openReviewComments === 'function') {
+                    window.openReviewComments(match[1], false);
+                }
+            }
+        });
             if (profileGuestView) {
                 profileGuestView.classList.add('hidden');
                 profileGuestView.classList.remove('flex');
@@ -353,14 +405,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 authRegisterForm.classList.remove('hidden');
                 authTitle.textContent = "Tạo tài khoản mới";
                 authSubtitle.textContent = "Hoàn thành các thông tin bên dưới để bắt đầu.";
-                switchAuthBtn.innerHTML = 'Đã có tài khoản? <span class="text-[#ff5500]">Đăng nhập</span>';
+                switchAuthBtn.innerHTML = 'Đã có tài khoản? <span class="text-primary">Đăng nhập</span>';
             } else {
                 // Switch to Login
                 authLoginForm.classList.remove('hidden');
                 authRegisterForm.classList.add('hidden');
                 authTitle.textContent = "Chào mừng trở lại!";
                 authSubtitle.textContent = "Đăng nhập để tiếp tục khám phá Kon Tum cùng chúng tôi.";
-                switchAuthBtn.innerHTML = 'Chưa có tài khoản? <span class="text-[#ff5500]">Đăng ký ngay</span>';
+                switchAuthBtn.innerHTML = 'Chưa có tài khoản? <span class="text-primary">Đăng ký ngay</span>';
             }
         });
     }

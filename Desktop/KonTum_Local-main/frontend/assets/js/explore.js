@@ -103,7 +103,7 @@ function addExploreMarker(place) {
     const el = document.createElement('div');
     el.className = 'custom-marker';
     el.innerHTML = `
-        <div class="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden bg-white hover:scale-110 active:scale-95 transition-transform cursor-pointer origin-bottom" style="margin-top: -10px;">
+        <div class="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden bg-surface hover:scale-110 btn-tactile cursor-pointer origin-bottom" style="margin-top: -10px;">
             <img src="${imgUrl}" class="w-full h-full object-cover">
         </div>
     `;
@@ -135,16 +135,16 @@ function showPreviewCard(place) {
     let imgUrl = place.thumbnail || (place.image_objects && place.image_objects.length > 0 ? place.image_objects[0].url : 'https://placehold.co/100x100?text=KT');
 
     previewContainer.innerHTML = `
-        <img src="${imgUrl}" class="w-20 h-20 rounded-2xl object-cover shadow-sm">
+        <img src="${imgUrl}" class="w-20 h-20 rounded-2xl object-cover shadow-soft">
         <div class="flex-1 overflow-hidden">
-            <h4 class="font-bold text-gray-800 dark:text-gray-100 truncate text-base">${place.name}</h4>
-            <p class="text-xs text-gray-500 dark:text-gray-400 truncate mb-1"><i class="fa-solid fa-location-dot mr-1"></i> ${place.address}</p>
+            <h4 class="font-bold text-textPrimary dark:text-gray-100 truncate text-base">${place.name}</h4>
+            <p class="text-xs text-textSecondary dark:text-gray-400 truncate mb-1"><i class="fa-solid fa-location-dot mr-1"></i> ${place.address}</p>
             <div class="flex items-center gap-2 mt-1">
                 <span class="text-xs font-bold px-2 py-0.5 rounded-md ${isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${isOpen ? 'Đang mở' : 'Đóng cửa'}</span>
-                <span class="text-xs text-[#ff5500] font-bold bg-[#ff5500]/10 px-2 py-0.5 rounded-md">${categoryName}</span>
+                <span class="text-xs text-primary font-bold bg-accent/10 px-2 py-0.5 rounded-md">${categoryName}</span>
             </div>
         </div>
-        <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
+        <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-textSecondary dark:text-gray-300">
             <i class="fa-solid fa-chevron-right"></i>
         </div>
     `;

@@ -66,10 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update UI
                 stars.forEach((s, index) => {
                     if (index < rating) {
-                        s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-gray-600');
+                        s.classList.remove('fa-regular', 'text-gray-300', 'dark:text-textSecondary');
                         s.classList.add('fa-solid', 'text-yellow-400');
                     } else {
-                        s.classList.add('fa-regular', 'text-gray-300', 'dark:text-gray-600');
+                        s.classList.add('fa-regular', 'text-gray-300', 'dark:text-textSecondary');
                         s.classList.remove('fa-solid', 'text-yellow-400');
                     }
                 });
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const imgDiv = document.createElement('div');
-                    imgDiv.className = 'shrink-0 relative w-24 h-24 rounded-xl overflow-hidden shadow-sm group';
+                    imgDiv.className = 'shrink-0 relative w-24 h-24 rounded-xl overflow-hidden shadow-soft group';
                     imgDiv.innerHTML = `
                         <img src="${e.target.result}" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer remove-img-btn">

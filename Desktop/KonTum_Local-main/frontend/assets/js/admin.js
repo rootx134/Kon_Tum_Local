@@ -46,11 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
         tab.addEventListener('click', (e) => {
             // Update Tab style
             adminTabs.forEach(t => {
-                t.classList.remove('active-tab', 'bg-[#ff5500]', 'text-white');
-                t.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-300');
+                t.classList.remove('active-tab', 'bg-accent', 'text-white');
+                t.classList.add('bg-gray-100', 'dark:bg-gray-800', 'text-textSecondary', 'dark:text-gray-300');
             });
-            tab.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-300');
-            tab.classList.add('active-tab', 'bg-[#ff5500]', 'text-white');
+            tab.classList.remove('bg-gray-100', 'dark:bg-gray-800', 'text-textSecondary', 'dark:text-gray-300');
+            tab.classList.add('active-tab', 'bg-accent', 'text-white');
 
             // Show Panel
             const targetId = tab.dataset.tab;
@@ -81,7 +81,7 @@ async function loadAdminData(tabId) {
 // -----------------------------------------------------------------------------------------
 async function loadPendingPlaces(adminId) {
     const listEl = document.getElementById('adminPlacesList');
-    listEl.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
+    listEl.innerHTML = '<div class="text-center py-10 text-textSecondary text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
 
     try {
         const res = await fetch(`${API_URL_ADMIN}?action=get_pending_places&admin_id=${adminId}`);
@@ -89,23 +89,23 @@ async function loadPendingPlaces(adminId) {
 
         if (result.status === 'success') {
             if (!result.data || result.data.length === 0) {
-                listEl.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm">Không có địa điểm nào chờ duyệt.</div>';
+                listEl.innerHTML = '<div class="text-center py-10 text-textSecondary text-sm">Không có địa điểm nào chờ duyệt.</div>';
                 return;
             }
 
             listEl.innerHTML = '';
             result.data.forEach(place => {
                 const card = document.createElement('div');
-                card.className = 'bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl flex flex-col gap-3 shadow-sm border border-gray-100 dark:border-gray-700';
+                card.className = 'bg-surface dark:bg-gray-800 p-4 rounded-2xl flex flex-col gap-3 shadow-soft border border-border dark:border-gray-700';
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-gray-900 dark:text-white text-base">${place.name}</h3>
-                            <span class="text-[10px] font-bold px-2 py-1 bg-orange-100 text-[#ff5500] rounded-lg">${place.category_name}</span>
+                            <h3 class="font-bold text-textPrimary dark:text-white text-base">${place.name}</h3>
+                            <span class="text-[10px] font-bold px-2 py-1 bg-orange-100 text-primary rounded-xl">${place.category_name}</span>
                         </div>
-                        <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-location-dot"></i> ${place.address}</p>
+                        <p class="text-xs text-textSecondary mt-1"><i class="fa-solid fa-location-dot"></i> ${place.address}</p>
                         <p class="text-xs text-gray-400 mt-1 italic">Bởi: ${place.sumitted_by_name || 'Khách'} - ${new Date(place.created_at).toLocaleDateString('vi-VN')}</p>
-                        <p class="text-sm mt-2 text-gray-700 dark:text-gray-300 line-clamp-2">${place.description || ''}</p>
+                        <p class="text-sm mt-2 text-textSecondary dark:text-gray-300 line-clamp-2">${place.description || ''}</p>
                     </div>
                     <div class="flex gap-2 mt-2">
                         <button onclick="event.stopPropagation(); handlePlaceAction(${place.id}, 'approve_place', ${adminId})" class="flex-1 bg-[#10b981] hover:bg-[#059669] text-white text-sm font-bold py-2 rounded-xl transition-colors">Duyệt</button>
@@ -161,7 +161,7 @@ async function executePlaceAction(placeId, action, adminId) {
 // -----------------------------------------------------------------------------------------
 async function loadReports(adminId) {
     const listEl = document.getElementById('adminReportsList');
-    listEl.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
+    listEl.innerHTML = '<div class="text-center py-10 text-textSecondary text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
 
     try {
         const res = await fetch(`${API_URL_ADMIN}?action=get_reports&admin_id=${adminId}`);
@@ -172,7 +172,7 @@ async function loadReports(adminId) {
             const pendingReports = result.data.filter(r => r.status === 'pending');
 
             if (pendingReports.length === 0) {
-                listEl.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm">Không có báo cáo mới nào.</div>';
+                listEl.innerHTML = '<div class="text-center py-10 text-textSecondary text-sm">Không có báo cáo mới nào.</div>';
                 return;
             }
 
@@ -180,26 +180,26 @@ async function loadReports(adminId) {
             pendingReports.forEach(report => {
                 const isReview = report.entity_type === 'review';
                 const card = document.createElement('div');
-                card.className = 'bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl flex flex-col gap-3 shadow-sm border border-gray-100 dark:border-gray-700';
+                card.className = 'bg-surface dark:bg-gray-800 p-4 rounded-2xl flex flex-col gap-3 shadow-soft border border-border dark:border-gray-700';
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start">
-                            <span class="text-xs font-bold px-2 py-1 ${isReview ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'} rounded-lg">
+                            <span class="text-xs font-bold px-2 py-1 ${isReview ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'} rounded-xl">
                                 Báo cáo ${isReview ? 'Đánh giá' : 'Địa điểm'}
                             </span>
                             <span class="text-[10px] text-gray-400">${new Date(report.created_at).toLocaleDateString('vi-VN')}</span>
                         </div>
-                        <p class="text-sm font-bold text-gray-900 dark:text-white mt-2">Bởi: <span class="font-normal text-gray-600">${report.reporter_name}</span></p>
+                        <p class="text-sm font-bold text-textPrimary dark:text-white mt-2">Bởi: <span class="font-normal text-textSecondary">${report.reporter_name}</span></p>
                         <p class="text-sm mt-1 text-red-500 dark:text-red-400 font-medium">Lý do: "${report.reason}"</p>
                         
-                        <div class="mt-3 p-3 bg-white dark:bg-darkBg rounded-xl border border-gray-100 dark:border-gray-700">
+                        <div class="mt-3 p-3 bg-surface dark:bg-darkBg rounded-xl border border-border dark:border-gray-700">
                             <p class="text-xs text-gray-400 font-bold mb-1">Nội dung bị báo cáo:</p>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 italic">"${report.target_content}"</p>
+                            <p class="text-sm text-textSecondary dark:text-gray-300 italic">"${report.target_content}"</p>
                         </div>
                     </div>
                     <div class="flex gap-2 mt-2">
                         <button onclick="handleReportAction(${report.id}, 'delete_entity', ${adminId})" class="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-2 rounded-xl transition-colors">Xóa bài</button>
-                        <button onclick="handleReportAction(${report.id}, 'dismiss', ${adminId})" class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:text-white text-gray-800 text-sm font-bold py-2 rounded-xl transition-colors">Bỏ qua</button>
+                        <button onclick="handleReportAction(${report.id}, 'dismiss', ${adminId})" class="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:text-white text-textPrimary text-sm font-bold py-2 rounded-xl transition-colors">Bỏ qua</button>
                     </div>
                 `;
                 listEl.appendChild(card);
@@ -246,7 +246,7 @@ async function executeReportAction(reportId, actionType, adminId) {
 // -----------------------------------------------------------------------------------------
 async function loadUsersList(adminId) {
     const listEl = document.getElementById('adminUsersList');
-    listEl.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
+    listEl.innerHTML = '<div class="text-center py-10 text-textSecondary text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
 
     try {
         const res = await fetch(`${API_URL_ADMIN}?action=get_users&admin_id=${adminId}`);
@@ -259,25 +259,25 @@ async function loadUsersList(adminId) {
                 const roleBadge = u.is_admin == 1 ? '<span class="px-2 py-0.5 bg-red-100 text-red-600 text-[10px] rounded-md font-bold ml-2">Admin</span>' : '';
 
                 const item = document.createElement('div');
-                item.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl mb-2';
+                item.className = 'flex items-center justify-between p-3 bg-surface dark:bg-gray-800 rounded-xl mb-2';
                 item.innerHTML = `
                     <div class="flex items-center gap-3">
                         <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover">
                         <div>
-                            <div class="font-bold text-sm text-gray-900 dark:text-white flex items-center">
+                            <div class="font-bold text-sm text-textPrimary dark:text-white flex items-center">
                                 ${u.fullname || u.username} ${roleBadge}
                             </div>
-                            <div class="text-xs text-gray-500">@${u.username} • Điểm: <span class="text-[#ff5500] font-bold">${u.points}</span></div>
+                            <div class="text-xs text-textSecondary">@${u.username} • Điểm: <span class="text-primary font-bold">${u.points}</span></div>
                         </div>
                     </div>
                     <div class="relative user-menu-container">
-                        <button class="text-gray-400 hover:text-[#ff5500] p-2" onclick="toggleUserMenu(${u.id})">
+                        <button class="text-gray-400 hover:text-primary p-2" onclick="toggleUserMenu(${u.id})">
                             <i class="fa-solid fa-ellipsis-vertical"></i>
                         </button>
-                        <div id="userMenu-${u.id}" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden z-10">
-                            ${u.is_admin == 0 ? `<button onclick="handleUserAction(${u.id}, 'grant_admin', ${adminId})" class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition dark:text-white"><i class="fa-solid fa-user-shield w-4 mr-2"></i>Cấp quyền Admin</button>` : `<button onclick="handleUserAction(${u.id}, 'revoke_admin', ${adminId})" class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-orange-500 transition"><i class="fa-solid fa-user-minus w-4 mr-2"></i>Hủy Admin</button>`}
+                        <div id="userMenu-${u.id}" class="hidden absolute right-0 mt-2 w-48 bg-surface dark:bg-gray-800 rounded-xl shadow-lg border border-border dark:border-gray-700 overflow-hidden z-10">
+                            ${u.is_admin == 0 ? `<button onclick="handleUserAction(${u.id}, 'grant_admin', ${adminId})" class="w-full text-left px-4 py-3 text-sm hover:bg-surface dark:hover:bg-gray-700 transition dark:text-white"><i class="fa-solid fa-user-shield w-4 mr-2"></i>Cấp quyền Admin</button>` : `<button onclick="handleUserAction(${u.id}, 'revoke_admin', ${adminId})" class="w-full text-left px-4 py-3 text-sm hover:bg-surface dark:hover:bg-gray-700 text-orange-500 transition"><i class="fa-solid fa-user-minus w-4 mr-2"></i>Hủy Admin</button>`}
                             <div class="h-px bg-gray-100 dark:bg-gray-700"></div>
-                            <button onclick="handleUserAction(${u.id}, 'delete_user', ${adminId})" class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 text-red-500 transition"><i class="fa-solid fa-ban w-4 mr-2"></i>Khóa tài khoản</button>
+                            <button onclick="handleUserAction(${u.id}, 'delete_user', ${adminId})" class="w-full text-left px-4 py-3 text-sm hover:bg-surface dark:hover:bg-gray-700 text-red-500 transition"><i class="fa-solid fa-ban w-4 mr-2"></i>Khóa tài khoản</button>
                         </div>
                     </div>
                 `;
@@ -346,7 +346,7 @@ document.addEventListener('click', (e) => {
 async function loadBannersAdmin(adminId) {
     const listEl = document.getElementById('adminBannersList');
     if (!listEl) return;
-    listEl.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
+    listEl.innerHTML = '<div class="text-center py-10 text-textSecondary text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang tải...</div>';
 
     try {
         const res = await fetch(`${API_URL_ADMIN}?action=get_banners&admin_id=${adminId}`);
@@ -354,20 +354,20 @@ async function loadBannersAdmin(adminId) {
 
         if (result.status === 'success') {
             if (result.data.length === 0) {
-                listEl.innerHTML = '<div class="text-center py-10 text-gray-500 text-sm">Chưa có banner nào.</div>';
+                listEl.innerHTML = '<div class="text-center py-10 text-textSecondary text-sm">Chưa có banner nào.</div>';
                 return;
             }
 
             listEl.innerHTML = '';
             result.data.forEach(banner => {
                 const card = document.createElement('div');
-                card.className = 'bg-white dark:bg-darkBg p-3 rounded-2xl flex items-center justify-between gap-3 shadow-sm border border-gray-100 dark:border-gray-800';
+                card.className = 'bg-surface dark:bg-darkBg p-3 rounded-2xl flex items-center justify-between gap-3 shadow-soft border border-border dark:border-gray-800';
                 card.innerHTML = `
                     <div class="flex items-center gap-3 flex-1 min-w-0">
-                        <img src="${banner.image_url}" class="w-16 h-10 object-cover rounded-lg bg-gray-200">
+                        <img src="${banner.image_url}" class="w-16 h-10 object-cover rounded-xl bg-gray-200">
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-gray-900 dark:text-white truncate">${banner.link_url || 'Không có link'}</p>
-                            <p class="text-xs text-gray-500">Trạng thái: ${banner.is_active == 1 ? '<span class="text-green-500">Đang bật</span>' : '<span class="text-gray-400">Đang tắt</span>'}</p>
+                            <p class="text-sm font-bold text-textPrimary dark:text-white truncate">${banner.link_url || 'Không có link'}</p>
+                            <p class="text-xs text-textSecondary">Trạng thái: ${banner.is_active == 1 ? '<span class="text-green-500">Đang bật</span>' : '<span class="text-gray-400">Đang tắt</span>'}</p>
                         </div>
                     </div>
                     <button onclick="deleteBanner(${banner.id}, ${adminId})" class="w-8 h-8 flex items-center justify-center bg-red-100 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-colors shrink-0">

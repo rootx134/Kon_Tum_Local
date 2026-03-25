@@ -191,12 +191,12 @@ function addMarker(place) {
                     <i class="fa-solid fa-star text-orange-400"></i> ${Number(place.average_rating || 0).toFixed(1)}
                 </div>
             </div>
-            <div class="p-3 bg-white rounded-b-lg">
-                <h3 class="font-bold text-sm text-gray-900 leading-tight mb-1 line-clamp-1">${place.name}</h3>
-                <p class="text-[10px] text-gray-500 line-clamp-1 mb-2">
+            <div class="p-3 bg-surface rounded-b-lg">
+                <h3 class="font-bold text-sm text-textPrimary leading-tight mb-1 line-clamp-1">${place.name}</h3>
+                <p class="text-[10px] text-textSecondary line-clamp-1 mb-2">
                     <i class="fa-solid fa-location-dot w-3"></i> ${place.address}
                 </p>
-                <button onclick="window.openPlaceFromMap(this)" data-place='${JSON.stringify(place).replace(/'/g, "&apos;")}' data-img="${thumbnail}" data-rating="${place.average_rating}" data-reviews="${place.review_count}" class="w-full bg-[#ff5500] hover:bg-[#ff7333] text-white text-[10px] font-bold py-1.5 rounded-md transition-colors">
+                <button onclick="window.openPlaceFromMap(this)" data-place='${JSON.stringify(place).replace(/'/g, "&apos;")}' data-img="${thumbnail}" data-rating="${place.average_rating}" data-reviews="${place.review_count}" class="w-full bg-accent hover:bg-[#ff7333] text-white text-[10px] font-bold py-1.5 rounded-md transition-colors">
                     Xem chi tiết
                 </button>
             </div>
@@ -366,10 +366,10 @@ window.initPlaceAutocomplete = function () {
                         const addressText = props.label || props.name || 'Địa chỉ không xác định';
 
                         const li = document.createElement('li');
-                        li.className = "px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors";
+                        li.className = "px-4 py-3 hover:bg-surface dark:hover:bg-gray-800 cursor-pointer transition-colors";
                         li.innerHTML = `
-                            <div class="font-bold text-gray-800 dark:text-gray-100">${props.name || props.street || 'Địa điểm không tên'}</div>
-                            <div class="text-xs text-gray-500">${addressText}</div>
+                            <div class="font-bold text-textPrimary dark:text-gray-100">${props.name || props.street || 'Địa điểm không tên'}</div>
+                            <div class="text-xs text-textSecondary">${addressText}</div>
                         `;
 
                         li.addEventListener('click', () => {

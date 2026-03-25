@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const mainActionBtn = document.getElementById('mainActionBtn');
+    const mainActionBtnDesktop = document.getElementById('mainActionBtnDesktop');
     const plusMenu = document.getElementById('plusMenu');
     const closePlusMenu = document.getElementById('closePlusMenu');
     const openAddPlaceModal = document.getElementById('openAddPlaceModal');
@@ -12,19 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewModal = document.getElementById('reviewModal'); // Handled in review.js but we need to open it
 
     // --- 1. Mở Form Thêm Địa Điểm qua Nút Dấu Cộng ---
-    if (mainActionBtn) {
-        mainActionBtn.addEventListener('click', () => {
-            if (!localStorage.getItem('user_vtkt')) {
-                showToast("Vui lòng đăng nhập để đóng góp!", "error");
-                document.querySelector('.nav-btn[data-target="profile"]').click();
-                return;
-            }
-            placeModal.classList.remove('hidden');
-            setTimeout(() => placeModal.classList.remove('translate-y-full'), 10);
+    const openAddPlaceHandler = () => {
+        if (!localStorage.getItem('user_vtkt')) {
+            showToast("Vui lòng đăng nhập để đóng góp!", "error");
+            document.querySelector('.nav-btn[data-target="profile"]').click();
+            return;
+        }
+        placeModal.classList.remove('hidden');
+        setTimeout(() => placeModal.classList.remove('translate-y-full'), 10);
 
-            // Re-init Google Maps Autocomplete just in case
-            if (window.initPlaceAutocomplete) window.initPlaceAutocomplete();
-        });
+        if (window.initPlaceAutocomplete) window.initPlaceAutocomplete();
+    };
+
+    if (mainActionBtn) {
+        mainActionBtn.addEventListener('click', openAddPlaceHandler);
+    }
+    if (mainActionBtnDesktop) {
+        mainActionBtnDesktop.addEventListener('click', openAddPlaceHandler);
     }
 
     // --- 3. Place Modal Close ---
@@ -60,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const div = document.createElement('div');
                     div.className = 'relative w-24 h-24 flex-shrink-0';
                     div.innerHTML = `
-                        <img src="${e.target.result}" class="w-full h-full object-cover rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-                        <button type="button" class="remove-place-img-btn absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-transform">
+                        <img src="${e.target.result}" class="w-full h-full object-cover rounded-2xl shadow-soft border border-border dark:border-gray-700">
+                        <button type="button" class="remove-place-img-btn absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-soft-lg active:scale-90 transition-transform">
                             <i class="fa-solid fa-xmark text-xs"></i>
                         </button>
                     `;
@@ -211,9 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(document.getElementById('placePriceRange')) document.getElementById('placePriceRange').value = '';
 
                 if (placeImagePreviewContainer) {
-                    const btnUpload = `<label class="w-24 h-24 flex-shrink-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-darkCard border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    const btnUpload = `<label class="w-24 h-24 flex-shrink-0 flex flex-col items-center justify-center bg-surface dark:bg-darkCard border-2 border-dashed border-border dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                             <i class="fa-solid fa-camera text-2xl text-gray-400 mb-1"></i>
-                            <span class="text-[10px] font-bold text-gray-500">Tải ảnh lên</span>
+                            <span class="text-[10px] font-bold text-textSecondary">Tải ảnh lên</span>
                             <input type="file" id="placeImageInput" accept="image/*" multiple class="hidden">
                         </label>`;
                     placeImagePreviewContainer.innerHTML = btnUpload;

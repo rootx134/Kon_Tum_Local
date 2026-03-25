@@ -16,7 +16,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,13 +25,26 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: { sans: ['"Be Vietnam Pro"', 'sans-serif'] },
+                    boxShadow: {
+                        'soft': '0 4px 20px rgba(26, 95, 83, 0.12)',
+                        'soft-lg': '0 10px 40px rgba(26, 95, 83, 0.16)'
+                    },
                     colors: {
-                        primary: '#ff5500', // Màu cam từ ảnh
-                        primaryDark: '#e64d00',
-                        bgGray: '#f8f8f8',
+                        primary: '#1A5F53',
+                        secondary: '#FFCD5A',
+                        accent: '#F27A0B',
+                        highlight: '#FF922A',
+                        surface: '#FFFFFF',
+                        background: '#FAF7F2',
+                        textPrimary: '#1E293B',
+                        textSecondary: '#64748B',
+                        border: '#E2D9CC',
+                        success: '#2E8B57',
+                        warning: '#F4B740',
+                        bgGray: '#F7F5EF',
                         darkBg: '#121212',
-                        darkCard: '#1c1c1e'
+                        darkCard: '#1C1C1E'
                     }
                 }
             }
@@ -44,7 +57,9 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: theme('colors.background');
+            color: theme('colors.textPrimary');
         }
 
         .tab-content {
@@ -73,8 +88,9 @@
         }
 
         .glass-nav {
-            backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            background-color: rgba(255, 255, 255, 0.85);
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
         }
 
         .dark .glass-nav {
@@ -119,7 +135,7 @@
             height: 0;
             border-left: 6px solid transparent;
             border-right: 6px solid transparent;
-            border-top: 8px solid #ff5500;
+            border-top: 8px solid #F27A0B;
             margin: 0 auto;
         }
 
@@ -193,7 +209,7 @@
 
         .map-popup-btn {
             width: 100%;
-            background: #ff5500;
+            background: #F27A0B;
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -205,10 +221,12 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+            transition: all 0.2s ease;
         }
 
         .map-popup-btn:hover {
-            background: #e64d00;
+            background: #FF922A;
+            transform: scale(0.97);
         }
 
         /* ── Map Filter bar ── */
@@ -243,9 +261,9 @@
         }
 
         .map-filter-btn.active-filter {
-            background: #ff5500;
+            background: #1A5F53;
             color: #fff;
-            border-color: #ff5500;
+            border-color: #1A5F53;
         }
 
         /* ── Map Control Buttons ── */
@@ -261,16 +279,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 4px 16px rgba(242, 122, 11, 0.25);
             border: none;
             cursor: pointer;
-            color: #ff5500;
+            color: #F27A0B;
             font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        #mapLocateBtn:active {
+            transform: scale(0.92);
         }
 
         .dark #mapLocateBtn {
             background: #2c2c2e;
-            color: #ff5500;
+            color: #F27A0B;
         }
 
         #mapInfoBar {
@@ -295,12 +318,14 @@
     </style>
 </head>
 
-<body
-    class="bg-white dark:bg-darkBg text-gray-900 dark:text-gray-100 antialiased h-screen flex flex-col overflow-hidden relative">
+<body class="bg-background dark:bg-darkBg text-textPrimary dark:text-gray-100 antialiased h-screen flex flex-col md:flex-row md:justify-center overflow-hidden relative">
 
+    <!-- Wrapper cho TopBar và Main Content trên Desktop -->
+    <div class="flex-1 flex flex-col h-screen md:order-2 overflow-hidden relative w-full lg:max-w-3xl md:max-w-xl md:border-x md:border-border dark:md:border-gray-800 shadow-sm md:shadow-xl bg-background dark:bg-darkBg z-10">
+        
     <!-- Top Status Bar -->
     <div id="topStatusBar"
-        class="px-6 py-4 flex justify-between items-center bg-white dark:bg-darkBg sticky top-0 z-40 shadow-sm border-b border-gray-100 dark:border-gray-800">
+        class="px-6 py-4 flex justify-between items-center bg-primary text-white sticky top-0 z-40 shadow-soft border-b border-primary/20 transition-all">
         <h1 class="font-black text-xl tracking-tight flex items-center gap-2"><img
                 src="https://fc.kontumplus.com/favicon.png" class="w-6 h-6 rounded"> Địa Điểm Kon Tum</h1>
         <div class="flex items-center gap-4">
@@ -309,10 +334,10 @@
     </div>
 
     <!-- Main Scrollable Area -->
-    <main id="appContent" class="flex-1 overflow-y-auto pb-24 z-10 overflow-x-hidden">
+    <main id="appContent" class="flex-1 overflow-y-auto pb-24 md:pb-6 z-10 overflow-x-hidden">
 
         <!-- Tab: Trang chủ -->
-        <section id="tab-home" class="tab-content active px-4 space-y-6">
+        <section id="tab-home" class="tab-content active px-4 space-y-6 pb-24 md:pb-6 bg-background dark:bg-darkBg min-h-[calc(100vh-140px)]">
             <!-- Search -->
             <div class="mt-2">
                 <div class="relative w-full">
@@ -324,7 +349,7 @@
                     </div>
                     <!-- Dropdown Kết quả Tìm Kiếm -->
                     <div id="searchSuggestionsList"
-                        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-darkCard rounded-2xl shadow-xl max-h-72 overflow-y-auto hidden border border-gray-100 dark:border-gray-800 z-50 divide-y divide-gray-50 dark:divide-gray-800/50">
+                        class="absolute top-full left-0 right-0 mt-2 bg-surface dark:bg-darkCard rounded-2xl shadow-xl max-h-72 overflow-y-auto hidden border border-border dark:border-gray-800 z-50 divide-y divide-gray-50 dark:divide-gray-800/50">
                     </div>
                 </div>
             </div>
@@ -338,13 +363,13 @@
                 </div>
                 <!-- Indicators -->
                 <div id="heroBannerIndicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                    <div class="w-4 h-1.5 bg-[#ff5500] rounded-full"></div>
+                    <div class="w-4 h-1.5 bg-accent rounded-full"></div>
                 </div>
             </div>
 
             <!-- Category Grid -->
             <div id="homeCategoryGrid"
-                class="bg-white dark:bg-darkCard rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] p-4 grid grid-cols-4 gap-y-4 gap-x-2">
+                class="bg-surface dark:bg-darkCard rounded-3xl shadow-soft border border-border/40 p-4 grid grid-cols-4 gap-y-4 gap-x-2">
                 <!-- Danh mục sẽ được load từ JS -->
             </div>
 
@@ -352,7 +377,7 @@
             <div>
                 <div class="flex justify-between items-center mb-4 mt-2">
                     <h2 class="text-xl font-extrabold text-[#1a1c3d] dark:text-white">Gợi ý cho bạn</h2>
-                    <i class="fa-solid fa-chevron-right text-[#ff5500]"></i>
+                    <i class="fa-solid fa-chevron-right text-primary"></i>
                 </div>
                 <div id="homeSuggestedPlacesList"
                     class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x transition-opacity duration-300">
@@ -364,7 +389,7 @@
             <div>
                 <div class="flex justify-between items-center mb-4 mt-2">
                     <h2 class="text-xl font-extrabold text-[#1a1c3d] dark:text-white">Địa điểm nổi bật</h2>
-                    <i class="fa-solid fa-chevron-right text-[#ff5500]"></i>
+                    <i class="fa-solid fa-chevron-right text-primary"></i>
                 </div>
                 <div id="homePlacesList"
                     class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x transition-opacity duration-300">
@@ -376,7 +401,7 @@
             <div>
                 <div class="flex justify-between items-center mb-4 mt-2">
                     <h2 class="text-xl font-extrabold text-[#1a1c3d] dark:text-white">Địa điểm mới</h2>
-                    <i class="fa-solid fa-chevron-right text-[#ff5500]"></i>
+                    <i class="fa-solid fa-chevron-right text-primary"></i>
                 </div>
                 <div id="homeNewPlacesList"
                     class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x transition-opacity duration-300">
@@ -386,15 +411,15 @@
         </section>
 
         <!-- Tab: Khám Phá -->
-        <section id="tab-explore" class="tab-content w-full max-w-md mx-auto h-full relative pb-20">
+        <section id="tab-explore" class="tab-content w-full max-w-md md:max-w-full mx-auto h-[calc(100vh-140px)] relative pb-24 md:pb-6 bg-background dark:bg-darkBg">
             <div class="w-full h-full flex flex-col pt-4 overflow-hidden relative">
                 <div class="px-4 flex justify-between items-center mb-3 shrink-0">
                     <h2 class="text-2xl font-black tracking-tight dark:text-gray-100">Khám Phá</h2>
                 <div class="flex gap-2">
-                    <button id="btnExploreRadar" class="bg-[#ff5500]/10 text-[#ff5500] px-3 py-2 rounded-full font-bold shadow-sm active:scale-95 transition-transform flex items-center gap-2 text-sm z-10 backdrop-blur-md">
+                    <button id="btnExploreRadar" class="bg-accent/10 text-primary px-3 py-2 rounded-full font-bold shadow-soft btn-tactile flex items-center gap-2 text-sm z-10 backdrop-blur-md">
                         <i class="fa-solid fa-satellite-dish"></i> Gần tôi
                     </button>
-                    <button id="btnExploreToggleView" class="bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm rounded-full text-gray-700 dark:text-gray-200 font-bold shadow-sm active:scale-95 transition-transform flex items-center gap-2 z-10 backdrop-blur-md">
+                    <button id="btnExploreToggleView" class="bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm rounded-full text-textSecondary dark:text-gray-200 font-bold shadow-soft btn-tactile flex items-center gap-2 z-10 backdrop-blur-md">
                         <i class="fa-solid fa-list"></i> Danh sách
                     </button>
                 </div>
@@ -405,21 +430,21 @@
                 <div id="exploreMap" class="absolute inset-0 w-full h-full rounded-t-3xl shadow-inner overflow-hidden"></div>
                 
                 <!-- Bottom Sheet for Place Preview -->
-                <div id="exploreMapPreview" class="absolute bottom-4 left-4 right-4 bg-white dark:bg-gray-800 rounded-3xl p-3 shadow-xl transform translate-y-[200%] transition-transform duration-300 z-[1000] flex gap-3 items-center cursor-pointer active:scale-[0.98]">
+                <div id="exploreMapPreview" class="absolute bottom-4 left-4 right-4 bg-surface dark:bg-gray-800 rounded-3xl p-3 shadow-xl transform translate-y-[200%] transition-transform duration-300 z-[1000] flex gap-3 items-center cursor-pointer card-tactile">
                     <!-- Render via JS -->
                 </div>
             </div>
             
             <!-- List View Container -->
-            <div id="explore-list-view" class="flex-1 w-full overflow-y-auto px-4 pb-24 hidden space-y-4">
-                <div id="exploreQuickFilters" class="space-y-3 sticky top-0 bg-white/90 dark:bg-darkBg/90 backdrop-blur-md z-10 py-2">
+            <div id="explore-list-view" class="flex-1 w-full overflow-y-auto px-4 pb-24 md:pb-6 hidden space-y-4">
+                <div id="exploreQuickFilters" class="space-y-3 sticky top-0 bg-surface/90 dark:bg-darkBg/90 backdrop-blur-md z-10 py-2">
                     <div id="exploreTopicChips" class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-[#ff5500] text-white" data-topic="all">Tất cả</button>
-                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="breakfast">Ăn sáng</button>
-                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="coffee">Cafe chill</button>
-                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="checkin">Check-in đẹp</button>
-                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="night">Mở khuya</button>
-                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" data-topic="budget">Sinh viên rẻ</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-accent text-white" data-topic="all">Tất cả</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300" data-topic="breakfast">Ăn sáng</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300" data-topic="coffee">Cafe chill</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300" data-topic="checkin">Check-in đẹp</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300" data-topic="night">Mở khuya</button>
+                        <button class="explore-chip px-3 py-1.5 rounded-full text-xs font-bold bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300" data-topic="budget">Sinh viên rẻ</button>
                     </div>
                 </div>
                 <div id="feedContainer" class="space-y-4 pb-10">
@@ -430,7 +455,7 @@
         </section>
 
         <!-- Tab: Thông Báo -->
-        <section id="tab-notifications" class="tab-content py-6 text-center space-y-4">
+        <section id="tab-notifications" class="tab-content py-6 text-center space-y-4 pb-24 md:pb-6 bg-background dark:bg-darkBg min-h-[calc(100vh-140px)]">
             <div class="px-6 flex justify-between items-center mb-2">
                 <h2 class="text-2xl font-black tracking-tight dark:text-gray-100">Thông báo</h2>
             </div>
@@ -445,18 +470,18 @@
         </section>
 
         <!-- Tab: Tài Khoản (Profile) -->
-        <section id="tab-profile" class="tab-content bg-bgGray dark:bg-darkBg min-h-full pb-24">
+        <section id="tab-profile" class="tab-content bg-background dark:bg-darkBg min-h-full pb-24 md:pb-6">
 
             <!-- Guest View -->
             <div id="profileGuestView"
                 class="hidden flex-col items-center justify-center min-h-full py-12 px-6 text-center">
 
                 <div
-                    class="w-full max-w-sm mx-auto bg-white dark:bg-darkCard p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
+                    class="w-full max-w-sm mx-auto bg-surface dark:bg-darkCard p-6 rounded-3xl shadow-soft-lg border border-border/40 dark:border-gray-800">
                     <img src="https://fc.kontumplus.com/favicon.png"
-                        class="w-14 h-14 mx-auto rounded-2xl shadow-md mb-4 bg-white p-1">
+                        class="w-14 h-14 mx-auto rounded-2xl shadow-soft-lg mb-4 bg-surface p-1">
                     <h3 class="text-2xl font-black mb-1 dark:text-white" id="profileAuthTitle">Đăng nhập</h3>
-                    <p class="text-gray-500 text-xs mb-6 px-2" id="profileAuthSubtitle">Chào mừng trở lại! Vui lòng đăng
+                    <p class="text-textSecondary text-xs mb-6 px-2" id="profileAuthSubtitle">Chào mừng trở lại! Vui lòng đăng
                         nhập để trải nghiệm.</p>
 
                     <!-- Login Form -->
@@ -465,21 +490,21 @@
                             <div class="relative">
                                 <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" id="profileLoginUsername" placeholder="Email hoặc Tên đăng nhập"
-                                    class="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-[#ff5500] focus:bg-white dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm">
+                                    class="w-full pl-11 pr-4 py-3.5 bg-surface dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-surface dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm">
                             </div>
                             <div class="relative">
                                 <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                 <input type="password" id="profileLoginPassword" placeholder="Mật khẩu"
-                                    class="w-full pl-11 pr-12 py-3.5 bg-gray-50 dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-[#ff5500] focus:bg-white dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm">
-                                <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    class="w-full pl-11 pr-12 py-3.5 bg-surface dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-surface dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm">
+                                <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-textSecondary focus:outline-none">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
                             </div>
                             <div class="flex items-center justify-end w-full pb-1">
-                                <button type="button" id="forgotPasswordLinkBtn" class="text-xs font-semibold text-[#ff5500] hover:text-[#e64d00] transition-colors focus:outline-none">Quên mật khẩu?</button>
+                                <button type="button" id="forgotPasswordLinkBtn" class="text-xs font-semibold text-primary hover:text-accent transition-colors focus:outline-none">Quên mật khẩu?</button>
                             </div>
                             <button type="submit"
-                                class="w-full flex justify-center items-center gap-2 bg-[#1a1c3d] hover:bg-[#252850] dark:bg-[#ff5500] dark:hover:bg-[#e64d00] text-white font-bold py-3.5 rounded-2xl shadow-md transition transform active:scale-95 text-sm">
+                                class="w-full flex justify-center items-center gap-2 bg-[#1a1c3d] hover:bg-[#252850] dark:bg-accent dark:hover:bg-accentSoft text-white font-bold py-3.5 rounded-2xl shadow-soft-lg transition transform btn-tactile text-sm">
                                 Đăng nhập
                             </button>
                         </form>
@@ -489,28 +514,28 @@
                             <div class="relative">
                                 <i class="fa-regular fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" id="profileRegFullname" placeholder="Họ và tên"
-                                    class="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-[#ff5500] focus:bg-white dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
+                                    class="w-full pl-11 pr-4 py-3.5 bg-surface dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-surface dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
                             </div>
                             <div class="relative">
                                 <i class="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" id="profileRegUsername" placeholder="Tên đăng nhập (viết liền không dấu)"
-                                    class="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-[#ff5500] focus:bg-white dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
+                                    class="w-full pl-11 pr-4 py-3.5 bg-surface dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-surface dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
                             </div>
                             <div class="relative">
                                 <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                 <input type="email" id="profileRegEmail" placeholder="Email"
-                                    class="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-[#ff5500] focus:bg-white dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
+                                    class="w-full pl-11 pr-4 py-3.5 bg-surface dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-surface dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
                             </div>
                             <div class="relative">
                                 <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                 <input type="password" id="profileRegPassword" placeholder="Mật khẩu"
-                                    class="w-full pl-11 pr-12 py-3.5 bg-gray-50 dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-[#ff5500] focus:bg-white dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
-                                <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    class="w-full pl-11 pr-12 py-3.5 bg-surface dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-surface dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
+                                <button type="button" class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-textSecondary focus:outline-none">
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
                             </div>
                             <button type="submit"
-                                class="w-full bg-gradient-to-r flex justify-center items-center gap-2 from-[#ff5500] to-[#ff8c00] hover:to-[#e64d00] text-white font-bold py-3.5 rounded-2xl shadow-md transition transform active:scale-95 text-sm">
+                                class="w-full bg-gradient-to-r flex justify-center items-center gap-2 from-[#ff5500] to-[#ff8c00] hover:to-[#e64d00] text-white font-bold py-3.5 rounded-2xl shadow-soft-lg transition transform btn-tactile text-sm">
                                 Tạo tài khoản
                             </button>
                         </form>
@@ -520,14 +545,14 @@
                             <div class="relative">
                                 <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                 <input type="email" id="profileForgotEmail" placeholder="Nhập email của bạn"
-                                    class="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-[#ff5500] focus:bg-white dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
+                                    class="w-full pl-11 pr-4 py-3.5 bg-surface dark:bg-gray-800 border-transparent rounded-2xl focus:ring-2 focus:ring-primary focus:bg-surface dark:focus:bg-gray-700 transition-all outline-none font-medium text-sm" required>
                             </div>
                             <button type="submit"
-                                class="w-full flex justify-center items-center gap-2 bg-[#ff5500] hover:bg-[#e64d00] text-white font-bold py-3.5 rounded-2xl shadow-md transition transform active:scale-95 text-sm">
+                                class="w-full flex justify-center items-center gap-2 bg-accent hover:bg-accentSoft text-white font-bold py-3.5 rounded-2xl shadow-soft-lg transition transform btn-tactile text-sm">
                                 Gửi liên kết đặt lại
                             </button>
                             <div class="mt-4 text-center">
-                                <button type="button" id="backToLoginBtn" class="text-sm text-gray-500 hover:text-[#ff5500] transition-colors font-medium focus:outline-none">
+                                <button type="button" id="backToLoginBtn" class="text-sm text-textSecondary hover:text-primary transition-colors font-medium focus:outline-none">
                                     <i class="fa-solid fa-arrow-left mr-1"></i> Quay lại đăng nhập
                                 </button>
                             </div>
@@ -537,44 +562,44 @@
                     <div id="socialLoginSection" class="mt-6">
                         <div class="relative">
                             <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-gray-100 dark:border-gray-800"></div>
+                                <div class="w-full border-t border-border dark:border-gray-800"></div>
                             </div>
                             <div class="relative flex justify-center text-sm">
-                                <span class="px-3 bg-white dark:bg-darkCard text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Hoặc tiếp tục với</span>
+                                <span class="px-3 bg-surface dark:bg-darkCard text-gray-400 text-[11px] font-semibold uppercase tracking-wider">Hoặc tiếp tục với</span>
                             </div>
                         </div>
                         <div class="mt-5 grid grid-cols-2 gap-3">
-                            <button id="googleLoginBtn" type="button" class="flex items-center justify-center w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] bg-white dark:bg-[#1a1c1e] text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95 group">
+                            <button id="googleLoginBtn" type="button" class="flex items-center justify-center w-full px-4 py-2.5 border border-border dark:border-gray-700 rounded-xl shadow-soft bg-surface dark:bg-[#1a1c1e] text-sm font-semibold text-textSecondary dark:text-gray-300 hover:bg-surface dark:hover:bg-gray-800 transition-all btn-tactile group">
                                 <img class="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
                                 Google
                             </button>
-                            <button id="facebookLoginBtn" type="button" class="flex items-center justify-center w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] bg-white dark:bg-[#1a1c1e] text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95 group">
+                            <button id="facebookLoginBtn" type="button" class="flex items-center justify-center w-full px-4 py-2.5 border border-border dark:border-gray-700 rounded-xl shadow-soft bg-surface dark:bg-[#1a1c1e] text-sm font-semibold text-textSecondary dark:text-gray-300 hover:bg-surface dark:hover:bg-gray-800 transition-all btn-tactile group">
                                 <img class="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook">
                                 Facebook
                             </button>
                         </div>
                     </div>
 
-                    <div id="authToggleSection" class="mt-6 text-sm text-gray-500">
+                    <div id="authToggleSection" class="mt-6 text-sm text-textSecondary">
                         <span id="profileAuthToggleText">Chưa có tài khoản?</span>
                         <button id="profileAuthToggleBtn" type="button"
-                            class="text-[#ff5500] font-bold hover:underline ml-1 focus:outline-none">Đăng ký ngay</button>
+                            class="text-primary font-bold hover:underline ml-1 focus:outline-none">Đăng ký ngay</button>
                     </div>
                 </div>
             </div>
 
             <div id="profileContent" class="hidden">
                 <!-- Header Info -->
-                <div class="bg-white dark:bg-darkCard px-6 pt-10 pb-8 rounded-b-[40px] shadow-sm relative">
+                <div class="bg-surface dark:bg-darkCard px-6 pt-10 pb-8 rounded-b-[40px] shadow-soft relative">
                     <div class="flex items-center gap-5">
                         <div class="relative group cursor-pointer">
                             <img src="https://images.unsplash.com/photo-1544005313-94ff6a00c24c?auto=format&fit=crop&q=80&w=150"
                                 id="profileAvatar"
-                                class="w-20 h-20 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-md transition-opacity group-hover:opacity-70"
+                                class="w-20 h-20 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-soft-lg transition-opacity group-hover:opacity-70"
                                 alt="Avatar">
                             <div
                                 class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fa-solid fa-camera text-white drop-shadow-md"></i>
+                                <i class="fa-solid fa-camera text-white drop-shadow-soft-lg"></i>
                             </div>
                             <input type="file" id="avatarUploadInput" accept="image/*" class="hidden">
                         </div>
@@ -583,7 +608,7 @@
                             <p class="text-gray-400 text-sm">Tài khoản: <span id="userAccountName">admin</span></p>
                         </div>
                         <button id="editProfileBtn"
-                            class="w-10 h-10 bg-[#fff5f0] text-[#ff5500] rounded-full flex items-center justify-center shadow-sm border border-[#ffe0d1]">
+                            class="w-10 h-10 bg-[#fff5f0] text-primary rounded-full flex items-center justify-center shadow-soft border border-[#ffe0d1]">
                             <i class="fa-solid fa-pen-to-square text-lg"></i>
                         </button>
                     </div>
@@ -592,19 +617,19 @@
                 <!-- Stats Bar -->
                 <div class="px-6 -mt-6">
                     <div
-                        class="bg-white dark:bg-darkCard rounded-3xl p-5 shadow-lg flex justify-around border border-gray-50 dark:border-[#2c2c2e]">
+                        class="bg-surface dark:bg-darkCard rounded-3xl p-5 shadow-lg flex justify-around border border-border dark:border-[#2c2c2e]">
                         <div class="flex-1 text-center">
-                            <p class="text-[#ff5500] text-xl font-black" id="profilePlaceCount">0</p>
+                            <p class="text-primary text-xl font-black" id="profilePlaceCount">0</p>
                             <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Đóng góp</p>
                         </div>
                         <div class="w-px h-10 bg-gray-100 dark:bg-[#3a3a3c] mx-2"></div>
                         <div class="flex-1 text-center">
-                            <p class="text-[#ff5500] text-xl font-black" id="profileReviewCount">0</p>
+                            <p class="text-primary text-xl font-black" id="profileReviewCount">0</p>
                             <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Đánh giá</p>
                         </div>
                         <div class="w-px h-10 bg-gray-100 dark:bg-[#3a3a3c] mx-2"></div>
                         <div class="flex-1 text-center">
-                            <p class="text-[#ff5500] text-xl font-black" id="profileFollowerCount">0</p>
+                            <p class="text-primary text-xl font-black" id="profileFollowerCount">0</p>
                             <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Theo dõi</p>
                         </div>
                     </div>
@@ -614,64 +639,64 @@
                 <div class="px-6 py-8 space-y-8">
                     <div>
                         <h4
-                            class="text-[13px] font-black text-gray-900 dark:text-gray-200 mb-4 px-1 uppercase tracking-widest">
+                            class="text-[13px] font-black text-textPrimary dark:text-gray-200 mb-4 px-1 uppercase tracking-widest">
                             Tài khoản của tôi</h4>
                         <div
-                            class="bg-white dark:bg-darkCard rounded-3xl overflow-hidden shadow-sm border border-gray-50 dark:border-[#2c2c2e]">
+                            class="bg-surface dark:bg-darkCard rounded-3xl overflow-hidden shadow-soft border border-border dark:border-[#2c2c2e]">
                             <button id="btnOpenRewards"
-                                class="w-full flex items-center gap-4 p-5 hover:bg-gray-50 dark:hover:bg-[#2c2c2e] transition text-left group">
+                                class="w-full flex items-center gap-4 p-5 hover:bg-surface dark:hover:bg-[#2c2c2e] transition text-left group">
                                 <div
-                                    class="w-10 h-10 rounded-2xl bg-orange-50 dark:bg-[#1f1612] flex items-center justify-center text-[#ff5500]">
+                                    class="w-10 h-10 rounded-2xl bg-orange-50 dark:bg-[#1f1612] flex items-center justify-center text-primary">
                                     <i class="fa-solid fa-gift"></i>
                                 </div>
                                 <span class="flex-1 font-bold text-[15px]">Quà tặng & Đổi thưởng</span>
                                 <i
-                                    class="fa-solid fa-chevron-right text-gray-300 group-hover:text-[#ff5500] transition"></i>
+                                    class="fa-solid fa-chevron-right text-gray-300 group-hover:text-primary transition"></i>
                             </button>
-                            <div class="h-px bg-gray-50 dark:bg-[#2c2c2e] mx-5"></div>
+                            <div class="h-px bg-surface dark:bg-[#2c2c2e] mx-5"></div>
                             <button id="btnOpenSavedPlaces"
-                                class="w-full flex items-center gap-4 p-5 hover:bg-gray-50 dark:hover:bg-[#2c2c2e] transition text-left group">
+                                class="w-full flex items-center gap-4 p-5 hover:bg-surface dark:hover:bg-[#2c2c2e] transition text-left group">
                                 <div
-                                    class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-[#121212] flex items-center justify-center text-gray-600 dark:text-gray-400">
+                                    class="w-10 h-10 rounded-2xl bg-surface dark:bg-[#121212] flex items-center justify-center text-textSecondary dark:text-gray-400">
                                     <i class="fa-regular fa-bookmark"></i>
                                 </div>
                                 <span class="flex-1 font-bold text-[15px]">Địa điểm đã lưu</span>
                                 <i
-                                    class="fa-solid fa-chevron-right text-gray-300 group-hover:text-[#ff5500] transition"></i>
+                                    class="fa-solid fa-chevron-right text-gray-300 group-hover:text-primary transition"></i>
                             </button>
-                            <div class="h-px bg-gray-50 dark:bg-[#2c2c2e] mx-5"></div>
+                            <div class="h-px bg-surface dark:bg-[#2c2c2e] mx-5"></div>
                             <button id="btnOpenSavedReviews"
-                                class="w-full flex items-center gap-4 p-5 hover:bg-gray-50 dark:hover:bg-[#2c2c2e] transition text-left group">
+                                class="w-full flex items-center gap-4 p-5 hover:bg-surface dark:hover:bg-[#2c2c2e] transition text-left group">
                                 <div
-                                    class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-[#121212] flex items-center justify-center text-gray-600 dark:text-gray-400">
-                                    <i class="fa-solid fa-bookmark text-[#ff5500]"></i>
+                                    class="w-10 h-10 rounded-2xl bg-surface dark:bg-[#121212] flex items-center justify-center text-textSecondary dark:text-gray-400">
+                                    <i class="fa-solid fa-bookmark text-primary"></i>
                                 </div>
                                 <span class="flex-1 font-bold text-[15px]">Đánh giá đã lưu</span>
                                 <i
-                                    class="fa-solid fa-chevron-right text-gray-300 group-hover:text-[#ff5500] transition"></i>
+                                    class="fa-solid fa-chevron-right text-gray-300 group-hover:text-primary transition"></i>
                             </button>
-                            <div class="h-px bg-gray-50 dark:bg-[#2c2c2e] mx-5"></div>
+                            <div class="h-px bg-surface dark:bg-[#2c2c2e] mx-5"></div>
                             <button id="btnOpenMyReviews"
-                                class="w-full flex items-center gap-4 p-5 hover:bg-gray-50 dark:hover:bg-[#2c2c2e] transition text-left group">
+                                class="w-full flex items-center gap-4 p-5 hover:bg-surface dark:hover:bg-[#2c2c2e] transition text-left group">
                                 <div
-                                    class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-[#121212] flex items-center justify-center text-gray-600 dark:text-gray-400">
+                                    class="w-10 h-10 rounded-2xl bg-surface dark:bg-[#121212] flex items-center justify-center text-textSecondary dark:text-gray-400">
                                     <i class="fa-regular fa-star"></i>
                                 </div>
                                 <span class="flex-1 font-bold text-[15px]">Bài đánh giá của tôi</span>
                                 <i
-                                    class="fa-solid fa-chevron-right text-gray-300 group-hover:text-[#ff5500] transition"></i>
+                                    class="fa-solid fa-chevron-right text-gray-300 group-hover:text-primary transition"></i>
                             </button>
-                            <div class="h-px bg-gray-50 dark:bg-[#2c2c2e] mx-5"></div>
+                            <div class="h-px bg-surface dark:bg-[#2c2c2e] mx-5"></div>
                             <div class="flex items-center gap-4 p-5">
                                 <div
-                                    class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-[#121212] flex items-center justify-center text-gray-600 dark:text-gray-400">
+                                    class="w-10 h-10 rounded-2xl bg-surface dark:bg-[#121212] flex items-center justify-center text-textSecondary dark:text-gray-400">
                                     <i class="fa-solid fa-moon"></i>
                                 </div>
                                 <span class="flex-1 font-bold text-[15px]">Giao diện tối</span>
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="darkModeSwitch" class="sr-only peer">
                                     <div
-                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#ff5500]">
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-accent">
                                     </div>
                                 </label>
                             </div>
@@ -680,31 +705,31 @@
 
                     <div>
                         <h4
-                            class="text-[13px] font-black text-gray-900 dark:text-gray-200 mb-4 px-1 uppercase tracking-widest">
+                            class="text-[13px] font-black text-textPrimary dark:text-gray-200 mb-4 px-1 uppercase tracking-widest">
                             Khác</h4>
                         <div
-                            class="bg-white dark:bg-darkCard rounded-3xl overflow-hidden shadow-sm border border-gray-50 dark:border-[#2c2c2e]">
+                            class="bg-surface dark:bg-darkCard rounded-3xl overflow-hidden shadow-soft border border-border dark:border-[#2c2c2e]">
 
                             <button id="btnOpenSettings"
-                                class="w-full flex items-center gap-4 p-5 hover:bg-gray-50 dark:hover:bg-[#2c2c2e] transition text-left group">
+                                class="w-full flex items-center gap-4 p-5 hover:bg-surface dark:hover:bg-[#2c2c2e] transition text-left group">
                                 <div
-                                    class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-[#121212] flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#ff5500] group-hover:text-white transition-colors">
+                                    class="w-10 h-10 rounded-2xl bg-surface dark:bg-[#121212] flex items-center justify-center text-textSecondary dark:text-gray-400 group-hover:bg-accent group-hover:text-white transition-colors">
                                     <i class="fa-solid fa-gear"></i>
                                 </div>
                                 <span class="flex-1 font-bold text-[15px]">Cài đặt tài khoản</span>
                                 <i class="fa-solid fa-chevron-right text-gray-300"></i>
                             </button>
-                            <div class="h-px bg-gray-50 dark:bg-[#2c2c2e] mx-5"></div>
+                            <div class="h-px bg-surface dark:bg-[#2c2c2e] mx-5"></div>
                             <button
-                                class="w-full flex items-center gap-4 p-5 hover:bg-gray-50 dark:hover:bg-[#2c2c2e] transition text-left group">
+                                class="w-full flex items-center gap-4 p-5 hover:bg-surface dark:hover:bg-[#2c2c2e] transition text-left group">
                                 <div
-                                    class="w-10 h-10 rounded-2xl bg-gray-50 dark:bg-[#121212] flex items-center justify-center text-gray-600 dark:text-gray-400">
+                                    class="w-10 h-10 rounded-2xl bg-surface dark:bg-[#121212] flex items-center justify-center text-textSecondary dark:text-gray-400">
                                     <i class="fa-regular fa-circle-question"></i>
                                 </div>
                                 <span class="flex-1 font-bold text-[15px]">Trung tâm trợ giúp</span>
                                 <i class="fa-solid fa-chevron-right text-gray-300"></i>
                             </button>
-                            <div class="h-px bg-gray-50 dark:bg-[#2c2c2e] mx-5"></div>
+                            <div class="h-px bg-surface dark:bg-[#2c2c2e] mx-5"></div>
                             <button class="w-full flex items-center gap-4 p-5 transition text-left group"
                                 id="logoutBtnProfile">
                                 <div
@@ -718,11 +743,12 @@
                 </div> <!-- End profileContent -->
         </section>
     </main>
+    </div> <!-- Close Editor/Main Content Wrapper -->
 
     <!-- Modal: Chỉnh Sửa Địa Điểm (Dành cho Admin) -->
     <div id="editPlaceModal"
-        class="hidden fixed inset-0 z-[10000] bg-white dark:bg-darkBg flex flex-col translate-y-full transition-transform duration-300">
-        <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/5">
+        class="hidden fixed inset-0 z-[10000] bg-surface dark:bg-darkBg flex flex-col translate-y-full transition-transform duration-300">
+        <div class="flex items-center justify-between p-4 border-b border-border dark:border-white/5">
             <button id="closeEditPlaceModal" class="p-2 text-gray-400"><i class="fa-solid fa-chevron-left"></i></button>
             <h3 class="font-black text-lg">Chỉnh sửa địa điểm</h3>
             <button id="submitEditPlaceBtn"
@@ -734,13 +760,13 @@
                     <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Tên địa điểm</label>
                     <input type="hidden" id="editPlaceId">
                     <input type="text" id="editPlaceName" placeholder="Tên địa điểm..."
-                        class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                        class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold">
                 </div>
                 <div class="grid grid-cols-1 gap-4">
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Danh mục</label>
                         <select id="editPlaceCategory"
-                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold appearance-none">
+                            class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold appearance-none">
                             <option value="1">Ăn uống</option>
                             <option value="4">Du lịch</option>
                             <option value="2">Giải trí</option>
@@ -752,23 +778,23 @@
                     <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Địa chỉ chính
                         xác</label>
                     <input type="text" id="editPlaceAddress" autocomplete="off" placeholder="Địa chỉ hiện tại..."
-                        class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                        class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold">
                 </div>
                 <div class="space-y-2">
                     <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Mô tả ngắn</label>
                     <textarea id="editPlaceDesc" rows="3" placeholder="..."
-                        class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-medium resize-none"></textarea>
+                        class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-medium resize-none"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Giờ mở cửa</label>
                         <input type="text" id="editPlaceOpeningHours" placeholder="08:00 - 22:00"
-                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                            class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold">
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Mức giá</label>
                         <input type="text" id="editPlacePriceRange" placeholder="50k - 200k"
-                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                            class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold">
                     </div>
                 </div>
                 <!-- Ảnh đính kèm -->
@@ -776,9 +802,9 @@
                     <label class="block text-xs font-black uppercase text-gray-400 tracking-widest pl-1 mb-2">Chỉnh sửa ảnh</label>
                     <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" id="editPlaceImagePreviewContainer">
                         <label
-                            class="w-24 h-24 flex-shrink-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-darkCard border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            class="w-24 h-24 flex-shrink-0 flex flex-col items-center justify-center bg-surface dark:bg-darkCard border-2 border-dashed border-border dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                             <i class="fa-solid fa-camera text-2xl text-gray-400 mb-1"></i>
-                            <span class="text-[10px] font-bold text-gray-500">Tải ảnh lên</span>
+                            <span class="text-[10px] font-bold text-textSecondary">Tải ảnh lên</span>
                             <input type="file" id="editPlaceImageInput" accept="image/*" multiple class="hidden">
                         </label>
                     </div>
@@ -791,25 +817,25 @@
 
     <!-- Modal: Thêm địa điểm -->
     <div id="placeModal"
-        class="hidden fixed inset-0 z-[100] bg-white dark:bg-darkBg flex flex-col translate-y-full transition-transform duration-300">
-        <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/5">
+        class="hidden fixed inset-0 z-[100] bg-surface dark:bg-darkBg flex flex-col translate-y-full transition-transform duration-300">
+        <div class="flex items-center justify-between p-4 border-b border-border dark:border-white/5">
             <button id="closePlaceModal" class="p-2 text-gray-400"><i class="fa-solid fa-chevron-left"></i></button>
             <h3 class="font-black text-lg">Đóng góp địa điểm</h3>
             <button id="submitPlaceBtn"
-                class="bg-[#ff5500] text-white px-5 py-1.5 rounded-full text-sm font-bold">Gửi</button>
+                class="bg-accent text-white px-5 py-1.5 rounded-full text-sm font-bold">Gửi</button>
         </div>
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
             <div class="space-y-4">
                 <div class="space-y-2">
                     <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Tên địa điểm</label>
                     <input type="text" id="placeName" placeholder="Ví dụ: Phở khô 123"
-                        class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                        class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold">
                 </div>
                 <div class="grid grid-cols-1 gap-4">
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Danh mục</label>
                         <select id="placeCategory"
-                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold appearance-none">
+                            class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold appearance-none">
                             <option value="1">Ăn uống</option>
                             <option value="4">Du lịch</option>
                             <option value="2">Giải trí</option>
@@ -819,9 +845,9 @@
                     <div class="space-y-2 hidden">
                         <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Toạ độ</label>
                         <button id="openCoordPicker" type="button"
-                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-between text-gray-400 active:bg-gray-100">
+                            class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl flex items-center justify-between text-gray-400 active:bg-gray-100">
                             <span class="text-xs font-bold" id="coordDisplay">Bấm để chọn</span>
-                            <i class="fa-solid fa-location-crosshairs text-[#ff5500]"></i>
+                            <i class="fa-solid fa-location-crosshairs text-primary"></i>
                         </button>
                         <input type="hidden" id="placeLatitude" name="latitude">
                         <input type="hidden" id="placeLongitude" name="longitude">
@@ -831,10 +857,10 @@
                     <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Địa chỉ chính
                         xác</label>
                     <input type="text" id="placeAddress" autocomplete="off" placeholder="Số nhà, tên đường, phường..."
-                        class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                        class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold">
                     <!-- Dropdown gợi ý địa chỉ -->
                     <ul id="placeAddressSuggestions"
-                        class="absolute z-10 w-full bg-white dark:bg-darkCard mt-1 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-800 text-sm font-medium">
+                        class="absolute z-10 w-full bg-surface dark:bg-darkCard mt-1 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden border border-border dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-800 text-sm font-medium">
                     </ul>
                 </div>
                 <!-- Giờ mở cửa và Khoảng giá -->
@@ -842,18 +868,18 @@
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Giờ mở cửa</label>
                         <input type="text" id="placeOpeningHours" placeholder="VD: 07:00 - 22:00"
-                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                            class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold">
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Khoảng giá</label>
                         <input type="text" id="placePriceRange" placeholder="VD: 30k - 50k"
-                            class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-bold">
+                            class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-bold">
                     </div>
                 </div>
                 <div class="space-y-2">
                     <label class="text-xs font-black uppercase text-gray-400 tracking-widest pl-1">Mô tả ngắn</label>
                     <textarea id="placeDesc" rows="3" placeholder="Chia sẻ thêm về không gian, món ăn..."
-                        class="w-full p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl outline-none font-medium resize-none"></textarea>
+                        class="w-full p-4 bg-surface dark:bg-gray-800 rounded-2xl outline-none font-medium resize-none"></textarea>
                 </div>
                 <!-- Ảnh đính kèm -->
                 <div>
@@ -861,9 +887,9 @@
                         (không bắt buộc)</label>
                     <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" id="placeImagePreviewContainer">
                         <label
-                            class="w-24 h-24 flex-shrink-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-darkCard border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            class="w-24 h-24 flex-shrink-0 flex flex-col items-center justify-center bg-surface dark:bg-darkCard border-2 border-dashed border-border dark:border-gray-700 rounded-2xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                             <i class="fa-solid fa-camera text-2xl text-gray-400 mb-1"></i>
-                            <span class="text-[10px] font-bold text-gray-500">Tải ảnh lên</span>
+                            <span class="text-[10px] font-bold text-textSecondary">Tải ảnh lên</span>
                             <input type="file" id="placeImageInput" accept="image/*" multiple class="hidden">
                         </label>
                     </div>
@@ -874,51 +900,73 @@
 
     <!-- Bottom Navigation Bar & Center Action Button -->
 
-    <!-- Floating Center Button -->
-    <div class="fixed left-1/2 bottom-[50px] -translate-x-1/2 flex justify-center z-[1000]">
+    <!-- Floating Center Button (Mobile Only) -->
+    <div class="fixed left-1/2 bottom-[50px] -translate-x-1/2 flex justify-center z-[1000] md:hidden">
         <button id="mainActionBtn"
-            class="bg-[#ff5500] text-white w-14 h-14 rounded-full shadow-[0_8px_20px_rgba(255,85,0,0.4)] border-4 border-white dark:border-darkBg transition-transform active:scale-90 flex items-center justify-center cursor-pointer relative overflow-hidden">
+            class="bg-accent text-white w-14 h-14 rounded-full shadow-soft border-4 border-white dark:border-darkBg transition-transform active:scale-90 flex items-center justify-center cursor-pointer relative overflow-hidden">
             <i class="fa-solid fa-plus text-2xl" id="mainPlusIcon"></i>
         </button>
     </div>
 
     <!-- Floating AI Bubble -->
     <button id="btnOpenAiChat"
-        class="fixed right-4 bottom-24 z-[990] bg-[#ff5500] text-white w-14 h-14 rounded-full shadow-[0_4px_15px_rgba(255,85,0,0.4)] border-4 border-white dark:border-darkBg flex items-center justify-center transition-transform active:scale-90 hover:bg-orange-600">
-        <i class="fa-solid fa-sparkles text-xl"></i>
+        class="fixed right-4 bottom-24 md:bottom-8 md:right-8 z-[990] bg-accent text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-soft border-4 border-white dark:border-darkBg flex items-center justify-center transition-transform active:scale-90 hover:bg-orange-600">
+        <i class="fa-solid fa-sparkles text-xl md:text-2xl"></i>
     </button>
 
-    <!-- Navigation Bar -->
-    <nav
-        class="fixed bottom-0 inset-x-0 mx-auto max-w-md bg-white/90 dark:bg-[#1c1c1e]/90 glass-nav border-t border-gray-100 dark:border-white/5 shadow-[0_-5px_20px_rgba(0,0,0,0.03)] px-3 z-[999] pb-safe">
-        <div class="flex justify-between items-center h-[72px]">
-            <div class="flex w-2/5 justify-around">
-                <button class="nav-btn active flex flex-col items-center justify-center transition-all duration-300"
+    <!-- Navigation Bar / Left Sidebar -->
+    <nav id="sidebarNav"
+        class="fixed bottom-0 inset-x-0 mx-auto max-w-md bg-surface/90 dark:bg-[#1c1c1e]/90 glass-nav border-t border-border dark:border-white/5 shadow-soft px-3 z-[999] pb-safe md:static md:w-[280px] md:max-w-none md:h-screen md:bg-transparent md:dark:bg-transparent md:border-t-0 md:border-r-0 md:px-6 md:py-8 md:flex-col md:order-1 transition-all md:glass-nav-none md:shadow-none">
+        
+        <!-- Logo Desktop (Hidden on mobile) -->
+        <div class="hidden md:flex items-center gap-3 mb-10 px-4">
+            <img src="https://fc.kontumplus.com/favicon.png" class="w-10 h-10 rounded-xl shadow-sm">
+            <span class="font-black text-2xl tracking-tight hidden lg:block text-primary dark:text-gray-100">KonTum<span class="text-accent">AI</span></span>
+        </div>
+
+        <div class="flex justify-between items-center h-[72px] md:h-auto md:flex-col md:items-start md:w-full md:gap-2">
+            <!-- Left Group -->
+            <div class="flex w-2/5 justify-around md:w-full md:flex-col md:gap-2">
+                <button class="nav-btn active flex flex-col md:flex-row items-center justify-center md:justify-start transition-all duration-300 md:px-4 md:py-3.5 md:hover:bg-gray-200/50 md:dark:hover:bg-gray-800 md:rounded-full md:w-full group"
                     data-target="home">
-                    <i class="fa-solid fa-house text-xl mb-1.5 transition-transform"></i>
-                    <span class="text-[9px] font-extrabold uppercase tracking-tight">Trang chủ</span>
+                    <i class="fa-solid fa-house text-xl mb-1.5 md:mb-0 md:text-2xl md:mr-5 md:w-8 md:text-center transition-transform md:group-hover:scale-105"></i>
+                    <span class="text-[9px] md:text-xl font-extrabold md:font-bold tracking-tight md:tracking-normal hidden md:inline-block">Trang chủ</span>
+                    <!-- Mobile view text -->
+                    <span class="text-[9px] font-extrabold uppercase tracking-tight md:hidden">Trang chủ</span>
                 </button>
                 <button
-                    class="nav-btn flex flex-col items-center justify-center text-gray-400 transition-all duration-300"
+                    class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start text-gray-400 md:text-textPrimary md:dark:text-gray-200 transition-all duration-300 md:px-4 md:py-3.5 md:hover:bg-gray-200/50 md:dark:hover:bg-gray-800 md:rounded-full md:w-full group"
                     data-target="explore">
-                    <i class="fa-regular fa-compass text-xl mb-1.5 transition-transform"></i>
-                    <span class="text-[9px] font-bold uppercase tracking-tight">Khám phá</span>
+                    <i class="fa-regular fa-compass text-xl mb-1.5 md:mb-0 md:text-2xl md:mr-5 md:w-8 md:text-center transition-transform md:group-hover:scale-105"></i>
+                    <span class="text-[9px] md:text-xl font-bold tracking-tight md:tracking-normal hidden md:inline-block">Khám phá</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tight md:hidden">Khám phá</span>
                 </button>
             </div>
-            <div class="w-1/5"></div> <!-- khoảng trống cho Center Button -->
-            <div class="flex w-2/5 justify-around">
+            
+            <div class="w-1/5 md:hidden"></div> <!-- khoảng trống cho Center Button trên mobile -->
+            
+            <!-- Right Group -->
+            <div class="flex w-2/5 justify-around md:w-full md:flex-col md:gap-2">
                 <button
-                    class="nav-btn flex flex-col items-center justify-center text-gray-400 transition-all duration-300 relative group"
+                    class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start text-gray-400 md:text-textPrimary md:dark:text-gray-200 transition-all duration-300 relative group md:px-4 md:py-3.5 md:hover:bg-gray-200/50 md:dark:hover:bg-gray-800 md:rounded-full md:w-full"
                     data-target="notifications">
-                    <i class="fa-solid fa-bell text-xl mb-1.5 transition-transform group-active:scale-90"></i>
-                    <span class="text-[9px] font-bold uppercase tracking-tight">Thông báo</span>
-                    <span id="navNotifBadge" class="absolute top-0 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white hidden px-1 border-2 border-white dark:border-[#1c1c1e]"></span>
+                    <i class="fa-solid fa-bell text-xl mb-1.5 md:mb-0 md:text-2xl md:mr-5 md:w-8 md:text-center transition-transform md:group-hover:scale-105 group-active:scale-90"></i>
+                    <span class="text-[9px] md:text-xl font-bold tracking-tight md:tracking-normal hidden md:inline-block">Thông báo</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tight md:hidden">Thông báo</span>
+                    <span id="navNotifBadge" class="absolute top-0 right-1 md:top-3 md:left-8 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white hidden px-1 border-2 border-white dark:border-[#1c1c1e] md:border-surface md:dark:border-darkBg"></span>
                 </button>
                 <button
-                    class="nav-btn flex flex-col items-center justify-center text-gray-400 transition-all duration-300"
+                    class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start text-gray-400 md:text-textPrimary md:dark:text-gray-200 transition-all duration-300 md:px-4 md:py-3.5 md:hover:bg-gray-200/50 md:dark:hover:bg-gray-800 md:rounded-full md:w-full group"
                     data-target="profile">
-                    <i class="fa-regular fa-user text-xl mb-1.5 transition-transform"></i>
-                    <span class="text-[9px] font-bold uppercase tracking-tight">Tài khoản</span>
+                    <i class="fa-regular fa-user text-xl mb-1.5 md:mb-0 md:text-2xl md:mr-5 md:w-8 md:text-center transition-transform md:group-hover:scale-105"></i>
+                    <span class="text-[9px] md:text-xl font-bold tracking-tight md:tracking-normal hidden md:inline-block">Tài khoản</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tight md:hidden">Tài khoản</span>
+                </button>
+
+                <!-- Post Button (Desktop Only) -->
+                <button id="mainActionBtnDesktop"
+                    class="hidden md:flex mt-6 w-full bg-accent text-white py-4 rounded-full font-bold text-lg items-center justify-center hover:bg-orange-600 transition-transform hover:scale-[1.02] shadow-soft btn-tactile">
+                    Đóng góp <i class="fa-solid fa-feather-pointed ml-2"></i>
                 </button>
             </div>
         </div>
@@ -926,7 +974,7 @@
 
     <!-- Modal: Chi tiết địa điểm (Place Detail) -->
     <div id="placeDetailModal"
-        class="hidden fixed inset-0 z-[9999] bg-white dark:bg-darkBg flex flex-col translate-y-full transition-transform duration-300">
+        class="hidden fixed inset-0 z-[9999] bg-surface dark:bg-darkBg flex flex-col translate-y-full transition-transform duration-300">
 
         <!-- Action Buttons Overlay (Absolute, fixed to top) -->
         <div class="absolute top-4 left-4 right-4 flex justify-between items-start z-[95] pointer-events-none">
@@ -969,32 +1017,32 @@
                 </div>
                 <div class="absolute bottom-4 left-4 right-4 text-white pointer-events-none">
                     <span id="detailPlaceCategory"
-                        class="inline-block bg-[#ff5500] text-[10px] font-bold px-2.5 py-1 rounded-md mb-2">DANH
+                        class="inline-block bg-accent text-[10px] font-bold px-2.5 py-1 rounded-md mb-2">DANH
                         MỤC</span>
-                    <h2 id="detailPlaceName" class="text-2xl font-black leading-tight drop-shadow-md">Tên Địa Điểm</h2>
+                    <h2 id="detailPlaceName" class="text-2xl font-black leading-tight drop-shadow-soft-lg">Tên Địa Điểm</h2>
                     <p id="detailPlaceAddress" class="text-sm font-medium opacity-90 mt-1 flex items-center gap-1.5"><i
                             class="fa-solid fa-location-dot"></i> <span>Địa chỉ</span></p>
                 </div>
             </div>
             <div class="p-4 space-y-6">
-                <div class="flex gap-4 p-4 bg-gray-50 dark:bg-[#1c1c1e] rounded-2xl">
+                <div class="flex gap-4 p-4 bg-surface dark:bg-[#1c1c1e] rounded-2xl">
                     <div class="flex-1 text-center">
-                        <p class="text-xl font-black text-[#ff5500]" id="detailStatReviews">0</p>
+                        <p class="text-xl font-black text-primary" id="detailStatReviews">0</p>
                         <p class="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Đánh giá</p>
                     </div>
                     <div class="w-px bg-gray-200 dark:bg-gray-800"></div>
                     <div class="flex-1 text-center">
-                        <p class="text-xl font-black text-[#ff5500]" id="detailStatRating">0.0</p>
+                        <p class="text-xl font-black text-primary" id="detailStatRating">0.0</p>
                         <p class="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Điểm (5★)</p>
                     </div>
                 </div>
                 <div>
                     <h3 class="font-bold mb-2">Giới thiệu</h3>
-                    <p id="detailPlaceDesc" class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed"></p>
+                    <p id="detailPlaceDesc" class="text-sm text-textSecondary dark:text-gray-300 leading-relaxed"></p>
                 </div>
                 <div class="mt-4 grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 text-[#ff5500] flex items-center justify-center shrink-0">
+                    <div class="bg-surface dark:bg-gray-800 p-4 rounded-2xl flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 text-primary flex items-center justify-center shrink-0">
                             <i class="fa-regular fa-clock"></i>
                         </div>
                         <div class="overflow-hidden">
@@ -1002,7 +1050,7 @@
                             <p id="detailPlaceOpeningHours" class="font-bold text-sm truncate">Đang cập nhật</p>
                         </div>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl flex items-center gap-3">
+                    <div class="bg-surface dark:bg-gray-800 p-4 rounded-2xl flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-500 flex items-center justify-center shrink-0">
                             <i class="fa-solid fa-money-bill-wave"></i>
                         </div>
@@ -1016,19 +1064,19 @@
                     <h3 class="font-bold mb-2">Vị trí</h3>
                     <div id="detailPlaceMap" class="w-full h-48 rounded-2xl bg-gray-200 overflow-hidden"></div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <div class="mt-4 pt-4 border-t border-border dark:border-gray-800">
                     <h3 class="font-bold mb-4">Đánh giá cộng đồng</h3>
                     <div id="detailPlaceReviewsList" class="space-y-4">
-                        <p class="text-sm text-gray-500 italic text-center py-4">Đang tải đánh giá...</p>
+                        <p class="text-sm text-textSecondary italic text-center py-4">Đang tải đánh giá...</p>
                     </div>
                 </div>
             </div> <!-- Closes .p-4.space-y-6 -->
         </div> <!-- Closes .flex-1.overflow-y-auto -->
 
         <!-- Fixed Bottom Button -->
-        <div class="p-4 border-t border-gray-100 dark:border-[#2c2c2e] bg-white dark:bg-darkCard z-10">
+        <div class="p-4 border-t border-border dark:border-[#2c2c2e] bg-surface dark:bg-darkCard z-10">
             <button id="btnWriteReviewFromDetail"
-                class="w-full bg-[#ff5500] text-white py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 relative overflow-hidden group hover:opacity-90 active:scale-[0.98] transition-all">
+                class="w-full bg-accent text-white py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 relative overflow-hidden group hover:opacity-90 card-tactile transition-all">
                 <i class="fa-solid fa-pen"></i> Viết đánh giá cho nơi này
             </button>
         </div>
@@ -1036,30 +1084,30 @@
 
     <!-- Modal Viết Đánh Giá -->
     <div id="reviewModal"
-        class="hidden fixed inset-0 z-[10000] bg-white dark:bg-darkBg flex flex-col translate-y-full transition-transform duration-300">
+        class="hidden fixed inset-0 z-[10000] bg-surface dark:bg-darkBg flex flex-col translate-y-full transition-transform duration-300">
         <div
-            class="h-16 px-4 flex items-center justify-between border-b border-gray-100 dark:border-[#2c2c2e] sticky top-0 bg-white/80 dark:bg-darkBg/80 backdrop-blur-md z-10">
-            <button id="closeReviewModal" class="p-2 -ml-2 text-gray-500 hover:text-gray-800 transition-colors">
+            class="h-16 px-4 flex items-center justify-between border-b border-border dark:border-[#2c2c2e] sticky top-0 bg-surface/80 dark:bg-darkBg/80 backdrop-blur-md z-10">
+            <button id="closeReviewModal" class="p-2 -ml-2 text-textSecondary hover:text-textPrimary transition-colors">
                 <i class="fa-solid fa-chevron-down text-xl"></i>
             </button>
-            <h2 class="font-extrabold text-lg text-gray-900 dark:text-white">Viết Đánh Giá</h2>
+            <h2 class="font-extrabold text-lg text-textPrimary dark:text-white">Viết Đánh Giá</h2>
             <button id="submitReviewBtn"
-                class="text-[#ff5500] font-bold px-2 py-1 bg-orange-50 dark:bg-orange-900/30 rounded-lg">Đăng</button>
+                class="text-primary font-bold px-2 py-1 bg-orange-50 dark:bg-orange-900/30 rounded-xl">Đăng</button>
         </div>
 
         <form id="reviewForm" class="flex-1 overflow-y-auto p-5 space-y-6 pb-safe">
             <!-- Địa điểm -->
             <div>
-                <label class="block text-sm font-black text-gray-900 dark:text-white mb-2">Địa điểm</label>
+                <label class="block text-sm font-black text-textPrimary dark:text-white mb-2">Địa điểm</label>
                 <select id="reviewPlace"
-                    class="w-full p-4 bg-gray-50 dark:bg-darkCard text-gray-900 dark:text-white rounded-2xl appearance-none font-medium">
+                    class="w-full p-4 bg-surface dark:bg-darkCard text-textPrimary dark:text-white rounded-2xl appearance-none font-medium">
                     <option value="">-- Chọn địa điểm --</option>
                 </select>
             </div>
 
             <!-- Cảm nhận -->
             <div>
-                <label class="block text-sm font-black text-gray-900 dark:text-white mb-2">Trải nghiệm của bạn thế
+                <label class="block text-sm font-black text-textPrimary dark:text-white mb-2">Trải nghiệm của bạn thế
                     nào?</label>
                 <div class="flex justify-center gap-2 mb-4" id="starRatingSystem">
                     <i class="fa-regular fa-star text-4xl text-gray-300 transition-colors cursor-pointer"
@@ -1076,16 +1124,16 @@
                 <input type="hidden" id="reviewRatingInput" value="0">
                 <textarea id="reviewContent" rows="4"
                     placeholder="Chia sẻ một vài dòng về không gian, phục vụ, đồ ăn... (ít nhất 10 ký tự)"
-                    class="w-full p-4 bg-gray-50 dark:bg-darkCard text-gray-900 dark:text-white border-transparent focus:ring-2 focus:ring-[#ff5500] focus:bg-white dark:focus:bg-gray-800 transition-all rounded-2xl resize-none font-medium"></textarea>
+                    class="w-full p-4 bg-surface dark:bg-darkCard text-textPrimary dark:text-white border-transparent focus:ring-2 focus:ring-primary focus:bg-surface dark:focus:bg-gray-800 transition-all rounded-2xl resize-none font-medium"></textarea>
             </div>
 
             <!-- Ảnh đính kèm -->
             <div>
-                <label class="block text-sm font-black text-gray-900 dark:text-white mb-2">Thêm ảnh (không bắt
+                <label class="block text-sm font-black text-textPrimary dark:text-white mb-2">Thêm ảnh (không bắt
                     buộc)</label>
                 <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" id="imagePreviewContainer">
                     <label
-                        class="shrink-0 w-24 h-24 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:border-[#ff5500] hover:text-[#ff5500] transition-colors">
+                        class="shrink-0 w-24 h-24 border-2 border-dashed border-border dark:border-gray-700 rounded-xl flex flex-col items-center justify-center text-textSecondary cursor-pointer hover:border-primary hover:text-primary transition-colors">
                         <i class="fa-solid fa-camera mb-1 text-xl"></i>
                         <span class="text-[10px] font-bold uppercase tracking-widest">Thư viện</span>
                         <input type="file" id="reviewImagesUpload" accept="image/*" multiple class="hidden">
@@ -1108,21 +1156,21 @@
     <div id="customConfirmModal"
         class="fixed inset-0 z-[99999] hidden items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="bg-white dark:bg-darkBg rounded-3xl w-[90%] max-w-xs overflow-hidden scale-95 opacity-0 transition-all duration-300 transform p-5 text-center shadow-2xl border border-gray-100 dark:border-gray-800">
+            class="bg-surface dark:bg-darkBg rounded-3xl w-[90%] max-w-xs overflow-hidden scale-95 opacity-0 transition-all duration-300 transform p-5 text-center shadow-2xl border border-border dark:border-gray-800">
             <div
-                class="w-16 h-16 bg-orange-100 text-[#ff5500] rounded-full flex items-center justify-center mx-auto mb-4">
+                class="w-16 h-16 bg-orange-100 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fa-solid fa-circle-question text-3xl"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Xác nhận</h3>
-            <p id="customConfirmMessage" class="text-sm text-gray-500 dark:text-gray-400 mb-6">Bạn có chắc chắn thực
+            <h3 class="text-lg font-bold text-textPrimary dark:text-white mb-2">Xác nhận</h3>
+            <p id="customConfirmMessage" class="text-sm text-textSecondary dark:text-gray-400 mb-6">Bạn có chắc chắn thực
                 hiện hành động này không?</p>
             <div class="flex gap-3">
                 <button id="customConfirmCancelBtn"
-                    class="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-xl transition-colors">
+                    class="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-textSecondary dark:text-gray-300 font-bold py-3 rounded-xl transition-colors">
                     Hủy
                 </button>
                 <button id="customConfirmOkBtn"
-                    class="flex-1 bg-[#ff5500] hover:bg-[#ff7333] text-white font-bold py-3 rounded-xl transition-colors shadow-md shadow-orange-500/20">
+                    class="flex-1 bg-accent hover:bg-[#ff7333] text-white font-bold py-3 rounded-xl transition-colors shadow-soft-lg shadow-orange-500/20">
                     Đồng ý
                 </button>
             </div>
@@ -1132,45 +1180,45 @@
     <!-- Modal Cập Nhật Thông Tin -->
     <div id="editProfileModal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="fixed inset-x-0 bottom-0 z-[101] bg-white dark:bg-darkBg rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 ease-out max-h-[90vh] flex flex-col">
-            <div class="p-5 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+            class="fixed inset-x-0 bottom-0 z-[101] bg-surface dark:bg-darkBg rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 ease-out max-h-[90vh] flex flex-col">
+            <div class="p-5 flex justify-between items-center border-b border-border dark:border-gray-800">
                 <h3 class="text-xl font-bold dark:text-white">Cập nhật Hồ Sơ</h3>
                 <button id="closeEditProfileModal"
-                    class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
+                    class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-textSecondary">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <div class="p-6 overflow-y-auto space-y-6">
                 <form id="editProfileForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Họ và tên</label>
+                        <label class="block text-sm font-bold text-textSecondary dark:text-gray-300 mb-1">Họ và tên</label>
                         <input type="text" id="editFullname"
-                            class="w-full p-4 bg-gray-50 dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            class="w-full p-4 bg-surface dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
                             required>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Số điện
+                        <label class="block text-sm font-bold text-textSecondary dark:text-gray-300 mb-1">Số điện
                             thoại</label>
                         <input type="text" id="editPhone"
-                            class="w-full p-4 bg-gray-50 dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20">
+                            class="w-full p-4 bg-surface dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20">
                     </div>
                     <button type="submit" id="btnSubmitEditProfile"
-                        class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-md pb-4">Lưu thay
+                        class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg shadow-soft-lg pb-4">Lưu thay
                         đổi</button>
                 </form>
 
-                <hr class="border-gray-100 dark:border-gray-800">
+                <hr class="border-border dark:border-gray-800">
 
                 <form id="changePasswordForm" class="space-y-4">
-                    <h4 class="font-bold text-gray-800 dark:text-white">Đổi mật khẩu</h4>
+                    <h4 class="font-bold text-textPrimary dark:text-white">Đổi mật khẩu</h4>
                     <div>
                         <input type="password" id="oldPassword" placeholder="Mật khẩu cũ"
-                            class="w-full p-4 bg-gray-50 dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            class="w-full p-4 bg-surface dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
                             required>
                     </div>
                     <div>
                         <input type="password" id="newPassword" placeholder="Mật khẩu mới"
-                            class="w-full p-4 bg-gray-50 dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            class="w-full p-4 bg-surface dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20"
                             required>
                     </div>
                     <button type="submit"
@@ -1184,15 +1232,15 @@
     <!-- Modal Xen Lịch sử Điểm (Points History) -->
     <div id="pointsHistoryModal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="fixed inset-x-0 bottom-0 z-[101] bg-white dark:bg-darkBg rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 ease-out max-h-[85vh] flex flex-col">
-            <div class="p-5 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+            class="fixed inset-x-0 bottom-0 z-[101] bg-surface dark:bg-darkBg rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 ease-out max-h-[85vh] flex flex-col">
+            <div class="p-5 flex justify-between items-center border-b border-border dark:border-gray-800">
                 <div>
                     <h3 class="text-xl font-bold dark:text-white">Lịch sử điểm</h3>
-                    <p class="text-sm text-gray-500 mt-1">Bạn đang có: <span id="historyModalPoints"
-                            class="font-bold text-[#ff5500]">0</span> điểm</p>
+                    <p class="text-sm text-textSecondary mt-1">Bạn đang có: <span id="historyModalPoints"
+                            class="font-bold text-primary">0</span> điểm</p>
                 </div>
                 <button id="closePointsHistoryModal"
-                    class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
+                    class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-textSecondary">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -1207,30 +1255,30 @@
     <div id="settingsModal"
         class="hidden fixed inset-0 z-[10001] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div
-            class="bg-white dark:bg-darkBg rounded-3xl w-[90%] max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300">
-            <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                <h3 class="text-[17px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <i class="fa-solid fa-gear text-[#ff5500]"></i> Cài đặt tài khoản
+            class="bg-surface dark:bg-darkBg rounded-3xl w-[90%] max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300">
+            <div class="p-5 border-b border-border dark:border-gray-800 flex justify-between items-center">
+                <h3 class="text-[17px] font-bold text-textPrimary dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-primary"></i> Cài đặt tài khoản
                 </h3>
-                <button id="closeSettingsModal" class="text-gray-400 hover:text-gray-600"><i
+                <button id="closeSettingsModal" class="text-gray-400 hover:text-textSecondary"><i
                         class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-5 space-y-5">
                 <form id="settingsProfileForm" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tên hiển thị
+                        <label class="block text-xs font-bold text-textSecondary uppercase tracking-wider mb-2">Tên hiển thị
                             mới</label>
                         <input type="text" id="editProfileName"
-                            class="w-full p-4 bg-gray-50 dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff5500]"
+                            class="w-full p-4 bg-surface dark:bg-darkCard dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Nhập họ tên...">
                     </div>
                     <button type="submit"
-                        class="w-full bg-[#ff5500] hover:bg-[#e64d00] text-white py-4 rounded-xl font-bold pb-2 transition-colors">Lưu
+                        class="w-full bg-accent hover:bg-accentSoft text-white py-4 rounded-xl font-bold pb-2 transition-colors">Lưu
                         thay đổi</button>
                 </form>
-                <hr class="border-gray-100 dark:border-gray-800">
+                <hr class="border-border dark:border-gray-800">
                 <button id="btnChangePassword"
-                    class="w-full bg-gray-50 dark:bg-darkCard hover:bg-gray-100 dark:hover:bg-[#2c2c2e] text-gray-700 dark:text-white py-4 rounded-xl font-bold transition-colors">
+                    class="w-full bg-surface dark:bg-darkCard hover:bg-gray-100 dark:hover:bg-[#2c2c2e] text-textSecondary dark:text-white py-4 rounded-xl font-bold transition-colors">
                     <i class="fa-solid fa-key mr-2 opacity-50"></i> Đổi mật khẩu
                 </button>
                 <button id="btnLogout"
@@ -1245,55 +1293,55 @@
     <div id="reportModal"
         class="hidden fixed inset-0 z-[10001] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div
-            class="bg-white dark:bg-darkBg rounded-3xl w-[90%] max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300">
-            <div class="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                <h3 class="text-[17px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            class="bg-surface dark:bg-darkBg rounded-3xl w-[90%] max-w-sm overflow-hidden scale-95 opacity-0 transition-all duration-300">
+            <div class="p-5 border-b border-border dark:border-gray-800 flex justify-between items-center">
+                <h3 class="text-[17px] font-bold text-textPrimary dark:text-white flex items-center gap-2">
                     <i class="fa-solid fa-flag text-red-500"></i> Báo cáo vi phạm
                 </h3>
-                <button id="closeReportModal" class="text-gray-400 hover:text-gray-600"><i
+                <button id="closeReportModal" class="text-gray-400 hover:text-textSecondary"><i
                         class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-5">
                 <input type="hidden" id="reportEntityType">
                 <input type="hidden" id="reportEntityId">
-                <p class="text-sm text-gray-500 mb-3" id="reportEntityDesc">Bạn đang báo cáo nội dung này.</p>
+                <p class="text-sm text-textSecondary mb-3" id="reportEntityDesc">Bạn đang báo cáo nội dung này.</p>
                 <textarea id="reportReason"
-                    class="w-full bg-gray-50 dark:bg-gray-800 border-transparent focus:border-red-500 focus:ring-0 rounded-2xl p-4 text-sm resize-none dark:text-white"
+                    class="w-full bg-surface dark:bg-gray-800 border-transparent focus:border-red-500 focus:ring-0 rounded-2xl p-4 text-sm resize-none dark:text-white"
                     rows="3" placeholder="Vui lòng cung cấp lý do chi tiết..." required></textarea>
                 <button id="btnSubmitReport"
-                    class="w-full mt-4 bg-red-500 text-white font-bold py-3.5 rounded-2xl active:scale-95 transition-transform">Gửi
+                    class="w-full mt-4 bg-red-500 text-white font-bold py-3.5 rounded-2xl btn-tactile">Gửi
                     Báo Cáo</button>
             </div>
         </div>
     </div>
     <div id="adminDashboardModal"
-        class="fixed inset-0 z-[9999] hidden flex-col bg-white dark:bg-[#121212] transition-transform duration-300 translate-y-full">
+        class="fixed inset-0 z-[9999] hidden flex-col bg-surface dark:bg-[#121212] transition-transform duration-300 translate-y-full">
         <!-- Header -->
         <div
-            class="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl border-b border-gray-100 dark:border-white/5">
+            class="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-surface/90 dark:bg-[#121212]/90 backdrop-blur-xl border-b border-border dark:border-white/5">
             <button id="closeAdminDashboard"
-                class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-95">
+                class="w-10 h-10 rounded-full flex items-center justify-center text-textSecondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors btn-tactile">
                 <i class="fa-solid fa-chevron-left text-xl"></i>
             </button>
-            <h2 class="text-lg font-black tracking-tight text-gray-900 dark:text-white">Công cụ Quản trị</h2>
+            <h2 class="text-lg font-black tracking-tight text-textPrimary dark:text-white">Công cụ Quản trị</h2>
             <div class="w-10"></div>
         </div>
 
         <div class="flex-1 overflow-y-auto">
             <!-- Tabs Header -->
             <div
-                class="flex px-4 pt-4 gap-2 overflow-x-auto pb-4 scrollbar-hide border-b border-gray-100 dark:border-gray-800">
+                class="flex px-4 pt-4 gap-2 overflow-x-auto pb-4 scrollbar-hide border-b border-border dark:border-gray-800">
                 <button
-                    class="admin-tab-btn active-tab px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-[#ff5500] text-white"
+                    class="admin-tab-btn active-tab px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-accent text-white"
                     data-tab="admin-places">Duyệt địa điểm</button>
                 <button
-                    class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
+                    class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300"
                     data-tab="admin-banners">Quản lý Banners</button>
                 <button
-                    class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
+                    class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300"
                     data-tab="admin-reports">Báo cáo</button>
                 <button
-                    class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
+                    class="admin-tab-btn px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300"
                     data-tab="admin-users">Người dùng</button>
             </div>
 
@@ -1303,25 +1351,25 @@
                 <div id="admin-places" class="admin-tab-panel">
                     <div id="adminPlacesList" class="space-y-3">
                         <!-- Render pending places here -->
-                        <div class="text-center py-10 text-gray-500 text-sm">Đang tải...</div>
+                        <div class="text-center py-10 text-textSecondary text-sm">Đang tải...</div>
                     </div>
                 </div>
 
                 <!-- Tab: Banners -->
                 <div id="admin-banners" class="admin-tab-panel hidden space-y-4">
-                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl flex flex-col gap-3">
+                    <div class="bg-surface dark:bg-gray-800 p-4 rounded-2xl flex flex-col gap-3">
                         <h4 class="font-bold text-sm">Thêm Banner Mới</h4>
                         <input type="text" id="adminBannerImgUrl" placeholder="Link ảnh (image url)"
-                            class="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+                            class="w-full bg-surface dark:bg-gray-900 border border-border dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
                         <input type="text" id="adminBannerLink" placeholder="Link đích (khi click - Optional)"
-                            class="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
+                            class="w-full bg-surface dark:bg-gray-900 border border-border dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-orange-500">
                         <button id="adminBtnAddBanner"
-                            class="bg-blue-500 text-white font-bold py-2 rounded-xl text-sm active:scale-95 transition-transform"><i
+                            class="bg-blue-500 text-white font-bold py-2 rounded-xl text-sm btn-tactile"><i
                                 class="fa-solid fa-plus"></i> Tạo Banner</button>
                     </div>
                     <div id="adminBannersList" class="space-y-3">
                         <!-- Render banners here -->
-                        <div class="text-center py-10 text-gray-500 text-sm">Đang tải...</div>
+                        <div class="text-center py-10 text-textSecondary text-sm">Đang tải...</div>
                     </div>
                 </div>
 
@@ -1329,7 +1377,7 @@
                 <div id="admin-reports" class="admin-tab-panel hidden">
                     <div id="adminReportsList" class="space-y-3">
                         <!-- Render reports here -->
-                        <div class="text-center py-10 text-gray-500 text-sm">Đang tải...</div>
+                        <div class="text-center py-10 text-textSecondary text-sm">Đang tải...</div>
                     </div>
                 </div>
 
@@ -1337,18 +1385,18 @@
                 <div id="admin-users" class="admin-tab-panel hidden">
                     <div id="adminUsersList" class="space-y-3">
                         <!-- Render users here -->
-                        <div class="text-center py-10 text-gray-500 text-sm">Đang tải...</div>
+                        <div class="text-center py-10 text-textSecondary text-sm">Đang tải...</div>
                     </div>
 
                     <div
-                        class="bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl flex flex-col gap-3 mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                        class="bg-surface dark:bg-gray-800 p-4 rounded-2xl flex flex-col gap-3 mt-4 border-t border-border dark:border-gray-700 pt-4">
                         <h4 class="font-bold text-sm text-purple-600"><i class="fa-solid fa-bullhorn mr-2"></i>Đẩy thông
                             báo hệ thống</h4>
                         <textarea id="adminNotifContent" rows="3"
                             placeholder="Nhập nội dung thông báo muốn gửi đến tất cả người dùng hệ thống..."
-                            class="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-500 resize-none"></textarea>
+                            class="w-full bg-surface dark:bg-gray-900 border border-border dark:border-gray-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-purple-500 resize-none"></textarea>
                         <button id="btnAdminPushNotif"
-                            class="bg-purple-500 text-white font-bold py-2 rounded-xl text-sm active:scale-95 transition-transform"><i
+                            class="bg-purple-500 text-white font-bold py-2 rounded-xl text-sm btn-tactile"><i
                                 class="fa-solid fa-paper-plane mr-2"></i> Gửi thông báo</button>
                     </div>
                 </div>
@@ -1361,11 +1409,11 @@
     <!-- Modal Danh Sách Địa Điểm Đã Lưu -->
     <div id="savedPlacesModal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="fixed inset-x-0 bottom-0 z-[101] bg-gray-50 dark:bg-darkBg translate-y-full transition-transform duration-300 ease-out h-[90vh] flex flex-col rounded-t-3xl">
+            class="fixed inset-x-0 bottom-0 z-[101] bg-surface dark:bg-darkBg translate-y-full transition-transform duration-300 ease-out h-[90vh] flex flex-col rounded-t-3xl">
             <div
-                class="h-16 px-4 bg-white dark:bg-darkCard flex items-center shadow-sm border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10 rounded-t-3xl">
+                class="h-16 px-4 bg-surface dark:bg-darkCard flex items-center shadow-soft border-b border-border dark:border-gray-800 sticky top-0 z-10 rounded-t-3xl">
                 <button id="closeSavedPlacesModal"
-                    class="w-10 h-10 flex items-center justify-center text-gray-800 dark:text-white">
+                    class="w-10 h-10 flex items-center justify-center text-textPrimary dark:text-white">
                     <i class="fa-solid fa-chevron-down text-lg"></i>
                 </button>
                 <h1 class="text-lg font-bold ml-2 dark:text-white">Địa điểm đã lưu</h1>
@@ -1382,11 +1430,11 @@
     <!-- Modal Danh Sách Địa Điểm Theo Danh Mục -->
     <div id="categoryPlacesModal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="fixed inset-x-0 bottom-0 z-[101] bg-gray-50 dark:bg-darkBg translate-y-full transition-transform duration-300 ease-out h-[90vh] flex flex-col rounded-t-3xl">
+            class="fixed inset-x-0 bottom-0 z-[101] bg-surface dark:bg-darkBg translate-y-full transition-transform duration-300 ease-out h-[90vh] flex flex-col rounded-t-3xl">
             <div
-                class="h-16 px-4 bg-white dark:bg-darkCard flex items-center shadow-sm border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10 rounded-t-3xl">
+                class="h-16 px-4 bg-surface dark:bg-darkCard flex items-center shadow-soft border-b border-border dark:border-gray-800 sticky top-0 z-10 rounded-t-3xl">
                 <button id="closeCategoryPlacesModal"
-                    class="w-10 h-10 flex items-center justify-center text-gray-800 dark:text-white">
+                    class="w-10 h-10 flex items-center justify-center text-textPrimary dark:text-white">
                     <i class="fa-solid fa-chevron-down text-lg"></i>
                 </button>
                 <h1 id="categoryPlacesTitle" class="text-lg font-bold ml-2 dark:text-white">Danh Mục</h1>
@@ -1404,11 +1452,11 @@
     <!-- Modal Danh Sách Đánh Giá Đã Lưu -->
     <div id="savedReviewsModal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="fixed inset-x-0 bottom-0 z-[101] bg-gray-50 dark:bg-darkBg translate-y-full transition-transform duration-300 ease-out h-[90vh] flex flex-col rounded-t-3xl">
+            class="fixed inset-x-0 bottom-0 z-[101] bg-surface dark:bg-darkBg translate-y-full transition-transform duration-300 ease-out h-[90vh] flex flex-col rounded-t-3xl">
             <div
-                class="h-16 px-4 bg-white dark:bg-darkCard flex items-center shadow-sm border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10 rounded-t-3xl">
+                class="h-16 px-4 bg-surface dark:bg-darkCard flex items-center shadow-soft border-b border-border dark:border-gray-800 sticky top-0 z-10 rounded-t-3xl">
                 <button id="closeSavedReviewsModal"
-                    class="w-10 h-10 flex items-center justify-center text-gray-800 dark:text-white">
+                    class="w-10 h-10 flex items-center justify-center text-textPrimary dark:text-white">
                     <i class="fa-solid fa-chevron-down text-lg"></i>
                 </button>
                 <h1 class="text-lg font-bold ml-2 dark:text-white">Đánh giá đã lưu</h1>
@@ -1425,11 +1473,11 @@
     <!-- Modal Danh Sách Đánh Giá Của Tôi -->
     <div id="myReviewsModal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="fixed inset-x-0 bottom-0 z-[101] bg-gray-50 dark:bg-darkBg translate-y-full transition-transform duration-300 ease-out h-[90vh] flex flex-col rounded-t-3xl">
+            class="fixed inset-x-0 bottom-0 z-[101] bg-surface dark:bg-darkBg translate-y-full transition-transform duration-300 ease-out h-[90vh] flex flex-col rounded-t-3xl">
             <div
-                class="h-16 px-4 bg-white dark:bg-darkCard flex items-center shadow-sm border-b border-gray-100 dark:border-gray-800 sticky top-0 z-10 rounded-t-3xl">
+                class="h-16 px-4 bg-surface dark:bg-darkCard flex items-center shadow-soft border-b border-border dark:border-gray-800 sticky top-0 z-10 rounded-t-3xl">
                 <button id="closeMyReviewsModal"
-                    class="w-10 h-10 flex items-center justify-center text-gray-800 dark:text-white">
+                    class="w-10 h-10 flex items-center justify-center text-textPrimary dark:text-white">
                     <i class="fa-solid fa-chevron-down text-lg"></i>
                 </button>
                 <h1 class="text-lg font-bold ml-2 dark:text-white">Bài đánh giá của tôi</h1>
@@ -1446,12 +1494,12 @@
     <!-- Modal Đổi Thưởng -->
     <div id="rewardsModal" class="fixed inset-0 z-[9999] hidden bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="fixed inset-x-0 bottom-0 z-[101] bg-white dark:bg-darkBg rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 ease-out max-h-[90vh] flex flex-col">
+            class="fixed inset-x-0 bottom-0 z-[101] bg-surface dark:bg-darkBg rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 ease-out max-h-[90vh] flex flex-col">
             <!-- Header -->
-            <div class="p-5 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
-                <h3 class="text-xl font-bold dark:text-white"><i class="fa-solid fa-gift text-[#ff5500] mr-2"></i>Quà tặng & Đổi thưởng</h3>
+            <div class="p-5 flex justify-between items-center border-b border-border dark:border-gray-800">
+                <h3 class="text-xl font-bold dark:text-white"><i class="fa-solid fa-gift text-primary mr-2"></i>Quà tặng & Đổi thưởng</h3>
                 <button id="closeRewardsModal"
-                    class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
+                    class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-textSecondary">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -1463,7 +1511,7 @@
                         <p class="text-xs font-medium opacity-80 uppercase tracking-wider">Điểm thưởng của bạn</p>
                         <p class="text-3xl font-black mt-1" id="rewardsModalPoints">0</p>
                     </div>
-                    <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center">
+                    <div class="w-14 h-14 rounded-2xl bg-surface/20 flex items-center justify-center">
                         <i class="fa-solid fa-coins text-2xl"></i>
                     </div>
                 </div>
@@ -1473,11 +1521,11 @@
             <!-- Tabs -->
             <div class="flex mx-4 mt-4 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
                 <button id="rewardsTabAvailable" onclick="switchRewardsTab('available')"
-                    class="flex-1 py-2.5 text-sm font-bold rounded-lg bg-white dark:bg-darkCard text-[#ff5500] shadow-sm transition">
+                    class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-surface dark:bg-darkCard text-primary shadow-soft transition">
                     <i class="fa-solid fa-store mr-1"></i> Quà tặng
                 </button>
                 <button id="rewardsTabHistory" onclick="switchRewardsTab('history')"
-                    class="flex-1 py-2.5 text-sm font-bold rounded-lg text-gray-500 transition">
+                    class="flex-1 py-2.5 text-sm font-bold rounded-xl text-textSecondary transition">
                     <i class="fa-solid fa-clock-rotate-left mr-1"></i> Lịch sử đổi
                 </button>
             </div>
@@ -1506,11 +1554,11 @@
     <!-- Modal Bình luận (Comments) -->
     <div id="commentsModal" class="fixed inset-0 z-[10000] hidden bg-black/60 backdrop-blur-sm transition-opacity">
         <div
-            class="fixed inset-x-0 bottom-0 z-[101] bg-white dark:bg-darkBg rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 ease-out h-[80vh] flex flex-col">
-            <div class="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+            class="fixed inset-x-0 bottom-0 z-[101] bg-surface dark:bg-darkBg rounded-t-3xl shadow-2xl translate-y-full transition-transform duration-300 ease-out h-[80vh] flex flex-col">
+            <div class="p-4 flex justify-between items-center border-b border-border dark:border-gray-800">
                 <h3 class="text-lg font-bold dark:text-white" id="commentsModalTitle">Bình luận</h3>
                 <button id="closeCommentsModal"
-                    class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
+                    class="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-textSecondary">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -1522,7 +1570,7 @@
                 </div>
             </div>
 
-            <div class="p-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-darkCard">
+            <div class="p-3 border-t border-border dark:border-gray-800 bg-surface dark:bg-darkCard">
                 <form id="commentForm" class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden flex-shrink-0" id="commentUserAvatar">
                         <img src="https://images.unsplash.com/photo-1544005313-94ff6a00c24c?auto=format&fit=crop&q=80&w=150"
@@ -1543,15 +1591,15 @@
 
     <!-- Coord Picker Modal -->
     <div id="coordPickerModal" class="hidden fixed inset-0 z-[200] bg-black/70 flex-col items-end justify-end">
-        <div class="bg-white dark:bg-darkBg w-full rounded-t-3xl shadow-2xl flex flex-col" style="height:70vh">
-            <div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
+        <div class="bg-surface dark:bg-darkBg w-full rounded-t-3xl shadow-2xl flex flex-col" style="height:70vh">
+            <div class="flex items-center justify-between p-4 border-b border-border dark:border-gray-800">
                 <button id="closeCoordPicker"
-                    class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500">
+                    class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-textSecondary">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
                 <h3 class="font-bold text-base dark:text-white">Chọn vị trí trên bản đồ</h3>
                 <button id="confirmCoordBtn"
-                    class="hidden bg-[#ff5500] text-white px-4 py-1.5 rounded-full text-sm font-bold">Xác nhận</button>
+                    class="hidden bg-accent text-white px-4 py-1.5 rounded-full text-sm font-bold">Xác nhận</button>
             </div>
             <p class="text-center text-xs text-gray-400 py-2"><i class="fa-solid fa-hand-pointer mr-1"></i>Bấm vào bản
                 đồ để ghim vị trí</p>
@@ -1562,18 +1610,18 @@
     <!-- AI Chat Modal -->
     <div id="aiChatModal"
         class="hidden fixed inset-0 z-[100000] bg-black/60 backdrop-blur-sm flex-col items-end justify-end">
-        <div class="bg-white dark:bg-darkBg w-full rounded-t-3xl shadow-2xl transition-transform transform translate-y-full duration-300 flex flex-col"
+        <div class="bg-surface dark:bg-darkBg w-full rounded-t-3xl shadow-2xl transition-transform transform translate-y-full duration-300 flex flex-col"
             style="height: calc(100vh - 40px); height: calc(100dvh - 40px);">
             <!-- Header -->
             <div
-                class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+                class="flex items-center justify-between px-5 py-4 border-b border-border dark:border-gray-800 flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div
-                        class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white shadow-md">
+                        class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white shadow-soft-lg">
                         <i class="fa-solid fa-robot text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="font-black text-lg text-gray-900 dark:text-white leading-tight">bé Cộng</h3>
+                        <h3 class="font-black text-lg text-textPrimary dark:text-white leading-tight">bé Cộng</h3>
                         <p class="text-xs text-green-500 font-medium tracking-wide flex items-center gap-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Online
                         </p>
@@ -1581,18 +1629,18 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <button id="closeAiChatModal"
-                        class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 transition">
+                        class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-textSecondary hover:bg-gray-200 dark:hover:bg-gray-700 btn-tactile transition">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Messages Area -->
-            <div id="aiChatMessages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50 dark:bg-[#18181b]">
+            <div id="aiChatMessages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-surface/50 dark:bg-[#18181b]">
                 <!-- Initial greeting -->
                 <div class="flex justify-start mb-2">
                     <div
-                        class="max-w-[80%] bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm shadow-sm border border-gray-100 dark:border-gray-700">
+                        class="max-w-[80%] bg-surface dark:bg-gray-800 text-textPrimary dark:text-gray-100 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm shadow-soft border border-border dark:border-gray-700">
                         Hem nhô bồ! 👋 Mình là bé Cộng nè. Bạn muốn ăn chơi nhảy múa ở Kon Tum chỗ nào cứ hỏi mình nha, mình chỉ rành rẽ luôn á! ✨
                     </div>
                 </div>
@@ -1600,13 +1648,13 @@
 
             <!-- Input Area -->
             <div
-                class="p-4 bg-white dark:bg-darkBg border-t border-gray-100 dark:border-gray-800 flex-shrink-0 pb-safe">
+                class="p-4 bg-surface dark:bg-darkBg border-t border-border dark:border-gray-800 flex-shrink-0 pb-safe">
                 <form id="aiChatForm" class="flex gap-2 items-end">
                     <textarea id="aiChatInput" rows="1" placeholder="Hỏi AI về Kon Tum..."
-                        class="flex-1 bg-gray-100 dark:bg-gray-800 border-transparent focus:border-[#ff5500] focus:ring-0 rounded-2xl px-4 py-3 text-sm text-gray-800 dark:text-gray-100 resize-none max-h-32 outline-none"
+                        class="flex-1 bg-gray-100 dark:bg-gray-800 border-transparent focus:border-primary focus:ring-0 rounded-2xl px-4 py-3 text-sm text-textPrimary dark:text-gray-100 resize-none max-h-32 outline-none"
                         required></textarea>
                     <button type="submit" id="aiChatSendBtn"
-                        class="w-11 h-11 bg-[#ff5500] text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-md transition-transform active:scale-95 disabled:opacity-50">
+                        class="w-11 h-11 bg-accent text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-soft-lg transition-transform btn-tactile disabled:opacity-50">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </form>

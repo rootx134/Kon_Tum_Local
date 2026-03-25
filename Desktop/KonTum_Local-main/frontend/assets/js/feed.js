@@ -167,11 +167,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!exploreTopicChips) return;
         exploreTopicChips.querySelectorAll('.explore-chip').forEach(chip => {
             const isActive = chip.dataset.topic === exploreState.topic;
-            chip.classList.toggle('bg-[#ff5500]', isActive);
+            chip.classList.toggle('bg-accent', isActive);
             chip.classList.toggle('text-white', isActive);
             chip.classList.toggle('bg-gray-100', !isActive);
             chip.classList.toggle('dark:bg-gray-800', !isActive);
-            chip.classList.toggle('text-gray-600', !isActive);
+            chip.classList.toggle('text-textSecondary', !isActive);
             chip.classList.toggle('dark:text-gray-300', !isActive);
         });
     }
@@ -179,11 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function syncExploreToggleUI() {
         const applyToggle = (btn, active) => {
             if (!btn) return;
-            btn.classList.toggle('bg-[#ff5500]', active);
+            btn.classList.toggle('bg-accent', active);
             btn.classList.toggle('text-white', active);
             btn.classList.toggle('bg-gray-100', !active);
             btn.classList.toggle('dark:bg-gray-800', !active);
-            btn.classList.toggle('text-gray-600', !active);
+            btn.classList.toggle('text-textSecondary', !active);
             btn.classList.toggle('dark:text-gray-300', !active);
         };
         applyToggle(toggleNearMeBtn, exploreState.nearMe);
@@ -279,9 +279,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!reviews || reviews.length === 0) {
             feedContainer.innerHTML = `
-                <div class="bg-white dark:bg-darkCard rounded-3xl p-8 text-center border border-gray-100 dark:border-gray-800">
+                <div class="bg-surface dark:bg-darkCard rounded-3xl p-8 text-center border border-border dark:border-gray-800">
                     <i class="fa-regular fa-compass text-3xl text-gray-300 mb-3"></i>
-                    <p class="text-sm font-semibold text-gray-500">Chưa có bài phù hợp bộ lọc hiện tại</p>
+                    <p class="text-sm font-semibold text-textSecondary">Chưa có bài phù hợp bộ lọc hiện tại</p>
                     <p class="text-xs text-gray-400 mt-1">Thử tắt bớt bộ lọc hoặc chọn chủ đề khác</p>
                 </div>
             `;
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         reviews.forEach(review => {
             const card = document.createElement('div');
-            card.className = 'bg-white dark:bg-darkCard rounded-3xl p-5 mb-4 shadow-sm border border-gray-50 dark:border-[#2c2c2e]';
+            card.className = 'bg-surface dark:bg-darkCard rounded-3xl p-5 mb-4 shadow-soft border border-border dark:border-[#2c2c2e]';
             card.dataset.id = review.id;
 
             // Thumbnail xử lý (nếu có nhiều ảnh)
@@ -305,8 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 imgUrls.forEach((imgUrl, idx) => {
                     imageHtml += `
-                        <div class="flex-shrink-0 snap-center relative w-24 h-24 rounded-2xl overflow-hidden cursor-pointer shadow-sm group" onclick="window.showLightbox(${imgUrlsJson}, ${idx})">
-                            <img src="${imgUrl}" class="w-full h-full object-cover group-active:scale-95 transition-transform">
+                        <div class="flex-shrink-0 snap-center relative w-24 h-24 rounded-2xl overflow-hidden cursor-pointer shadow-soft group" onclick="window.showLightbox(${imgUrlsJson}, ${idx})">
+                            <img src="${imgUrl}" class="w-full h-full object-cover group-btn-tactile">
                         </div>
                     `;
                 });
@@ -315,19 +315,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const randomBg = review.user_id % 2 === 0 ? 'ff5500' : 'ff8800'; // Default Orange Tints
             const avatarUrl = (review.avatar && review.avatar !== 'default_avatar.png') ? review.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(review.fullname)}&background=${randomBg}&color=fff&rounded=true&bold=true`;
-            const likeColor = (review.is_liked || review.liked_by_me == 1 || review.currentUser_liked == 1) ? 'text-[#ff5500]' : 'text-gray-400';
+            const likeColor = (review.is_liked || review.liked_by_me == 1 || review.currentUser_liked == 1) ? 'text-primary' : 'text-gray-400';
 
             card.innerHTML = `
                 <div class="flex items-center gap-3 relative">
-                    <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover shadow-sm border border-gray-100">
+                    <img src="${avatarUrl}" class="w-10 h-10 rounded-full object-cover shadow-soft border border-border">
                     <div class="flex-1">
-                        <h4 class="font-extrabold text-sm flex items-center gap-2">${review.fullname} <button class="text-[#ff5500] text-[10px] uppercase tracking-wider bg-[#fff5f0] px-2 py-0.5 rounded-full" onclick="window.toggleFollowUser(this, ${review.user_id})"><i class="fa-solid fa-plus mr-1"></i>Follow</button></h4>
+                        <h4 class="font-extrabold text-sm flex items-center gap-2">${review.fullname} <button class="text-primary text-[10px] uppercase tracking-wider bg-[#fff5f0] px-2 py-0.5 rounded-full" onclick="window.toggleFollowUser(this, ${review.user_id})"><i class="fa-solid fa-plus mr-1"></i>Follow</button></h4>
                         <p class="text-[11px] text-gray-400 font-medium flex items-center gap-1">
-                            <i class="fa-solid fa-location-dot"></i> <span>Đã đánh giá tại <b class="text-[#ff5500] hover:underline cursor-pointer" onclick="window.openPlaceDetail({id: ${review.place_id}})">${review.place_name}</b></span>
+                            <i class="fa-solid fa-location-dot"></i> <span>Đã đánh giá tại <b class="text-primary hover:underline cursor-pointer" onclick="window.openPlaceDetail({id: ${review.place_id}})">${review.place_name}</b></span>
                         </p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                        <div class="bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 px-2 py-1 rounded-xl text-xs font-bold flex items-center gap-1">
                             <i class="fa-solid fa-star"></i> ${review.rating}
                         </div>
                         <div class="relative">
@@ -335,30 +335,30 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                             </button>
                             <!-- Dropdown Menu -->
-                            <div id="feedReviewMenu-${review.id}" class="hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-[#3a3a3c] rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 py-1.5 z-50 text-left origin-top-right transition-transform transform scale-95 opacity-0">
+                            <div id="feedReviewMenu-${review.id}" class="hidden absolute right-0 top-full mt-1 w-36 bg-surface dark:bg-[#3a3a3c] rounded-xl shadow-lg border border-border dark:border-gray-700 py-1.5 z-50 text-left origin-top-right transition-transform transform scale-95 opacity-0">
                                 ${user && String(user.id) === String(review.user_id) ? `
-                                    <button onclick="window.openEditReviewModal(${review.id}, this.closest('.bg-white')?.querySelector('.place-card-click')?.textContent || '', ${review.rating}, '${review.place_id}'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-pen fa-fw text-blue-500"></i> Sửa bài</button>
+                                    <button onclick="window.openEditReviewModal(${review.id}, this.closest('.bg-surface')?.querySelector('.place-card-click')?.textContent || '', ${review.rating}, '${review.place_id}'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-textSecondary dark:text-gray-200 hover:bg-surface flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-pen fa-fw text-blue-500"></i> Sửa bài</button>
                                     <button onclick="window.deleteOwnReview(${review.id}, '${review.place_id}'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-trash fa-fw text-red-500"></i> Xóa bài</button>
                                 ` : ''}
                                 ${user && user.is_admin == 1 && String(user.id) !== String(review.user_id) ? `
                                     <button onclick="window.adminDeleteReview(${review.id}, '${review.place_id}', event); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-trash fa-fw text-red-500"></i> Xóa (Admin)</button>
                                 ` : ''}
                                 ${user && String(user.id) !== String(review.user_id) ? `
-                                    <button onclick="if(window.openReportModal) window.openReportModal('review', ${review.id}, 'đánh giá'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-flag fa-fw text-orange-400"></i> Báo cáo</button>
+                                    <button onclick="if(window.openReportModal) window.openReportModal('review', ${review.id}, 'đánh giá'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-textSecondary dark:text-gray-200 hover:bg-surface flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-flag fa-fw text-orange-400"></i> Báo cáo</button>
                                 ` : ''}
                                 ${!user ? `
-                                    <button onclick="alert('Vui lòng đăng nhập!'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-50 flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-flag fa-fw text-orange-400"></i> Báo cáo</button>
+                                    <button onclick="alert('Vui lòng đăng nhập!'); document.getElementById('feedReviewMenu-${review.id}').classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-xs text-textSecondary dark:text-gray-200 hover:bg-surface flex items-center gap-2.5 transition-colors"><i class="fa-solid fa-flag fa-fw text-orange-400"></i> Báo cáo</button>
                                 ` : ''}
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <p class="text-gray-600 dark:text-gray-300 text-sm mt-3 mb-2 leading-relaxed place-card-click cursor-pointer">${review.content}</p>
+                <p class="text-textSecondary dark:text-gray-300 text-sm mt-3 mb-2 leading-relaxed place-card-click cursor-pointer">${review.content}</p>
                 
                 ${imageHtml}
                 
-                <div class="flex items-center gap-6 mt-4 pt-3 border-t border-gray-50 dark:border-white/5">
+                <div class="flex items-center gap-6 mt-4 pt-3 border-t border-border dark:border-white/5">
                     <button data-like-btn-id="${review.id}" class="flex items-center gap-2 ${likeColor} text-sm font-bold group" onclick="window.toggleLikeReview(this, ${review.id})">
                         <i data-like-icon-id="${review.id}" class="${(review.liked_by_me == 1 || review.is_liked) ? 'fa-solid' : 'fa-regular'} fa-heart group-hover:scale-110 transition-transform"></i>
                         <span data-like-count-id="${review.id}">${review.total_likes !== undefined ? review.total_likes : review.like_count}</span>
@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="flex items-center gap-2 ${review.saved_by_me ? 'text-red-500' : 'text-gray-400'} text-sm font-bold active:text-red-500 group" onclick="window.toggleSaveReview(this, ${review.id})">
                             <i class="${review.saved_by_me ? 'fa-solid' : 'fa-regular'} fa-bookmark group-hover:scale-110 transition-transform"></i>
                         </button>
-                        <button class="flex items-center gap-2 text-gray-400 text-sm font-bold active:text-[#ff5500] group" onclick="window.shareReview('${review.place_name.replace(/'/g, "\\'")}', '${review.content.replace(/'/g, "\\'")}', ${review.id})">
+                        <button class="flex items-center gap-2 text-gray-400 text-sm font-bold active:text-primary group" onclick="window.shareReview('${review.place_name.replace(/'/g, "\\'")}', '${review.content.replace(/'/g, "\\'")}', ${review.id})">
                             <i class="fa-solid fa-share-nodes group-hover:scale-110 transition-transform"></i>
                         </button>
                     </div>
@@ -398,7 +398,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const placeDetailModal = document.getElementById('placeDetailModal');
     const closePlaceDetail = document.getElementById('closePlaceDetail');
 
-    async function openPlaceDetail(placeInput, imgUrl, rating, reviewCount) {
+    window.generateSlug = window.generateSlug || function(text) {
+        if (!text) return '';
+        return text.toString().toLowerCase()
+            .replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a')
+            .replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e')
+            .replace(/i|í|ì|ỉ|ĩ|ị/gi, 'i')
+            .replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o')
+            .replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u')
+            .replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y')
+            .replace(/đ/gi, 'd')
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9\-]/g, '')
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    };
+
+    /**
+     * Mở modal chi tiết địa điểm
+     */
+    window.openPlaceDetail = async function openPlaceDetail(placeInput, imgUrl, rating, reviewCount, shouldPushState = true) {
         if (!placeDetailModal) return;
 
         let place = placeInput;
@@ -418,6 +438,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error("Error fetching place detail", e);
         }
+
+        // ---------- Update SEO URL ----------
+        if (shouldPushState) {
+            const slug = window.generateSlug(place.name || placeInput.name);
+            history.pushState({ placeId: place.id }, '', `/place/${place.id}/${slug}`);
+        }
+        document.title = `${place.name || placeInput.name} | Kon Tum Local`;
 
         // Hiển thị thông tin cơ bản
         const imageContainer = document.getElementById('detailPlaceImageContainer');
@@ -506,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const el = document.createElement('div');
                 el.innerHTML = `
                     <div style="position: relative; text-align: center; width: 32px; height: 32px; margin-top: -16px;">
-                        <i class="fa-solid fa-location-dot text-[#ff5500]" style="font-size: 32px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));"></i>
+                        <i class="fa-solid fa-location-dot text-primary" style="font-size: 32px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));"></i>
                     </div>
                 `;
 
@@ -751,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Fetch reviews cho địa điểm này
         const reviewsContainer = document.getElementById('detailPlaceReviewsList');
         if (reviewsContainer) {
-            reviewsContainer.innerHTML = '<p class="text-sm text-gray-500 italic text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang tải đánh giá...</p>';
+            reviewsContainer.innerHTML = '<p class="text-sm text-textSecondary italic text-center py-4"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Đang tải đánh giá...</p>';
 
             const currentUserStr = localStorage.getItem('user_vtkt');
             const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
@@ -780,40 +807,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 imgUrls.forEach((imgUrl, idx) => {
                                     imgHtml += `
-                                        <div class="flex-shrink-0 snap-center relative w-24 h-24 rounded-2xl overflow-hidden cursor-pointer shadow-sm group" onclick="window.showLightbox(${imgUrlsJson}, ${idx})">
-                                            <img src="${imgUrl}" class="w-full h-full object-cover group-active:scale-95 transition-transform">
+                                        <div class="flex-shrink-0 snap-center relative w-24 h-24 rounded-2xl overflow-hidden cursor-pointer shadow-soft group" onclick="window.showLightbox(${imgUrlsJson}, ${idx})">
+                                            <img src="${imgUrl}" class="w-full h-full object-cover group-btn-tactile">
                                         </div>
                                     `;
                                 });
                                 imgHtml += '</div>';
                             }
-                            const isLiked = (r.is_liked || r.liked_by_me == 1) ? 'fa-solid text-red-500' : 'fa-regular text-gray-500';
+                            const isLiked = (r.is_liked || r.liked_by_me == 1) ? 'fa-solid text-red-500' : 'fa-regular text-textSecondary';
                             const likesCount = parseInt(r.like_count || r.likes_count || r.total_likes) || 0;
                             const commentsCount = parseInt(r.comment_count || r.comments_count || r.total_comments) || 0;
 
                             html += `
-                                <div class="bg-gray-50 dark:bg-[#2c2c2e] p-4 rounded-2xl relative group">
+                                <div class="bg-surface dark:bg-[#2c2c2e] p-4 rounded-2xl relative group">
                                     <div class="absolute top-3 right-3 z-10">
-                                        <button onclick="event.stopPropagation(); const m=this.nextElementSibling; m.classList.toggle('hidden'); document.addEventListener('click',()=>m.classList.add('hidden'),{once:true})" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                        <button onclick="event.stopPropagation(); const m=this.nextElementSibling; m.classList.toggle('hidden'); document.addEventListener('click',()=>m.classList.add('hidden'),{once:true})" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-400 hover:text-textSecondary dark:hover:text-gray-300">
                                             <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
                                         </button>
-                                        <div class="hidden absolute right-0 top-8 bg-white dark:bg-[#3a3a3c] rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-1.5 z-50 min-w-[160px]" onclick="event.stopPropagation()">
+                                        <div class="hidden absolute right-0 top-8 bg-surface dark:bg-[#3a3a3c] rounded-xl shadow-xl border border-border dark:border-gray-700 py-1.5 z-50 min-w-[160px]" onclick="event.stopPropagation()">
                                             ${currentUser && String(currentUser.id) === String(r.user_id) ? `
-                                            <button onclick="window.openEditReviewModal(${r.id}, this.closest('.group').querySelector('.review-content-text')?.textContent || '', ${r.rating}, '${r.place_id}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center gap-2.5 transition-colors">
+                                            <button onclick="window.openEditReviewModal(${r.id}, this.closest('.group').querySelector('.review-content-text')?.textContent || '', ${r.rating}, '${r.place_id}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-sm text-textSecondary dark:text-gray-200 hover:bg-surface dark:hover:bg-gray-600 flex items-center gap-2.5 transition-colors">
                                                 <i class="fa-solid fa-pen-to-square text-blue-500 w-4 text-center"></i> Chỉnh sửa
                                             </button>
                                             <button onclick="window.deleteOwnReview(${r.id}, '${r.place_id}'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2.5 transition-colors">
                                                 <i class="fa-solid fa-trash w-4 text-center"></i> Xoá đánh giá
                                             </button>
-                                            <div class="border-t border-gray-100 dark:border-gray-600 my-1"></div>
+                                            <div class="border-t border-border dark:border-gray-600 my-1"></div>
                                             ` : ''}
                                             ${currentUser && currentUser.is_admin == 1 && String(currentUser.id) !== String(r.user_id) ? `
                                             <button onclick="window.adminDeleteReview(${r.id}, '${r.place_id}', event); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2.5 transition-colors">
                                                 <i class="fa-solid fa-trash w-4 text-center"></i> Xoá (Admin)
                                             </button>
-                                            <div class="border-t border-gray-100 dark:border-gray-600 my-1"></div>
+                                            <div class="border-t border-border dark:border-gray-600 my-1"></div>
                                             ` : ''}
-                                            <button onclick="if(window.openReportModal) window.openReportModal('review', ${r.id}, 'đánh giá'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center gap-2.5 transition-colors">
+                                            <button onclick="if(window.openReportModal) window.openReportModal('review', ${r.id}, 'đánh giá'); this.parentElement.classList.add('hidden')" class="w-full text-left px-4 py-2.5 text-sm text-textSecondary dark:text-gray-200 hover:bg-surface dark:hover:bg-gray-600 flex items-center gap-2.5 transition-colors">
                                                 <i class="fa-solid fa-flag text-orange-400 w-4 text-center"></i> Báo cáo
                                             </button>
                                         </div>
@@ -821,20 +848,20 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <div class="flex items-center gap-3 mb-2 pr-10">
                                         <img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover">
                                         <div>
-                                            <p class="font-bold text-sm leading-none text-gray-900 dark:text-white">${r.fullname}</p>
+                                            <p class="font-bold text-sm leading-none text-textPrimary dark:text-white">${r.fullname}</p>
                                             <div class="flex mt-1">${starHtml}${unstarHtml}</div>
                                             <p class="text-[10px] text-gray-400 mt-1.5">${window.timeAgo ? window.timeAgo(r.created_at) : r.created_at}</p>
                                         </div>
                                     </div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300">${r.content}</p>
+                                    <p class="text-sm text-textSecondary dark:text-gray-300">${r.content}</p>
                                     ${imgHtml}
                                     
-                                    <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                    <div class="flex items-center gap-4 mt-3 pt-3 border-t border-border dark:border-gray-700">
                                         <button onclick="window.toggleReviewLikeInDetail(${r.id}, this)" class="flex items-center gap-1.5 text-xs font-bold transition hover:opacity-80">
                                             <i data-like-icon-id="${r.id}" class="${isLiked} fa-heart text-base"></i>
-                                            <span data-like-count-id="${r.id}" class="${(r.is_liked || r.liked_by_me == 1) ? 'text-red-500' : 'text-gray-500'}">${likesCount}</span>
+                                            <span data-like-count-id="${r.id}" class="${(r.is_liked || r.liked_by_me == 1) ? 'text-red-500' : 'text-textSecondary'}">${likesCount}</span>
                                         </button>
-                                        <button onclick="window.openReviewComments(${r.id})" class="flex items-center gap-1.5 text-xs font-bold text-gray-500 transition hover:text-blue-500">
+                                        <button onclick="window.openReviewComments(${r.id})" class="flex items-center gap-1.5 text-xs font-bold text-textSecondary transition hover:text-blue-500">
                                             <i class="fa-regular fa-comment text-base"></i>
                                             <span data-comment-count-id="${r.id}">${commentsCount}</span>
                                         </button>
@@ -842,7 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <button class="flex items-center gap-2 ${r.saved_by_me ? 'text-red-500' : 'text-gray-400'} text-xs font-bold active:text-red-500 group" onclick="window.toggleSaveReview(this, ${r.id})">
                                                 <i class="${r.saved_by_me ? 'fa-solid' : 'fa-regular'} fa-bookmark text-base group-hover:scale-110 transition-transform"></i>
                                             </button>
-                                            <button class="flex items-center gap-2 text-gray-400 text-xs font-bold active:text-[#ff5500] group" onclick="window.shareReview('${(place.name || '').replace(/'/g, "\\'")}', '${r.content.replace(/'/g, "\\'")}', ${r.id})">
+                                            <button class="flex items-center gap-2 text-gray-400 text-xs font-bold active:text-primary group" onclick="window.shareReview('${(place.name || '').replace(/'/g, "\\'")}', '${r.content.replace(/'/g, "\\'")}', ${r.id})">
                                                 <i class="fa-solid fa-share-nodes text-base group-hover:scale-110 transition-transform"></i>
                                             </button>
                                         </div>
@@ -852,7 +879,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                         reviewsContainer.innerHTML = html;
                     } else {
-                        reviewsContainer.innerHTML = '<p class="text-sm text-gray-500 italic text-center py-4">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>';
+                        reviewsContainer.innerHTML = '<p class="text-sm text-textSecondary italic text-center py-4">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>';
                     }
                 })
                 .catch(err => {
@@ -867,6 +894,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (closePlaceDetail) {
         closePlaceDetail.addEventListener('click', () => {
+            if (window.location.pathname.startsWith('/place/')) {
+                history.pushState(null, '', '/');
+                document.title = 'Kon Tum Local';
+            }
             placeDetailModal.classList.add('translate-y-full');
             setTimeout(() => placeDetailModal.classList.add('hidden'), 300);
         });
@@ -916,20 +947,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const style = categoryStyles[cat.name] || defaultStyle;
                 const finalIcon = cat.icon && cat.icon.startsWith('fa-') ? cat.icon : style.icon;
                 const el = document.createElement('div');
-                el.className = 'flex flex-col items-center gap-2 cursor-pointer transition-all active:scale-95 hover:scale-105';
+                el.className = 'flex flex-col items-center gap-2 cursor-pointer transition-all btn-tactile hover:scale-105';
                 el.onclick = () => window.openCategoryPlacesModal(cat.id, cat.name);
                 el.innerHTML = `
-                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm transition-shadow hover:shadow-md" style="background: ${style.bg}; border: 1.5px solid ${style.border};">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-soft transition-shadow hover:shadow-soft-lg" style="background: ${style.bg}; border: 1.5px solid ${style.border};">
                         <i class="${finalIcon} text-xl" style="color: ${style.color}"></i>
                     </div>
-                    <span class="text-[11px] font-semibold text-gray-600 dark:text-gray-400 text-center line-clamp-1 max-w-[72px]">${cat.name}</span>
+                    <span class="text-[11px] font-semibold text-textSecondary dark:text-gray-400 text-center line-clamp-1 max-w-[72px]">${cat.name}</span>
                 `;
                 homeCategoryGrid.appendChild(el);
             });
 
             // Add "Gần đây" button
             const nearbyBtn = document.createElement('div');
-            nearbyBtn.className = 'flex flex-col items-center gap-2 cursor-pointer transition-transform active:scale-95';
+            nearbyBtn.className = 'flex flex-col items-center gap-2 cursor-pointer transition-transform btn-tactile';
             nearbyBtn.onclick = () => {
                 if (window.loadNearbyPlaces) {
                     window.loadNearbyPlaces();
@@ -938,10 +969,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
             nearbyBtn.innerHTML = `
-                <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-500 border border-blue-100 dark:border-blue-800 shadow-sm">
+                <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center text-blue-500 border border-blue-100 dark:border-blue-800 shadow-soft">
                     <i class="fa-solid fa-location-crosshairs text-xl"></i>
                 </div>
-                <span class="text-[11px] font-medium text-gray-600 dark:text-gray-400 text-center">Gần bạn</span>
+                <span class="text-[11px] font-medium text-textSecondary dark:text-gray-400 text-center">Gần bạn</span>
             `;
             homeCategoryGrid.appendChild(nearbyBtn);
 
@@ -996,7 +1027,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         places.forEach(place => {
             const card = document.createElement('div');
-            card.className = 'snap-start w-40 flex-shrink-0 space-y-2 cursor-pointer active:scale-[0.98] transition-transform';
+            card.className = 'snap-start w-40 flex-shrink-0 space-y-2 cursor-pointer card-tactile transition-transform';
 
             // IMPORTANT FIX: Use place.thumbnail instead of place.image_url. If raw URL is present, prepend API relative path.
             let imgUrl = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=400';
@@ -1008,15 +1039,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const reviewCount = Number(place.review_count || 0);
 
             card.innerHTML = `
-                <div class="aspect-square bg-gray-200 rounded-3xl overflow-hidden relative shadow-md">
+                <div class="aspect-square bg-gray-200 rounded-3xl overflow-hidden relative shadow-soft-lg">
                     <img src="${imgUrl}" class="w-full h-full object-cover">
-                    <div class="absolute top-3 right-3 bg-white/90 text-gray-900 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                    <div class="absolute top-3 right-3 bg-surface/90 text-textPrimary text-[10px] font-bold px-2 py-1 rounded-xl flex items-center gap-1 shadow-soft">
                         <i class="fa-solid fa-star text-yellow-500"></i> ${rating > 0 ? rating : 'Mới'}
                     </div>
                 </div>
-                <p class="text-[10px] font-bold text-[#ff5500] uppercase mt-3 line-clamp-1">${place.category_name || 'Khám phá'}</p>
+                <p class="text-[10px] font-bold text-primary uppercase mt-3 line-clamp-1">${place.category_name || 'Khám phá'}</p>
                 <h4 class="font-bold text-[15px] line-clamp-1">${place.name}</h4>
-                <p class="text-[11px] text-gray-500 line-clamp-1"><i class="fa-solid fa-location-dot"></i> ${place.address}</p>
+                <p class="text-[11px] text-textSecondary line-clamp-1"><i class="fa-solid fa-location-dot"></i> ${place.address}</p>
             `;
 
             card.addEventListener('click', () => {
@@ -1072,7 +1103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${imgUrl}" class="w-full h-full object-cover">
                         ${(banner.title || banner.subtitle) ? `
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-4">
-                                ${banner.title ? `<h3 class="text-white font-bold text-lg leading-tight line-clamp-2 shadow-sm">${banner.title}</h3>` : ''}
+                                ${banner.title ? `<h3 class="text-white font-bold text-lg leading-tight line-clamp-2 shadow-soft">${banner.title}</h3>` : ''}
                                 ${banner.subtitle ? `<p class="text-white/80 text-sm mt-1 line-clamp-2">${banner.subtitle}</p>` : ''}
                             </div>
                         ` : ''}
@@ -1082,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Indicator
                     const dot = document.createElement('div');
-                    dot.className = `h-1.5 rounded-full transition-all duration-300 ${idx === 0 ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`;
+                    dot.className = `h-1.5 rounded-full transition-all duration-300 ${idx === 0 ? 'w-4 bg-surface' : 'w-1.5 bg-surface/50'}`;
                     heroBannerIndicators.appendChild(dot);
                 });
 
@@ -1104,9 +1135,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const dots = heroBannerIndicators.children;
                         for (let i = 0; i < dots.length; i++) {
                             if (i === currentBannerIndex) {
-                                dots[i].className = 'h-1.5 rounded-full transition-all duration-300 w-4 bg-white';
+                                dots[i].className = 'h-1.5 rounded-full transition-all duration-300 w-4 bg-surface';
                             } else {
-                                dots[i].className = 'h-1.5 rounded-full transition-all duration-300 w-1.5 bg-white/50';
+                                dots[i].className = 'h-1.5 rounded-full transition-all duration-300 w-1.5 bg-surface/50';
                             }
                         }
                     }
@@ -1173,12 +1204,12 @@ window.toggleFollowUser = async function (btn, authorId) {
         if (data.status === 'success') {
             if (data.following) {
                 btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Following';
-                btn.classList.add('bg-gray-100', 'text-gray-500');
-                btn.classList.remove('bg-[#fff5f0]', 'text-[#ff5500]');
+                btn.classList.add('bg-gray-100', 'text-textSecondary');
+                btn.classList.remove('bg-[#fff5f0]', 'text-primary');
             } else {
                 btn.innerHTML = '<i class="fa-solid fa-plus mr-1"></i>Follow';
-                btn.classList.remove('bg-gray-100', 'text-gray-500');
-                btn.classList.add('bg-[#fff5f0]', 'text-[#ff5500]');
+                btn.classList.remove('bg-gray-100', 'text-textSecondary');
+                btn.classList.add('bg-[#fff5f0]', 'text-primary');
             }
             if (typeof showToast === 'function') showToast(data.message, "success");
         }
@@ -1263,16 +1294,16 @@ async function loadComments(reviewId) {
             const isMine = currentUserId === String(c.user_id);
             const menuHtml = currentUser ? `
                 <div class="relative">
-                    <button onclick="window.toggleCommentMenu(${c.id}, event)" class="text-gray-400 hover:text-gray-600 px-1 py-0.5 rounded transition active:bg-gray-200">
+                    <button onclick="window.toggleCommentMenu(${c.id}, event)" class="text-gray-400 hover:text-textSecondary px-1 py-0.5 rounded transition active:bg-gray-200">
                         <i class="fa-solid fa-ellipsis"></i>
                     </button>
                     <!-- Dropdown Menu -->
-                    <div id="commentMenu-${c.id}" class="hidden absolute right-0 top-full mt-1 w-32 bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden text-left origin-top-right transition-transform transform scale-95 opacity-0">
+                    <div id="commentMenu-${c.id}" class="hidden absolute right-0 top-full mt-1 w-32 bg-surface rounded-xl shadow-lg border border-border z-50 overflow-hidden text-left origin-top-right transition-transform transform scale-95 opacity-0">
                         ${isMine ? `
-                            <button onclick="window.editComment(${c.id}, this)" data-content="${c.content.replace(/"/g, '&quot;')}" class="w-full px-4 py-2 text-xs text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-pen fa-fw text-gray-400"></i> Sửa</button>
+                            <button onclick="window.editComment(${c.id}, this)" data-content="${c.content.replace(/"/g, '&quot;')}" class="w-full px-4 py-2 text-xs text-left text-textSecondary hover:bg-surface flex items-center gap-2"><i class="fa-solid fa-pen fa-fw text-gray-400"></i> Sửa</button>
                             <button onclick="window.deleteComment(${c.id}, ${reviewId})" class="w-full px-4 py-2 text-xs text-left text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-trash fa-fw text-red-400"></i> Xóa</button>
                         ` : `
-                            <button onclick="window.reportComment(${c.id})" class="w-full px-4 py-2 text-xs text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2"><i class="fa-solid fa-flag fa-fw text-gray-400"></i> Báo cáo</button>
+                            <button onclick="window.reportComment(${c.id})" class="w-full px-4 py-2 text-xs text-left text-textSecondary hover:bg-surface flex items-center gap-2"><i class="fa-solid fa-flag fa-fw text-gray-400"></i> Báo cáo</button>
                         `}
                     </div>
                 </div>
@@ -1281,17 +1312,17 @@ async function loadComments(reviewId) {
             const el = document.createElement('div');
             el.className = 'flex gap-3 items-start mb-4';
             el.innerHTML = `
-                <img src="${(c.avatar && c.avatar !== 'default_avatar.png') ? c.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.fullname)}&background=random`}" class="w-8 h-8 rounded-full object-cover shadow-sm bg-gray-200 flex-shrink-0">
+                <img src="${(c.avatar && c.avatar !== 'default_avatar.png') ? c.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.fullname)}&background=random`}" class="w-8 h-8 rounded-full object-cover shadow-soft bg-gray-200 flex-shrink-0">
                 <div class="flex-1">
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-2xl rounded-tl-none">
-                        <h5 class="font-bold text-xs text-gray-800 dark:text-gray-300 mb-1 flex justify-between items-center">
+                    <div class="bg-surface dark:bg-gray-800 p-3 rounded-2xl rounded-tl-none">
+                        <h5 class="font-bold text-xs text-textPrimary dark:text-gray-300 mb-1 flex justify-between items-center">
                             <span>${c.fullname}</span>
                             <div class="flex items-center gap-2">
                                 <span class="font-normal text-[10px] text-gray-400">${window.timeAgo(c.created_at)}</span>
                                 ${menuHtml}
                             </div>
                         </h5>
-                        <p class="text-sm text-gray-700 dark:text-gray-200" id="commentText-${c.id}">${c.content}</p>
+                        <p class="text-sm text-textSecondary dark:text-gray-200" id="commentText-${c.id}">${c.content}</p>
                     </div>
                 </div>
             `;
@@ -1410,7 +1441,10 @@ window.reportComment = async function(commentId) {
     }
 };
 
-window.openReviewComments = function (reviewId) {
+window.openReviewComments = function (reviewId, shouldPushState = true) {
+    if (shouldPushState) {
+        history.pushState({ reviewId: reviewId }, '', `/review/${reviewId}/chi-tiet-danh-gia`);
+    }
     if (typeof window.openComments === 'function') {
         window.openComments(reviewId);
     }
@@ -1482,21 +1516,21 @@ window.toggleLikeReview = async (btn, reviewId) => {
 
         if (!isCurrentlyLiked) {
             icon.classList.replace('fa-regular', 'fa-solid');
-            b.classList.add('text-[#ff5500]');
+            b.classList.add('text-primary');
             b.classList.remove('text-gray-400');
-            icon.classList.remove('text-gray-500');
+            icon.classList.remove('text-textSecondary');
             icon.classList.add('text-red-500');
-            span.classList.remove('text-gray-500');
+            span.classList.remove('text-textSecondary');
             span.classList.add('text-red-500');
             count++;
         } else {
             icon.classList.replace('fa-solid', 'fa-regular');
-            b.classList.remove('text-[#ff5500]');
+            b.classList.remove('text-primary');
             b.classList.add('text-gray-400');
             icon.classList.remove('text-red-500');
-            icon.classList.add('text-gray-500');
+            icon.classList.add('text-textSecondary');
             span.classList.remove('text-red-500');
-            span.classList.add('text-gray-500');
+            span.classList.add('text-textSecondary');
             count = Math.max(0, count - 1);
         }
         span.textContent = count;
@@ -1516,21 +1550,21 @@ window.toggleLikeReview = async (btn, reviewId) => {
 
             if (wasLiked) {
                 icon.classList.replace('fa-regular', 'fa-solid');
-                b.classList.add('text-[#ff5500]');
+                b.classList.add('text-primary');
                 b.classList.remove('text-gray-400');
-                icon.classList.remove('text-gray-500');
+                icon.classList.remove('text-textSecondary');
                 icon.classList.add('text-red-500');
-                span.classList.remove('text-gray-500');
+                span.classList.remove('text-textSecondary');
                 span.classList.add('text-red-500');
                 count++;
             } else {
                 icon.classList.replace('fa-solid', 'fa-regular');
-                b.classList.remove('text-[#ff5500]');
+                b.classList.remove('text-primary');
                 b.classList.add('text-gray-400');
                 icon.classList.remove('text-red-500');
-                icon.classList.add('text-gray-500');
+                icon.classList.add('text-textSecondary');
                 span.classList.remove('text-red-500');
-                span.classList.add('text-gray-500');
+                span.classList.add('text-textSecondary');
                 count = Math.max(0, count - 1);
             }
             span.textContent = count;
@@ -1580,17 +1614,17 @@ window.showLightbox = function (images, initialIndex = 0) {
         lightbox.className = 'fixed inset-0 z-[9999] bg-black/95 hidden flex flex-col transition-opacity duration-300 opacity-0';
         lightbox.innerHTML = `
             <div class="absolute top-0 inset-x-0 p-4 flex justify-end z-10">
-                <button id="closeLightboxBtn" class="w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center backdrop-blur-md hover:bg-white/20 transition">
+                <button id="closeLightboxBtn" class="w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center backdrop-blur-md hover:bg-surface/20 transition">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             <div class="flex-1 flex items-center justify-center relative touch-pan-y" id="lightboxTouchArea">
                 <img id="lightboxMainImage" src="" class="max-w-full max-h-full object-contain transition-transform duration-300">
                 
-                <button id="lightboxPrevBtn" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full items-center justify-center backdrop-blur-md hidden text-xl hover:bg-white/20 transition">
+                <button id="lightboxPrevBtn" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full items-center justify-center backdrop-blur-md hidden text-xl hover:bg-surface/20 transition">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                <button id="lightboxNextBtn" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full items-center justify-center backdrop-blur-md hidden text-xl hover:bg-white/20 transition">
+                <button id="lightboxNextBtn" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 text-white rounded-full items-center justify-center backdrop-blur-md hidden text-xl hover:bg-surface/20 transition">
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
@@ -1717,17 +1751,17 @@ window.openCategoryPlacesModal = function (categoryId, categoryName) {
                     img = place.thumbnail.startsWith('http') ? place.thumbnail : `${API_URL}/../${place.thumbnail}`;
                 }
                 html += `
-                    <div class="bg-white dark:bg-darkCard rounded-2xl shadow-sm overflow-hidden flex flex-col active:scale-95 transition-transform cursor-pointer border border-gray-100 dark:border-gray-800" onclick="window.openPlaceDetail({id: ${place.id}})">
+                    <div class="bg-surface dark:bg-darkCard rounded-2xl shadow-soft overflow-hidden flex flex-col btn-tactile cursor-pointer border border-border dark:border-gray-800" onclick="window.openPlaceDetail({id: ${place.id}})">
                         <div class="h-32 w-full relative">
                             <img src="${img}" class="w-full h-full object-cover">
-                            <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-lg px-2 py-1 flex items-center gap-1">
+                            <div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-xl px-2 py-1 flex items-center gap-1">
                                 <i class="fa-solid fa-star text-yellow-400 text-[10px]"></i>
                                 <span class="text-white text-xs font-bold">${parseFloat(place.average_rating || 0).toFixed(1)}</span>
                             </div>
                         </div>
                         <div class="p-3 flex-1 flex flex-col">
-                            <h3 class="font-bold text-sm text-gray-900 dark:text-white line-clamp-1 mb-1">${place.name}</h3>
-                            <p class="text-xs text-gray-500 line-clamp-1 mt-auto"><i class="fa-solid fa-location-dot mr-1"></i>${place.address}</p>
+                            <h3 class="font-bold text-sm text-textPrimary dark:text-white line-clamp-1 mb-1">${place.name}</h3>
+                            <p class="text-xs text-textSecondary line-clamp-1 mt-auto"><i class="fa-solid fa-location-dot mr-1"></i>${place.address}</p>
                         </div>
                     </div>
                 `;
@@ -1783,7 +1817,7 @@ if (searchInput && suggestionsList) {
                 const filtered = uniquePlaces;
 
                 if (filtered.length === 0) {
-                    suggestionsList.innerHTML = '<div class="p-4 text-center text-sm text-gray-500">Không tìm thấy kết quả nào cho "' + query + '"</div>';
+                    suggestionsList.innerHTML = '<div class="p-4 text-center text-sm text-textSecondary">Không tìm thấy kết quả nào cho "' + query + '"</div>';
                 } else {
                     let html = '';
                     filtered.forEach(p => {
@@ -1793,11 +1827,11 @@ if (searchInput && suggestionsList) {
                         }
                         const iconCat = p.icon || 'fa-solid fa-map-location';
                         html += `
-                            <div class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors border-b last:border-b-0 border-gray-100 dark:border-gray-800/50 first:rounded-t-2xl last:rounded-b-2xl" onclick="document.getElementById('searchSuggestionsList').classList.add('hidden'); window.openPlaceDetail({id: ${p.id}});">
+                            <div class="flex items-center gap-3 p-3 hover:bg-surface dark:hover:bg-gray-800 cursor-pointer transition-colors border-b last:border-b-0 border-border dark:border-gray-800/50 first:rounded-t-2xl last:rounded-b-2xl" onclick="document.getElementById('searchSuggestionsList').classList.add('hidden'); window.openPlaceDetail({id: ${p.id}});">
                                 <img src="${img}" class="w-12 h-12 rounded-xl object-cover shrink-0">
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white line-clamp-1">${p.name}</h4>
-                                    <p class="text-xs text-gray-500 line-clamp-1">${p.address || ''}</p>
+                                    <h4 class="font-bold text-sm text-textPrimary dark:text-white line-clamp-1">${p.name}</h4>
+                                    <p class="text-xs text-textSecondary line-clamp-1">${p.address || ''}</p>
                                 </div>
                                 <div class="bg-gray-100 dark:bg-gray-800 shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-gray-400 text-xs">
                                     <i class="fa-solid fa-chevron-right"></i>
@@ -1864,7 +1898,7 @@ window.loadNearbyPlaces = function () {
 
                 places.slice(0, 15).forEach(p => {
                     const el = document.createElement('div');
-                    el.className = 'flex items-center gap-4 bg-white dark:bg-[#1c1c1e] p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-[#2c2c2e] cursor-pointer';
+                    el.className = 'flex items-center gap-4 bg-surface dark:bg-[#1c1c1e] p-4 rounded-3xl shadow-soft border border-border dark:border-[#2c2c2e] cursor-pointer';
                     let img = 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=200';
                     if (p.thumbnail && p.thumbnail !== 'default_place.jpg') {
                         img = p.thumbnail.startsWith('http') ? p.thumbnail : `${API_URL}/../${p.thumbnail}`;
@@ -1873,7 +1907,7 @@ window.loadNearbyPlaces = function () {
                         <img src="${img}" class="w-16 h-16 rounded-2xl object-cover">
                         <div class="flex-1 min-w-0">
                             <h4 class="font-bold text-[15px] truncate">${p.name}</h4>
-                            <p class="text-xs text-gray-500 truncate mt-1"><i class="fa-solid fa-location-dot"></i> ${p.address}</p>
+                            <p class="text-xs text-textSecondary truncate mt-1"><i class="fa-solid fa-location-dot"></i> ${p.address}</p>
                             ${p.distance < 99999 ? `<p class="text-[10px] font-bold text-blue-500 mt-1"><i class="fa-solid fa-location-arrow"></i> Cách ${(p.distance).toFixed(1)} km</p>` : ''}
                         </div>
                     `;
@@ -1987,16 +2021,16 @@ window.openEditReviewModal = function(reviewId, content, rating, placeId) {
     modal.className = 'fixed inset-0 z-[9999] flex items-end sm:items-center justify-center';
     modal.innerHTML = `
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="this.parentElement.remove()"></div>
-        <div class="relative bg-white dark:bg-[#2c2c2e] w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl p-6 animate-slide-up z-10">
+        <div class="relative bg-surface dark:bg-[#2c2c2e] w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl p-6 animate-slide-up z-10">
             <div class="flex items-center justify-between mb-5">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Chỉnh sửa đánh giá</h3>
+                <h3 class="text-lg font-bold text-textPrimary dark:text-white">Chỉnh sửa đánh giá</h3>
                 <button onclick="document.getElementById('editReviewModal').remove()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <i class="fa-solid fa-xmark text-gray-400"></i>
                 </button>
             </div>
 
             <div class="mb-4">
-                <label class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2 block">Đánh giá sao</label>
+                <label class="text-sm font-semibold text-textSecondary dark:text-gray-300 mb-2 block">Đánh giá sao</label>
                 <div class="flex gap-2" id="editReviewStars">
                     ${[1,2,3,4,5].map(i => `
                         <button onclick="document.querySelectorAll('#editReviewStars button i').forEach((s,idx)=>{s.classList.toggle('fa-solid',idx<${i});s.classList.toggle('fa-regular',idx>=${i});s.classList.toggle('text-yellow-400',idx<${i});s.classList.toggle('text-gray-300',idx>=${i})}); document.getElementById('editReviewRating').value=${i}" class="text-2xl transition-transform hover:scale-125">
@@ -2008,11 +2042,11 @@ window.openEditReviewModal = function(reviewId, content, rating, placeId) {
             </div>
 
             <div class="mb-5">
-                <label class="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2 block">Nội dung</label>
-                <textarea id="editReviewContent" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-[#1c1c1e] text-sm text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-[#ff5500] focus:border-transparent outline-none resize-none transition-all">${content}</textarea>
+                <label class="text-sm font-semibold text-textSecondary dark:text-gray-300 mb-2 block">Nội dung</label>
+                <textarea id="editReviewContent" rows="4" class="w-full px-4 py-3 rounded-xl border border-border dark:border-gray-600 bg-surface dark:bg-[#1c1c1e] text-sm text-textPrimary dark:text-gray-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none transition-all">${content}</textarea>
             </div>
 
-            <button onclick="window.submitEditReview(${reviewId}, '${placeId}')" class="w-full bg-gradient-to-r from-[#ff5500] to-[#ff8800] text-white font-bold py-3 rounded-xl hover:opacity-90 transition-all active:scale-[0.98] shadow-lg shadow-orange-200 dark:shadow-none">
+            <button onclick="window.submitEditReview(${reviewId}, '${placeId}')" class="w-full bg-gradient-to-r from-[#ff5500] to-[#ff8800] text-white font-bold py-3 rounded-xl hover:opacity-90 transition-all card-tactile shadow-lg shadow-orange-200 dark:shadow-none">
                 <i class="fa-solid fa-check mr-2"></i>Lưu thay đổi
             </button>
         </div>

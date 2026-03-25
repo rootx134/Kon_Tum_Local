@@ -1,4 +1,14 @@
 {
   "outputDirectory": ".",
-  "buildCommand": null
+  "buildCommand": null,
+  "rewrites": [
+    {
+      "source": "/place/:id/:slug",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/review/:id/:slug",
+      "destination": "/index.html"
+    }
+  ]
 }

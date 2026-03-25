@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = '';
             places.forEach(place => {
                 const el = document.createElement('div');
-                el.className = 'bg-white dark:bg-darkCard rounded-2xl p-4 shadow-sm border border-gray-50 dark:border-[#2c2c2e] flex gap-4';
+                el.className = 'bg-surface dark:bg-darkCard rounded-2xl p-4 shadow-soft border border-border dark:border-[#2c2c2e] flex gap-4';
 
                 let img = 'https://placehold.co/200x200?text=KT';
                 if (place.thumbnail && place.thumbnail !== 'default_place.jpg') {
@@ -458,8 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${img}" class="w-full h-full object-cover">
                     </div>
                     <div class="flex-1 flex flex-col justify-center">
-                        <h4 class="font-bold text-gray-900 dark:text-white leading-tight mb-1">${place.name}</h4>
-                        <div class="flex items-center text-xs text-gray-500 mb-2">
+                        <h4 class="font-bold text-textPrimary dark:text-white leading-tight mb-1">${place.name}</h4>
+                        <div class="flex items-center text-xs text-textSecondary mb-2">
                             <span class="text-orange-500 font-bold mr-1"><i class="fa-solid fa-star"></i> ${Number(place.average_rating || 0).toFixed(1)}</span>
                             <span>(${place.review_count || 0} đánh giá)</span>
                         </div>
@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = '';
             reviews.forEach(review => {
                 const el = document.createElement('div');
-                el.className = 'bg-white dark:bg-darkCard rounded-2xl p-4 shadow-sm border border-gray-50 dark:border-[#2c2c2e]';
+                el.className = 'bg-surface dark:bg-darkCard rounded-2xl p-4 shadow-soft border border-border dark:border-[#2c2c2e]';
 
                 let revImages = [];
                 try { revImages = typeof review.images === 'string' ? JSON.parse(review.images) : (review.images || []); } catch (e) { revImages = []; }
@@ -535,8 +535,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     imgUrls.forEach((imgUrl, idx) => {
                         imageHtml += `
-                            <div class="flex-shrink-0 snap-center relative w-24 h-24 rounded-2xl overflow-hidden cursor-pointer shadow-sm group" onclick="window.showLightbox(${imgUrlsJson}, ${idx})">
-                                <img src="${imgUrl}" class="w-full h-full object-cover group-active:scale-95 transition-transform">
+                            <div class="flex-shrink-0 snap-center relative w-24 h-24 rounded-2xl overflow-hidden cursor-pointer shadow-soft group" onclick="window.showLightbox(${imgUrlsJson}, ${idx})">
+                                <img src="${imgUrl}" class="w-full h-full object-cover group-btn-tactile">
                             </div>
                         `;
                     });
@@ -552,17 +552,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             <img src="${avatar}" class="w-10 h-10 rounded-full object-cover">
                             <div class="flex-1">
                                 <div class="flex justify-between items-center w-full">
-                                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">${review.fullname}</h4>
+                                    <h4 class="font-bold text-sm text-textPrimary dark:text-white">${review.fullname}</h4>
                                     <span class="text-[10px] text-gray-400 font-normal pl-2">${window.timeAgo ? window.timeAgo(review.created_at) : review.created_at}</span>
                                 </div>
-                                <p class="text-xs text-gray-400 cursor-pointer hover:text-[#ff5500] transition" onclick="document.getElementById('closeSavedReviewsModal').click(); setTimeout(() => window.openPlaceDetail({id: ${review.place_id}}), 300);">tại <span class="font-semibold">${review.place_name}</span></p>
+                                <p class="text-xs text-gray-400 cursor-pointer hover:text-primary transition" onclick="document.getElementById('closeSavedReviewsModal').click(); setTimeout(() => window.openPlaceDetail({id: ${review.place_id}}), 300);">tại <span class="font-semibold">${review.place_name}</span></p>
                             </div>
                         </div>
                     </div>
                     <div class="flex items-center gap-1 text-orange-400 mb-2">
                         ${Array(5).fill(0).map((_, i) => `<i class="${i < review.rating ? 'fa-solid' : 'fa-regular'} fa-star text-[10px]"></i>`).join('')}
                     </div>
-                    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3">${review.content}</p>
+                    <p class="text-sm text-textSecondary dark:text-gray-300 leading-relaxed line-clamp-3">${review.content}</p>
                     ${imageHtml}
                 `;
                 list.appendChild(el);
@@ -595,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!user) return;
 
         const list = document.getElementById('myReviewsList');
-        list.innerHTML = '<div class="text-center py-6"><i class="fa-solid fa-spinner fa-spin text-2xl text-[#ff5500]"></i></div>';
+        list.innerHTML = '<div class="text-center py-6"><i class="fa-solid fa-spinner fa-spin text-2xl text-primary"></i></div>';
 
         try {
             const res = await fetch(`${API_URL}/interactions.php?action=get_my_reviews&user_id=${user.id}`);
@@ -613,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = '';
             reviews.forEach(r => {
                 const el = document.createElement('div');
-                el.className = 'bg-white dark:bg-darkCard p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800';
+                el.className = 'bg-surface dark:bg-darkCard p-4 rounded-2xl shadow-soft border border-border dark:border-gray-800';
 
                 let ratingHtml = '';
                 for (let i = 1; i <= 5; i++) {
@@ -622,7 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 el.innerHTML = `
-                    <h4 class="font-bold text-xs text-[#ff5500] mb-2 cursor-pointer transition-colors" onclick="document.getElementById('closeMyReviewsModal').click(); setTimeout(()=>window.openPlaceDetail({id: ${r.place_id}}), 300);"><i class="fa-solid fa-location-dot mr-1"></i>${r.place_name}</h4>
+                    <h4 class="font-bold text-xs text-primary mb-2 cursor-pointer transition-colors" onclick="document.getElementById('closeMyReviewsModal').click(); setTimeout(()=>window.openPlaceDetail({id: ${r.place_id}}), 300);"><i class="fa-solid fa-location-dot mr-1"></i>${r.place_name}</h4>
                     <div class="flex mb-2">
                         ${ratingHtml}
                     </div>
@@ -642,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!user) return;
 
         const list = document.getElementById('myReviewsList');
-        list.innerHTML = '<div class="text-center py-6"><i class="fa-solid fa-spinner fa-spin text-2xl text-[#ff5500]"></i></div>';
+        list.innerHTML = '<div class="text-center py-6"><i class="fa-solid fa-spinner fa-spin text-2xl text-primary"></i></div>';
 
         try {
             const res = await fetch(`/api/interactions.php?action=get_my_reviews&user_id=${user.id}`);
@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
             list.innerHTML = '';
             reviews.forEach(r => {
                 const el = document.createElement('div');
-                el.className = 'bg-white dark:bg-darkCard p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800';
+                el.className = 'bg-surface dark:bg-darkCard p-4 rounded-2xl shadow-soft border border-border dark:border-gray-800';
 
                 let ratingHtml = '';
                 for (let i = 1; i <= 5; i++) {
@@ -669,7 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 el.innerHTML = `
-                    <h4 class="font-bold text-xs text-[#ff5500] mb-2 cursor-pointer transition-colors" onclick="document.getElementById('closeMyReviewsModal').click(); setTimeout(()=>window.openPlaceDetail({id: ${r.place_id}}), 300);"><i class="fa-solid fa-location-dot mr-1"></i>${r.place_name}</h4>
+                    <h4 class="font-bold text-xs text-primary mb-2 cursor-pointer transition-colors" onclick="document.getElementById('closeMyReviewsModal').click(); setTimeout(()=>window.openPlaceDetail({id: ${r.place_id}}), 300);"><i class="fa-solid fa-location-dot mr-1"></i>${r.place_name}</h4>
                     <div class="flex mb-2">
                         ${ratingHtml}
                     </div>
@@ -712,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!user) return;
 
         const list = document.getElementById('pointsHistoryList');
-        list.innerHTML = '<div class="text-center py-6"><i class="fa-solid fa-spinner fa-spin text-2xl text-[#ff5500]"></i></div>';
+        list.innerHTML = '<div class="text-center py-6"><i class="fa-solid fa-spinner fa-spin text-2xl text-primary"></i></div>';
 
         try {
             const res = await fetch(`${window.API_URL || '/api'}/interactions.php?action=get_points_history&user_id=${user.id}`);
@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
             history.forEach(item => {
                 const isPositive = item.points_changed > 0;
                 const el = document.createElement('div');
-                el.className = 'bg-white dark:bg-darkCard border-b border-gray-50 dark:border-gray-800 p-4 shrink-0 flex items-center justify-between';
+                el.className = 'bg-surface dark:bg-darkCard border-b border-border dark:border-gray-800 p-4 shrink-0 flex items-center justify-between';
 
                 el.innerHTML = `
                     <div class="flex items-center gap-3">
@@ -739,7 +739,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i class="fa-solid ${isPositive ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
                         </div>
                         <div>
-                            <p class="text-[13px] font-bold text-gray-800 dark:text-gray-200 line-clamp-1">${item.reason}</p>
+                            <p class="text-[13px] font-bold text-textPrimary dark:text-gray-200 line-clamp-1">${item.reason}</p>
                             <p class="text-[10px] text-gray-400 mt-0.5">${window.timeAgo ? window.timeAgo(item.created_at) : item.created_at}</p>
                         </div>
                     </div>
@@ -823,7 +823,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon = '<i class="fa-solid fa-heart text-red-500"></i>';
                     text = `yêu thích bài đánh giá của bạn.`;
                 } else if (n.type === 'new_review') {
-                    icon = '<i class="fa-solid fa-star text-[#ff5500]"></i>';
+                    icon = '<i class="fa-solid fa-star text-primary"></i>';
                     text = `vừa đăng bài đánh giá mới.`;
                 } else if (n.type === 'system') {
                     icon = '<i class="fa-solid fa-bullhorn text-purple-500"></i>';
@@ -832,12 +832,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     icon = '<i class="fa-solid fa-check-circle text-green-500"></i>';
                     text = n.content || n.message || `Địa điểm của bạn đã được duyệt!(+15 điểm)`;
                 } else {
-                    icon = '<i class="fa-solid fa-bell text-gray-500"></i>';
+                    icon = '<i class="fa-solid fa-bell text-textSecondary"></i>';
                     text = n.content || n.message || `Thông báo.`;
                 }
 
                 const el = document.createElement('div');
-                el.className = `p-4 rounded-xl flex gap-3 items-start border ${n.is_read == 0 || n.is_read === false ? 'bg-orange-50/50 border-orange-100 dark:bg-orange-900/20 dark:border-orange-800/30' : 'bg-white border-gray-100 dark:bg-darkCard dark:border-[#2c2c2e]'}`;
+                el.className = `p-4 rounded-xl flex gap-3 items-start border ${n.is_read == 0 || n.is_read === false ? 'bg-orange-50/50 border-orange-100 dark:bg-orange-900/20 dark:border-orange-800/30' : 'bg-surface border-border dark:bg-darkCard dark:border-[#2c2c2e]'}`;
 
                 // Use simple fallbacks if actor info is missing
                 const actorName = n.actor_name || 'Hệ thống';
@@ -850,11 +850,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.innerHTML = `
                     <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                         ${!isSystemMessage ? `<img src="${avatarUrl}" class="w-full h-full object-cover">` : icon}
-                        ${!isSystemMessage ? `<div class="absolute bottom-0 right-0 w-3 h-3 bg-white rounded-full flex items-center justify-center shadow-sm text-[8px]">${icon}</div>` : ''}
+                        ${!isSystemMessage ? `<div class="absolute bottom-0 right-0 w-3 h-3 bg-surface rounded-full flex items-center justify-center shadow-soft text-[8px]">${icon}</div>` : ''}
                     </div>
                     <div>
-                        <p class="text-[13px] text-gray-800 dark:text-gray-200">
-                            ${!isSystemMessage ? `<span class="font-bold text-[#ff5500]">${actorName}</span> ` : ''}${text}
+                        <p class="text-[13px] text-textPrimary dark:text-gray-200">
+                            ${!isSystemMessage ? `<span class="font-bold text-primary">${actorName}</span> ` : ''}${text}
                         </p>
                         <p class="text-[10px] text-gray-400 mt-1">${window.timeAgo ? window.timeAgo(n.created_at) : (new Date(n.created_at)).toLocaleString()}</p>
                     </div>
@@ -1002,17 +1002,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
         // Bold
-        html = html.replace(/\*\*(.*?)\*\*/g, '<b class="text-gray-900 dark:text-white">$1</b>');
+        html = html.replace(/\*\*(.*?)\*\*/g, '<b class="text-textPrimary dark:text-white">$1</b>');
 
         // Headings
-        html = html.replace(/### (.*?)(?:\n|$)/g, '<h4 class="font-bold text-[#ff5500] mt-3 mb-1 text-[15px] uppercase tracking-wide">$1</h4>\n');
+        html = html.replace(/### (.*?)(?:\n|$)/g, '<h4 class="font-bold text-primary mt-3 mb-1 text-[15px] uppercase tracking-wide">$1</h4>\n');
 
         // Lists
         html = html.replace(/^- (.*?)(?:\n|$)/gm, '<li class="ml-4 list-disc my-1">$1</li>\n');
 
         // Replace place ID tag with a button
         html = html.replace(/\[PLACE_ID:\s*(\d+)\]/g, (match, id) => {
-            return `<button onclick="window.openPlaceDetail({id: ${id}}); document.getElementById('closeAiChatModal').click();" class="flex w-full items-center justify-center gap-1.5 bg-orange-100 text-[#ff5500] px-3 py-2 rounded-xl text-xs font-bold hover:bg-orange-200 mt-2 mb-2 transition-all border border-orange-200"><i class="fa-solid fa-map-location-dot"></i> Xem chi tiết địa điểm này</button>`;
+            return `<button onclick="window.openPlaceDetail({id: ${id}}); document.getElementById('closeAiChatModal').click();" class="flex w-full items-center justify-center gap-1.5 bg-orange-100 text-primary px-3 py-2 rounded-xl text-xs font-bold hover:bg-orange-200 mt-2 mb-2 transition-all border border-orange-200"><i class="fa-solid fa-map-location-dot"></i> Xem chi tiết địa điểm này</button>`;
         });
 
         // Newlines -> br
@@ -1035,8 +1035,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const bubble = document.createElement('div');
         bubble.className = role === 'user'
-            ? 'max-w-[80%] bg-[#ff5500] text-white rounded-2xl rounded-tr-sm px-4 py-2 text-sm font-medium shadow-sm'
-            : 'max-w-[90%] bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-[14.5px] border border-gray-100 dark:border-gray-700 shadow-sm';
+            ? 'max-w-[80%] bg-accent text-white rounded-2xl rounded-tr-sm px-4 py-2 text-sm font-medium shadow-soft'
+            : 'max-w-[90%] bg-surface dark:bg-gray-800 text-textPrimary dark:text-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-[14.5px] border border-border dark:border-gray-700 shadow-soft';
 
         if (role === 'assistant') {
             bubble.innerHTML = formatAiMessage(content);
@@ -1221,14 +1221,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tab === 'available') {
             availableList.classList.remove('hidden');
             historyList.classList.add('hidden');
-            tabAvailable.className = 'flex-1 py-2.5 text-sm font-bold rounded-lg bg-white dark:bg-darkCard text-[#ff5500] shadow-sm transition';
-            tabHistory.className = 'flex-1 py-2.5 text-sm font-bold rounded-lg text-gray-500 transition';
+            tabAvailable.className = 'flex-1 py-2.5 text-sm font-bold rounded-xl bg-surface dark:bg-darkCard text-primary shadow-soft transition';
+            tabHistory.className = 'flex-1 py-2.5 text-sm font-bold rounded-xl text-textSecondary transition';
             loadRewards();
         } else {
             availableList.classList.add('hidden');
             historyList.classList.remove('hidden');
-            tabHistory.className = 'flex-1 py-2.5 text-sm font-bold rounded-lg bg-white dark:bg-darkCard text-[#ff5500] shadow-sm transition';
-            tabAvailable.className = 'flex-1 py-2.5 text-sm font-bold rounded-lg text-gray-500 transition';
+            tabHistory.className = 'flex-1 py-2.5 text-sm font-bold rounded-xl bg-surface dark:bg-darkCard text-primary shadow-soft transition';
+            tabAvailable.className = 'flex-1 py-2.5 text-sm font-bold rounded-xl text-textSecondary transition';
             loadRedemptionHistory();
         }
     };
@@ -1271,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const canRedeem = userPoints >= reward.points_required && (unlimited || reward.stock > 0);
 
                 const card = document.createElement('div');
-                card.className = `bg-white dark:bg-darkCard rounded-2xl border ${canRedeem ? 'border-[#ff5500]/20' : 'border-gray-100 dark:border-gray-800'} overflow-hidden shadow-sm transition-all`;
+                card.className = `bg-surface dark:bg-darkCard rounded-2xl border ${canRedeem ? 'border-primary/20' : 'border-border dark:border-gray-800'} overflow-hidden shadow-soft transition-all`;
 
                 // Image section: use image_url if available, else fallback icon
                 let typeIcon = 'fa-gift';
@@ -1288,12 +1288,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     img.alt = reward.name || '';
                     img.className = 'w-full h-full object-cover';
                     img.onerror = function() {
-                        imageBlock.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-700"><i class="fa-solid ' + typeIcon + ' text-3xl text-[#ff5500]"></i></div>';
+                        imageBlock.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-700"><i class="fa-solid ' + typeIcon + ' text-3xl text-primary"></i></div>';
                     };
                     imageBlock.appendChild(img);
                 } else {
                     imageBlock.className = 'w-full h-32 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center';
-                    imageBlock.innerHTML = '<i class="fa-solid ' + typeIcon + ' text-3xl text-[#ff5500]"></i>';
+                    imageBlock.innerHTML = '<i class="fa-solid ' + typeIcon + ' text-3xl text-primary"></i>';
                 }
                 card.appendChild(imageBlock);
 
@@ -1303,19 +1303,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Name
                 const nameEl = document.createElement('h4');
-                nameEl.className = 'font-bold text-sm text-gray-900 dark:text-white mb-1 line-clamp-2';
+                nameEl.className = 'font-bold text-sm text-textPrimary dark:text-white mb-1 line-clamp-2';
                 nameEl.textContent = reward.name || reward.title || '(Chưa có tên)';
                 body.appendChild(nameEl);
 
                 // Points badge
                 const pointsBadge = document.createElement('div');
                 pointsBadge.className = 'flex items-center gap-1 mb-2';
-                pointsBadge.innerHTML = '<i class="fa-solid fa-coins text-amber-500 text-xs"></i><span class="text-xs font-bold text-[#ff5500]">' + (reward.points_required || 0) + ' điểm</span>';
+                pointsBadge.innerHTML = '<i class="fa-solid fa-coins text-amber-500 text-xs"></i><span class="text-xs font-bold text-primary">' + (reward.points_required || 0) + ' điểm</span>';
                 body.appendChild(pointsBadge);
 
                 // Stock status
                 const stockEl = document.createElement('div');
-                stockEl.className = 'text-xs text-gray-400 dark:text-gray-500 mb-3';
+                stockEl.className = 'text-xs text-gray-400 dark:text-textSecondary mb-3';
                 if (reward.stock === -1) {
                     stockEl.textContent = 'Không giới hạn';
                 } else {
@@ -1334,7 +1334,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.textContent = 'Chưa đủ điểm';
                     btn.disabled = true;
                 } else {
-                    btn.className = 'w-full py-2 text-xs rounded-xl bg-[#ff5500] text-white font-bold hover:bg-[#e04d00] active:scale-95 transition-all';
+                    btn.className = 'w-full py-2 text-xs rounded-xl bg-accent text-white font-bold hover:bg-[#e04d00] btn-tactile transition-all';
                     btn.innerHTML = '<i class="fa-solid fa-gift mr-1"></i>Đổi ngay';
                     btn.onclick = function() {
                         window.redeemReward(reward.id, reward.name, reward.points_required, reward.image_url || null);
@@ -1370,18 +1370,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             modal.innerHTML = `
                 <div class="fixed inset-0 z-[9999] flex items-end justify-center" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px)">
-                    <div class="bg-white dark:bg-darkCard w-full max-w-sm rounded-t-3xl p-6 animate-slide-up shadow-2xl">
-                        ${imageUrl ? `<div class="w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-4 shadow-md"><img src="${imageUrl}" class="w-full h-full object-cover"></div>` 
-                                   : `<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-gift text-2xl text-[#ff5500]"></i></div>`}
-                        <h3 class="text-center font-black text-gray-900 dark:text-white text-lg">Đổi quà tặng</h3>
-                        <p class="text-center text-gray-600 dark:text-gray-400 text-sm mt-1 mb-4">${rewardName}</p>
+                    <div class="bg-surface dark:bg-darkCard w-full max-w-sm rounded-t-3xl p-6 animate-slide-up shadow-2xl">
+                        ${imageUrl ? `<div class="w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-4 shadow-soft-lg"><img src="${imageUrl}" class="w-full h-full object-cover"></div>` 
+                                   : `<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-gift text-2xl text-primary"></i></div>`}
+                        <h3 class="text-center font-black text-textPrimary dark:text-white text-lg">Đổi quà tặng</h3>
+                        <p class="text-center text-textSecondary dark:text-gray-400 text-sm mt-1 mb-4">${rewardName}</p>
                         <div class="bg-orange-50 dark:bg-[#2c1a12] rounded-2xl p-4 flex items-center justify-between mb-5">
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Sẽ sử dụng</span>
-                            <span class="font-black text-[#ff5500] text-base"><i class="fa-solid fa-coins text-amber-500 mr-1"></i>${pointsRequired} điểm</span>
+                            <span class="text-sm text-textSecondary dark:text-gray-300">Sẽ sử dụng</span>
+                            <span class="font-black text-primary text-base"><i class="fa-solid fa-coins text-amber-500 mr-1"></i>${pointsRequired} điểm</span>
                         </div>
                         <div class="flex gap-3">
-                            <button id="redeemCancelBtn" class="flex-1 py-3 rounded-2xl text-sm font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 transition-all">Huỷ</button>
-                            <button id="redeemConfirmBtn" class="flex-1 py-3 rounded-2xl text-sm font-bold bg-[#ff5500] text-white hover:bg-[#e04d00] active:scale-95 transition-all">
+                            <button id="redeemCancelBtn" class="flex-1 py-3 rounded-2xl text-sm font-bold bg-gray-100 dark:bg-gray-800 text-textSecondary dark:text-gray-300 hover:bg-gray-200 transition-all">Huỷ</button>
+                            <button id="redeemConfirmBtn" class="flex-1 py-3 rounded-2xl text-sm font-bold bg-accent text-white hover:bg-[#e04d00] btn-tactile transition-all">
                                 <i class="fa-solid fa-gift mr-1"></i>Xác nhận
                             </button>
                         </div>
@@ -1506,12 +1506,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isActive = r.status === 'active';
                 
                 if (isActive) {
-                    el.className = 'bg-white dark:bg-darkCard rounded-2xl p-4 border border-orange-100 dark:border-orange-900 flex items-center gap-3 cursor-pointer hover:shadow-md transition-all active:scale-[0.98] relative overflow-hidden';
+                    el.className = 'bg-surface dark:bg-darkCard rounded-2xl p-4 border border-orange-100 dark:border-orange-900 flex items-center gap-3 cursor-pointer hover:shadow-soft-lg transition-all card-tactile relative overflow-hidden';
                     // Optional flash effect or indicator
                     el.innerHTML = '<div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-400 to-amber-500"></div>';
                     el.onclick = () => window.showVoucherDetail(r);
                 } else {
-                    el.className = 'bg-white dark:bg-darkCard rounded-2xl p-4 border border-gray-100 dark:border-gray-800 flex items-center gap-3 opacity-75';
+                    el.className = 'bg-surface dark:bg-darkCard rounded-2xl p-4 border border-border dark:border-gray-800 flex items-center gap-3 opacity-75';
                     el.innerHTML = '';
                 }
 
@@ -1546,17 +1546,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 el.innerHTML += `
                     <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-[#2c1a12] flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-gift text-[#ff5500]"></i>
+                        <i class="fa-solid fa-gift text-primary"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-[13px] text-gray-900 dark:text-white truncate">${rewardName}</h4>
+                        <h4 class="font-bold text-[13px] text-textPrimary dark:text-white truncate">${rewardName}</h4>
                         <p class="text-[11px] text-gray-400 mt-0.5">
                             <i class="fa-solid fa-coins text-amber-500 mr-1"></i>${r.points_spent} điểm
                             <span class="mx-1">·</span>
                             ${window.timeAgo ? window.timeAgo(r.created_at) : new Date(r.created_at).toLocaleDateString()}
                         </p>
                     </div>
-                    <div class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${statusColor} flex-shrink-0">
+                    <div class="px-2.5 py-1 rounded-xl text-[10px] font-bold ${statusColor} flex-shrink-0">
                         <i class="fa-solid ${statusIcon} mr-0.5"></i> ${statusText}
                     </div>
                 `;
@@ -1589,15 +1589,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const modalHtml = `
         <div id="voucherDetailModal" class="fixed inset-0 z-[1000] flex flex-col justify-end bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-            <div class="bg-white dark:bg-darkCard w-full max-w-lg mx-auto rounded-t-3xl shadow-2xl pb-safe flex flex-col transform translate-y-full transition-transform duration-300" id="voucherDetailContent">
+            <div class="bg-surface dark:bg-darkCard w-full max-w-lg mx-auto rounded-t-3xl shadow-2xl pb-safe flex flex-col transform translate-y-full transition-transform duration-300" id="voucherDetailContent">
                 
                 <div class="px-6 pt-5 pb-3">
                     <div class="w-12 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
                     <div class="flex justify-between items-start">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white pb-2 pr-6 leading-snug">
+                        <h3 class="text-xl font-bold text-textPrimary dark:text-white pb-2 pr-6 leading-snug">
                             Voucher của bạn
                         </h3>
-                        <button onclick="closeVoucherDetail()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors">
+                        <button onclick="closeVoucherDetail()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-textSecondary hover:text-textPrimary dark:hover:text-white transition-colors">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
@@ -1609,20 +1609,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="absolute -top-10 -right-10 w-24 h-24 bg-orange-200/50 rounded-full blur-xl"></div>
                         <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-rose-200/50 rounded-full blur-xl"></div>
                         
-                        <div class="w-16 h-16 bg-white dark:bg-dark border border-orange-200 shadow-sm rounded-2xl mx-auto flex items-center justify-center mb-3 relative z-10">
-                            <i class="fa-solid fa-gift text-2xl text-[#ff5500]"></i>
+                        <div class="w-16 h-16 bg-surface dark:bg-dark border border-orange-200 shadow-soft rounded-2xl mx-auto flex items-center justify-center mb-3 relative z-10">
+                            <i class="fa-solid fa-gift text-2xl text-primary"></i>
                         </div>
-                        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1 relative z-10 leading-snug">${rewardName}</h4>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 relative z-10">Ngày đổi: ${formattedDate}</p>
+                        <h4 class="text-lg font-bold text-textPrimary dark:text-white mb-1 relative z-10 leading-snug">${rewardName}</h4>
+                        <p class="text-sm text-textSecondary dark:text-gray-400 relative z-10">Ngày đổi: ${formattedDate}</p>
                     </div>
 
-                    <div class="bg-white dark:bg-dark border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl p-6 mb-6 text-center">
+                    <div class="bg-surface dark:bg-dark border-2 border-dashed border-border dark:border-gray-700 rounded-2xl p-6 mb-6 text-center">
                         <p class="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">MÃ CHỨNG NHẬN</p>
-                        <div class="bg-gray-50 dark:bg-gray-800/50 py-3 px-4 rounded-xl inline-block mx-auto mb-4">
-                            <span class="text-2xl font-mono font-bold tracking-[0.2em] text-gray-900 dark:text-white">KT-${pseudoCode}</span>
+                        <div class="bg-surface dark:bg-gray-800/50 py-3 px-4 rounded-xl inline-block mx-auto mb-4">
+                            <span class="text-2xl font-mono font-bold tracking-[0.2em] text-textPrimary dark:text-white">KT-${pseudoCode}</span>
                         </div>
                         <!-- Fake QR placeholder -->
-                        <div class="w-36 h-36 mx-auto bg-white border border-gray-200 p-2 rounded-xl" title="Đưa mã này cho nhân viên để quét">
+                        <div class="w-36 h-36 mx-auto bg-surface border border-border p-2 rounded-xl" title="Đưa mã này cho nhân viên để quét">
                             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-black">
                                 <path d="M10 10h30v30H10zm5 5v20h20V15zM60 10h30v30H60zm5 5v20h20V15zM10 60h30v30H10zm5 5v20h20V65z" fill="currentColor"/>
                                 <rect x="20" y="20" width="10" height="10" fill="currentColor"/>
@@ -1636,7 +1636,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <path d="M75 70h20v20H75zM50 85h20v5H50z" fill="currentColor"/>
                             </svg>
                         </div>
-                        <p class="text-xs text-gray-500 mt-4 leading-relaxed max-w-[240px] mx-auto">Sử dụng tính năng quét QR tại cửa hàng để đổi thưởng</p>
+                        <p class="text-xs text-textSecondary mt-4 leading-relaxed max-w-[240px] mx-auto">Sử dụng tính năng quét QR tại cửa hàng để đổi thưởng</p>
                     </div>
                 </div>
             </div>

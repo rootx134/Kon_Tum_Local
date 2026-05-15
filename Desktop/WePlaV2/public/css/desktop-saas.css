@@ -658,13 +658,22 @@ body.desktop-body {
     left: calc(50% + 48px);
 }
 .journey-connector {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     width: 20px;
     height: 2px;
-    background: linear-gradient(to right, rgba(236,72,153,0.3), rgba(236,72,153,0.05));
-    flex-shrink: 0;
+    background: var(--event-color, var(--primary));
+    opacity: 0.4;
+    z-index: -1;
+}
+.journey-event-info.right .journey-connector {
+    right: 100%;
+    background: linear-gradient(to left, var(--event-color, var(--primary)), transparent);
 }
 .journey-event-info.left .journey-connector {
-    background: linear-gradient(to left, rgba(236,72,153,0.3), rgba(236,72,153,0.05));
+    left: 100%;
+    background: linear-gradient(to right, var(--event-color, var(--primary)), transparent);
 }
 
 .journey-event-card {
@@ -678,6 +687,10 @@ body.desktop-body {
     box-shadow: 0 8px 32px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
     transition: all 0.3s;
     border-left: 4px solid var(--event-color, var(--primary));
+}
+.journey-event-info.left .journey-event-card {
+    border-left: 1px solid rgba(255,255,255,0.9);
+    border-right: 4px solid var(--event-color, var(--primary));
 }
 .journey-event-card:hover {
     transform: translateY(-2px);

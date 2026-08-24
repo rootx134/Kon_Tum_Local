@@ -197,6 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['use_voucher'])) {
 
     <link rel="stylesheet" href="assets/css/voucher.css?v=<?= filemtime(__DIR__.'/assets/css/voucher.css') ?>">
     <link rel="stylesheet" href="assets/css/style.css?v=<?= filemtime(__DIR__.'/assets/css/style.css') ?>">
+    <script src="assets/js/theme.js?v=<?= filemtime(__DIR__.'/assets/js/theme.js') ?>"></script>
 </head>
 
 <body>
@@ -286,6 +287,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['use_voucher'])) {
         <div class="bottom-actions fade-up-item delay-600">
             <button class="action-chip" onclick="openSheet('guide-sheet')"><i class="fas fa-info-circle"></i> Hướng dẫn</button>
             <button class="action-chip" onclick="openSheet('menu-sheet')"><i class="fas fa-utensils"></i> Menu áp dụng</button>
+            <button class="action-chip theme-toggle-btn" title="Chuyển chế độ sáng/tối">
+                <span class="theme-icon-wrapper"></span>
+                <span class="theme-text">Tự động</span>
+            </button>
         </div>
     </div>
 

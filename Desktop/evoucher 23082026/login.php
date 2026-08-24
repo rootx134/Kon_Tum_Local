@@ -57,6 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Đăng nhập - Kon Tum + E-Voucher</title>
     <link href="/assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/voucher.css?v=<?= filemtime(__DIR__.'/assets/css/voucher.css') ?>">
+    <script src="assets/js/theme.js?v=<?= filemtime(__DIR__.'/assets/js/theme.js') ?>"></script>
     <style>
         * {
             margin: 0;
@@ -269,13 +271,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             animation: spin 1s linear infinite;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Light Theme Overrides */
+        [data-theme="light"] body {
+            background: linear-gradient(135deg, rgba(243,244,246,0.92), rgba(229,231,235,0.85)), url('https://fc.kontumplus.com/bg_voucher.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #111827;
+        }
+
+        [data-theme="light"] .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(0, 0, 0, 0.12);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            color: #111827;
+        }
+
+        [data-theme="light"] .login-title {
+            color: #111827;
+        }
+
+        [data-theme="light"] .form-group label {
+            color: #374151;
+        }
+
+        [data-theme="light"] .form-group input {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #111827;
+        }
+
+        [data-theme="light"] .back-link a {
+            color: #4B5563;
         }
     </style>
 </head>
 <body>
+    <div style="position: absolute; top: 20px; right: 20px;">
+        <button class="theme-toggle-btn" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: inherit; padding: 8px 16px; border-radius: 30px; cursor: pointer; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; transition: all 0.3s ease;">
+            <span class="theme-icon-wrapper"></span>
+            <span class="theme-text">Tự động</span>
+        </button>
+    </div>
     <div class="login-container">
         <div class="logo">
             <h1>KON TUM +</h1>

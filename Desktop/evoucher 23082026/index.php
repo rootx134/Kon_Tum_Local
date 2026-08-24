@@ -36,6 +36,8 @@ if (isset($_SERVER['REQUEST_URI'])) {
     <meta property="twitter:image" content="https://fc.kontumplus.com/bg_voucher.jpeg">
     <link href="/assets/vendor/fontawesome/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/voucher.css?v=<?= filemtime(__DIR__.'/assets/css/voucher.css') ?>">
+    <script src="assets/js/theme.js?v=<?= filemtime(__DIR__.'/assets/js/theme.js') ?>"></script>
     <style>
         * {
             margin: 0;
@@ -382,9 +384,45 @@ if (isset($_SERVER['REQUEST_URI'])) {
             animation: spin 1s linear infinite;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Light Theme Overrides */
+        [data-theme="light"] body {
+            background: linear-gradient(135deg, rgba(243,244,246,0.92), rgba(229,231,235,0.85)), url('https://fc.kontumplus.com/bg_voucher.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #111827;
+        }
+
+        [data-theme="light"] .hero-title {
+            background: linear-gradient(45deg, #111827, #1F2937);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        [data-theme="light"] .hero-subtitle {
+            color: #374151;
+            opacity: 1;
+        }
+
+        [data-theme="light"] .hero-description {
+            color: #4B5563;
+            opacity: 1;
+        }
+
+        [data-theme="light"] .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #111827;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        [data-theme="light"] .feature-title {
+            color: #111827;
+        }
+
+        [data-theme="light"] .feature-description {
+            color: #6B7280;
         }
     </style>
 </head>
@@ -396,8 +434,12 @@ if (isset($_SERVER['REQUEST_URI'])) {
 
     <!-- Header -->
     <header class="header">
-        <div class="container">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
             <div class="logo floating">KON TUM +</div>
+            <button class="theme-toggle-btn theme-toggle-header-btn" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 8px 16px; border-radius: 30px; cursor: pointer; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; transition: all 0.3s ease;">
+                <span class="theme-icon-wrapper"></span>
+                <span class="theme-text">Tự động</span>
+            </button>
         </div>
     </header>
 

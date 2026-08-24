@@ -1,58 +1,146 @@
-:root {
-            --primary-color: #FF5C00;
-            --primary-hover: #E05000;
-            --bg-color: #F3F4F6;
-            --card-bg: rgba(255, 255, 255, 0.96);
-            --text-dark: #111827;
-            --text-muted: #6B7280;
-            --border-color: #E5E7EB;
-            --success-color: #10B981;
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
-        }
+:root, [data-theme="light"] {
+    --primary-color: #FF5C00;
+    --primary-hover: #E05000;
+    --bg-color: #F3F4F6;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-border: rgba(255, 255, 255, 0.8);
+    --text-dark: #111827;
+    --text-muted: #6B7280;
+    --border-color: #E5E7EB;
+    --success-color: #10B981;
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
+    
+    --backdrop-bg: rgba(243, 244, 246, 0.65);
+    --ticket-bg: #FFFFFF;
+    --ticket-border: #D1D5DB;
+    --ticket-notch-shadow-left: inset -2px 0 0 #D1D5DB;
+    --ticket-notch-shadow-right: inset 2px 0 0 #D1D5DB;
+    --expiry-bg: rgba(255, 92, 0, 0.1);
+    --sheet-bg: #FFFFFF;
+    --sheet-handle-bg: #E5E7EB;
+    --sheet-close-bg: #F3F4F6;
+    --sheet-text: #374151;
+    --bottom-actions-bg: rgba(255, 255, 255, 0.92);
+    --action-chip-hover: rgba(0, 0, 0, 0.06);
+    --btn-outline-border: #E5E7EB;
+    --disabled-bg: #E5E7EB;
+    --disabled-text: #9CA3AF;
+    --used-mask-bg: rgba(255, 255, 255, 0.78);
+    --guide-json-card-bg: #fff8f5;
+    --guide-json-card-border: #ffefe8;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+[data-theme="dark"] {
+    --primary-color: #FF6B1A;
+    --primary-hover: #FF5C00;
+    --bg-color: #0F172A;
+    --card-bg: rgba(30, 41, 59, 0.92);
+    --card-border: rgba(255, 255, 255, 0.14);
+    --text-dark: #F8FAFC;
+    --text-muted: #94A3B8;
+    --border-color: #334155;
+    --success-color: #10B981;
+    --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    
+    --backdrop-bg: rgba(15, 23, 42, 0.85);
+    --ticket-bg: rgba(15, 23, 42, 0.75);
+    --ticket-border: #334155;
+    --ticket-notch-shadow-left: inset -2px 0 0 #334155;
+    --ticket-notch-shadow-right: inset 2px 0 0 #334155;
+    --expiry-bg: rgba(255, 107, 26, 0.18);
+    --sheet-bg: #1E293B;
+    --sheet-handle-bg: #475569;
+    --sheet-close-bg: #334155;
+    --sheet-text: #E2E8F0;
+    --bottom-actions-bg: rgba(30, 41, 59, 0.92);
+    --action-chip-hover: rgba(255, 255, 255, 0.12);
+    --btn-outline-border: #334155;
+    --disabled-bg: #334155;
+    --disabled-text: #64748B;
+    --used-mask-bg: rgba(15, 23, 42, 0.85);
+    --guide-json-card-bg: rgba(255, 107, 26, 0.1);
+    --guide-json-card-border: rgba(255, 107, 26, 0.25);
+}
 
-        body {
-            background-color: var(--bg-color);
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow-x: hidden;
-            color: var(--text-dark);
-        }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --primary-color: #FF6B1A;
+        --primary-hover: #FF5C00;
+        --bg-color: #0F172A;
+        --card-bg: rgba(30, 41, 59, 0.92);
+        --card-border: rgba(255, 255, 255, 0.14);
+        --text-dark: #F8FAFC;
+        --text-muted: #94A3B8;
+        --border-color: #334155;
+        --success-color: #10B981;
+        --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+        
+        --backdrop-bg: rgba(15, 23, 42, 0.85);
+        --ticket-bg: rgba(15, 23, 42, 0.75);
+        --ticket-border: #334155;
+        --ticket-notch-shadow-left: inset -2px 0 0 #334155;
+        --ticket-notch-shadow-right: inset 2px 0 0 #334155;
+        --expiry-bg: rgba(255, 107, 26, 0.18);
+        --sheet-bg: #1E293B;
+        --sheet-handle-bg: #475569;
+        --sheet-close-bg: #334155;
+        --sheet-text: #E2E8F0;
+        --bottom-actions-bg: rgba(30, 41, 59, 0.92);
+        --action-chip-hover: rgba(255, 255, 255, 0.12);
+        --btn-outline-border: #334155;
+        --disabled-bg: #334155;
+        --disabled-text: #64748B;
+        --used-mask-bg: rgba(15, 23, 42, 0.85);
+        --guide-json-card-bg: rgba(255, 107, 26, 0.1);
+        --guide-json-card-border: rgba(255, 107, 26, 0.25);
+    }
+}
 
-        .page-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://fc.kontumplus.com/bg_voucher.jpeg') center/cover no-repeat;
-            background-attachment: fixed;
-            z-index: -2;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
 
-        .page-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: -1;
-        }
+body {
+    background-color: var(--bg-color);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+    color: var(--text-dark);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.page-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://fc.kontumplus.com/bg_voucher.jpeg') center/cover no-repeat;
+    background-attachment: fixed;
+    z-index: -2;
+}
+
+.page-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--backdrop-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: -1;
+    transition: background 0.3s ease;
+}
 
         .main-container {
             flex: 1;
@@ -164,8 +252,8 @@
         }
 
         .ticket-box {
-            background: #FFFFFF;
-            border: 2px dashed #D1D5DB;
+            background: var(--ticket-bg);
+            border: 2px dashed var(--ticket-border);
             border-radius: var(--radius-md);
             padding: 16px;
             text-align: center;
@@ -173,6 +261,7 @@
             margin-bottom: 16px;
             z-index: 2;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.04);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .ticket-box::before,
@@ -185,16 +274,17 @@
             background: var(--card-bg);
             border-radius: 50%;
             transform: translateY(-50%);
+            transition: background 0.3s ease;
         }
 
         .ticket-box::before {
             left: -12px;
-            box-shadow: inset -2px 0 0 #D1D5DB;
+            box-shadow: var(--ticket-notch-shadow-left);
         }
 
         .ticket-box::after {
             right: -12px;
-            box-shadow: inset 2px 0 0 #D1D5DB;
+            box-shadow: var(--ticket-notch-shadow-right);
         }
 
         .voucher-code-label {
@@ -221,7 +311,7 @@
             gap: 6px;
             font-size: 14px;
             font-weight: 500;
-            background: rgba(255, 92, 0, 0.1);
+            background: var(--expiry-bg);
             padding: 6px 12px;
             border-radius: 20px;
             color: var(--primary-color);
@@ -296,8 +386,8 @@
         }
 
         .btn-disabled {
-            background: #E5E7EB;
-            color: #9CA3AF;
+            background: var(--disabled-bg);
+            color: var(--disabled-text);
             box-shadow: none;
             cursor: not-allowed;
             animation: none;
@@ -309,7 +399,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.7);
+            background: var(--used-mask-bg);
             backdrop-filter: grayscale(100%) blur(2px);
             -webkit-backdrop-filter: grayscale(100%) blur(2px);
             z-index: 20;
@@ -347,17 +437,19 @@
 
         .bottom-actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
             margin-top: 12px;
             justify-content: space-between;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 14px;
+            background: var(--bottom-actions-bg);
+            padding: 8px 12px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             z-index: 10;
+            border: 1px solid var(--card-border);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
 
         .action-chip {
@@ -367,21 +459,59 @@
             border: none;
             color: var(--text-dark);
             font-weight: 600;
-            font-size: 15px;
-            padding: 10px 12px;
+            font-size: 14px;
+            padding: 10px 8px;
             border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .action-chip:hover {
+            background: var(--action-chip-hover);
+        }
+
+        .action-chip i {
+            color: var(--primary-color);
+            font-size: 15px;
+        }
+
+        .theme-toggle-chip {
+            border: 1px solid var(--border-color);
+        }
+
+        /* Floating Theme Toggle (Optional top-right placement) */
+        .theme-toggle-floating {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 99;
+            background: var(--bottom-actions-bg);
+            color: var(--text-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
-        .action-chip:hover {
-            background: rgba(0, 0, 0, 0.05);
+        .theme-toggle-floating:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
 
-        .action-chip i {
+        .theme-toggle-floating i {
             color: var(--primary-color);
             font-size: 16px;
         }
@@ -409,16 +539,17 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: white;
+            background: var(--sheet-bg);
             border-radius: 24px 24px 0 0;
             padding: 24px;
             padding-bottom: env(safe-area-inset-bottom, 24px);
             transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.3s ease;
             z-index: 101;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+            color: var(--sheet-text);
         }
 
         .bottom-sheet.active {
@@ -428,7 +559,7 @@
         .sheet-handle {
             width: 40px;
             height: 5px;
-            background: #E5E7EB;
+            background: var(--sheet-handle-bg);
             border-radius: 10px;
             margin: 0 auto 20px auto;
         }
@@ -443,10 +574,11 @@
         .sheet-title {
             font-size: 20px;
             font-weight: 700;
+            color: var(--text-dark);
         }
 
         .sheet-close {
-            background: #F3F4F6;
+            background: var(--sheet-close-bg);
             border: none;
             width: 32px;
             height: 32px;
@@ -459,7 +591,7 @@
         }
 
         .sheet-body {
-            color: #374151;
+            color: var(--sheet-text);
             line-height: 1.6;
             font-size: 15px;
         }
@@ -501,7 +633,7 @@
 
         .btn-outline {
             background: transparent;
-            border: 2px solid #E5E7EB;
+            border: 2px solid var(--btn-outline-border);
             color: var(--text-dark);
             font-weight: 600;
             padding: 14px;

@@ -35,20 +35,21 @@
 
 .guide-title {
     margin: 0 0 10px 0;
-    color: #333;
+    color: var(--text-dark);
     font-size: 16px;
     font-weight: 600;
 }
 
 .guide-sponsor-name {
     margin: 0 0 8px 0;
-    color: #d9534f;
+    color: var(--primary-color);
     font-size: 18px;
     font-weight: bold;
 }
 
 .guide-details {
-    color: #444;
+    color: var(--text-dark);
+    opacity: 0.9;
     font-size: 15px;
     line-height: 1.6;
 }
@@ -65,13 +66,13 @@
 
 .guide-detail-icon {
     width: 20px;
-    color: #d9534f;
+    color: var(--primary-color);
     font-size: 13px;
 }
 
 .guide-instructions-title {
     margin: 0 0 15px 0;
-    color: #FF5C00;
+    color: var(--primary-color);
     font-size: 16px;
     font-weight: 600;
     display: flex;
@@ -84,7 +85,8 @@
 }
 
 .guide-instructions-list {
-    color: #444;
+    color: var(--text-dark);
+    opacity: 0.9;
     font-size: 15px;
     line-height: 1.7;
     padding-left: 26px;
@@ -103,7 +105,7 @@
     position: absolute;
     left: -22px;
     color: #fff;
-    background: #FF5C00;
+    background: var(--primary-color);
     width: 18px;
     height: 18px;
     border-radius: 50%;
@@ -118,7 +120,7 @@
 .guide-footer-text {
     margin: 0;
     font-style: italic;
-    color: #888;
+    color: var(--text-muted);
     font-size: 14px;
     text-align: center;
 }
@@ -128,16 +130,17 @@
 }
 
 .menu-card {
-    background-color: #fff8f5;
+    background-color: var(--guide-json-card-bg);
     border-radius: 12px;
     padding: 15px;
     margin-bottom: 20px;
-    border: 1px solid #ffefe8;
+    border: 1px solid var(--guide-json-card-border);
+    color: var(--text-dark);
 }
 
 .menu-card-title {
     margin: 0 0 12px 0;
-    color: #FF5C00;
+    color: var(--primary-color);
     font-size: 16px;
     font-weight: 600;
     text-align: center;
@@ -151,7 +154,7 @@
     padding-left: 0;
     list-style: none;
     line-height: 1.8;
-    color: #444;
+    color: var(--text-dark);
     margin: 0;
     font-size: 15px;
 }
@@ -167,7 +170,7 @@
     left: 0;
     top: 6px;
     font-size: 13px;
-    color: #d9534f;
+    color: var(--primary-color);
 }
 
 .menu-image-container {
@@ -179,7 +182,7 @@
     height: auto;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    border: 1px solid #eee;
+    border: 1px solid var(--card-border);
 }
 
 .menu-empty {
@@ -189,14 +192,14 @@
 
 .menu-empty i {
     font-size: 40px;
-    color: #ddd;
+    color: var(--text-muted);
     margin-bottom: 15px;
     display: block;
 }
 
 .menu-empty p {
     font-size: 15px;
-    color: #666;
+    color: var(--text-muted);
     margin: 0;
 }
 

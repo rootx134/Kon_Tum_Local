@@ -1,0 +1,66 @@
+# ── .gitignore cho repo Kon_Tum_Local (gốc tại ~/) ──
+# Ngăn file tái-tạo-được / rác lọt vào lịch sử git, tránh phình kho object
+# như sự cố 27GB trước đây. Thứ tự quan trọng: dòng SAU thắng dòng TRƯỚC.
+
+# ── BƯỚC 1: Ổ home rộng — chỉ theo dõi thư mục dự án trên Desktop ──
+# Bỏ qua mọi thứ ở gốc home để "git add ." không nuốt Downloads/Movies/Library...
+/*
+!/.gitignore
+!/Desktop/
+/Desktop/*
+!/Desktop/KonTum_Local-main/
+!/Desktop/V2/
+!/Desktop/WePlaV2/
+!/Desktop/evoucher 23082026/
+
+# ── BƯỚC 2: Trong các thư mục dự án, loại file rác (đặt SAU để thắng allowlist) ──
+
+# macOS
+**/.DS_Store
+**/._*
+**/.Spotlight-V100
+**/.Trashes
+
+# Dependencies (cài lại bằng install)
+**/node_modules/
+**/.pnp/
+**/__pycache__/
+**/.venv/
+*.pyc
+
+# Build / output
+**/.next/
+**/out/
+**/dist/
+**/build/
+**/.turbo/
+**/.cache/
+**/*.tsbuildinfo
+**/.parcel-cache/
+
+# Logs & tạm
+**/*.log
+**/*.tmp
+**/*.temp
+**/.eslintcache
+
+# Môi trường / bí mật (KHÔNG commit)
+**/.env
+**/.env.local
+**/.env.*.local
+**/*.pem
+**/*.key
+
+# Coverage / test
+**/coverage/
+**/.nyc_output/
+**/playwright-report/
+**/test-results/
+
+# IDE / editor
+**/.idea/
+**/*.swp
+**/*.swo
+
+# Zip archives
+*.zip

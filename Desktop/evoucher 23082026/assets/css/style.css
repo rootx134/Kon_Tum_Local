@@ -1,0 +1,245 @@
+/* Custom JSON Formatting for Voucher Guide and Menu */
+.guide-json-content {
+    padding: 5px;
+}
+
+.guide-address-section {
+    display: flex;
+    align-items: flex-start;
+    border-bottom: 1px dashed #e0e0e0;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.guide-icon-box {
+    margin-right: 15px;
+    min-width: 44px;
+    background: #fff5f0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(255,92,0,0.15);
+}
+
+.guide-icon-box i {
+    font-size: 20px;
+    color: #FF5C00;
+}
+
+.guide-info-col {
+    flex: 1;
+}
+
+.guide-title {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.guide-sponsor-name {
+    margin: 0 0 8px 0;
+    color: #d9534f;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.guide-details {
+    color: #444;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.guide-detail-item {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 6px;
+}
+
+.guide-detail-item.last {
+    margin-bottom: 0;
+}
+
+.guide-detail-icon {
+    width: 20px;
+    color: #d9534f;
+    font-size: 13px;
+}
+
+.guide-instructions-title {
+    margin: 0 0 15px 0;
+    color: #FF5C00;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.guide-instructions-title i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.guide-instructions-list {
+    color: #444;
+    font-size: 15px;
+    line-height: 1.7;
+    padding-left: 26px;
+}
+
+.guide-step {
+    margin: 0 0 10px 0;
+    position: relative;
+}
+
+.guide-step.last-step {
+    margin-bottom: 20px;
+}
+
+.guide-step-number {
+    position: absolute;
+    left: -22px;
+    color: #fff;
+    background: #FF5C00;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 4px;
+}
+
+.guide-footer-text {
+    margin: 0;
+    font-style: italic;
+    color: #888;
+    font-size: 14px;
+    text-align: center;
+}
+
+.menu-json-content {
+    padding: 5px;
+}
+
+.menu-card {
+    background-color: #fff8f5;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ffefe8;
+}
+
+.menu-card-title {
+    margin: 0 0 12px 0;
+    color: #FF5C00;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.menu-card-title i {
+    margin-right: 8px;
+}
+
+.menu-item-list {
+    padding-left: 0;
+    list-style: none;
+    line-height: 1.8;
+    color: #444;
+    margin: 0;
+    font-size: 15px;
+}
+
+.menu-item {
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 24px;
+}
+
+.menu-item-icon {
+    position: absolute;
+    left: 0;
+    top: 6px;
+    font-size: 13px;
+    color: #d9534f;
+}
+
+.menu-image-container {
+    text-align: center;
+}
+
+.menu-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+}
+
+.menu-empty {
+    text-align: center;
+    padding: 30px 10px;
+}
+
+.menu-empty i {
+    font-size: 40px;
+    color: #ddd;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.menu-empty p {
+    font-size: 15px;
+    color: #666;
+    margin: 0;
+}
+
+/* Voucher Status Messages */
+.status-message {
+    text-align: center;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 10px;
+    /* Box shadow to match disabled buttons style slightly */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.status-message small {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 6px;
+    opacity: 0.9;
+}
+
+.status-message i {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.status-used {
+    background-color: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.status-expired {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.status-upcoming {
+    background-color: #fefce8;
+    color: #a16207;
+    border: 1px solid #fef08a;
+}

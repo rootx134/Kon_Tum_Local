@@ -1,0 +1,152 @@
+/* admin-forms.css — Form groups, input styles, and upload widgets */
+
+/* ── Form Base ── */
+.form-group { margin-bottom: 20px; }
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all var(--duration-normal) ease;
+    background: #f8fafc;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* ── Logo Uploader ── */
+.logo-input-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.logo-uploader {
+    position: relative;
+    width: 120px; height: 120px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.2s, background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.logo-uploader:hover { border-color: var(--color-primary); background-color: var(--color-primary-light); }
+
+.logo-input-row .logo-uploader { margin-top: 0; flex: 1 1 0; width: auto; min-width: 0; height: 110px; }
+
+.logo-preview-container {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.logo-preview { width: 100%; height: 100%; object-fit: contain; background-color: #ffffff; }
+
+.upload-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; color: #64748b; font-size: 14px; text-align: center; padding: 10px;
+}
+.upload-placeholder i { font-size: 24px; color: #94a3b8; }
+.logo-uploader:hover .upload-placeholder i  { color: var(--color-primary); }
+.logo-uploader:hover .upload-placeholder     { color: var(--color-primary-dark); }
+
+/* ── Logo Paste Area ── */
+.logo-paste-area {
+    flex: 1 1 0; width: auto; min-width: 0; height: 110px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; border: 2px dashed #cbd5e1; border-radius: 8px; background-color: #f8fafc;
+    color: #64748b; font-size: 13px; text-align: center; cursor: pointer; outline: none;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+    user-select: none; line-height: 1.4; box-sizing: border-box;
+}
+.logo-paste-area i { font-size: 22px; color: #94a3b8; transition: color 0.2s; }
+.logo-paste-area small { font-size: 11px; opacity: 0.75; }
+
+.logo-paste-area:hover,
+.logo-paste-area:focus {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+}
+.logo-paste-area:hover i, .logo-paste-area:focus i { color: var(--color-primary); }
+.logo-paste-area:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+
+/* ── Menu Image Uploader ── */
+.menu-image-input-row {
+    display: flex; flex-direction: row; align-items: flex-start; gap: 10px; margin-top: 8px;
+}
+
+.menu-image-uploader {
+    flex: 1 1 0; min-width: 0; height: 90px;
+    border: 2px dashed #cbd5e1; border-radius: 8px; background: #f8fafc;
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    gap: 6px; cursor: pointer; overflow: hidden;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.menu-image-uploader:hover { border-color: var(--color-primary); background: var(--color-primary-light); }
+
+.menu-image-uploader .upload-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; color: #64748b; font-size: 13px; text-align: center; padding: 8px;
+}
+.menu-image-uploader .upload-placeholder i { font-size: 20px; color: #94a3b8; }
+.menu-image-uploader:hover .upload-placeholder i  { color: var(--color-primary); }
+.menu-image-uploader:hover .upload-placeholder     { color: var(--color-primary-dark); }
+
+.menu-image-preview { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Menu Paste Area ── */
+.menu-paste-area {
+    flex: 1 1 0; min-width: 0; height: 90px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; border: 2px dashed #cbd5e1; border-radius: 8px; background: #f8fafc;
+    color: #64748b; font-size: 13px; text-align: center; cursor: pointer; outline: none;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+    user-select: none; line-height: 1.4; box-sizing: border-box;
+}
+.menu-paste-area i { font-size: 20px; color: #94a3b8; transition: color 0.2s; }
+.menu-paste-area small { font-size: 11px; opacity: 0.75; }
+
+.menu-paste-area:hover,
+.menu-paste-area:focus {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+}
+.menu-paste-area:hover i, .menu-paste-area:focus i { color: var(--color-primary); }
+.menu-paste-area:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .form-row { grid-template-columns: 1fr; }
+}

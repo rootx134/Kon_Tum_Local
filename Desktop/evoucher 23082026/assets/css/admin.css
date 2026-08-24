@@ -1,0 +1,306 @@
+/* admin.css — Design tokens + imports */
+
+/* @import MUST come before all other rules */
+@import url('admin-layout.css');
+@import url('admin-components.css');
+@import url('admin-modal.css');
+@import url('admin-forms.css');
+
+:root {
+    /* Brand */
+    --color-primary:       #3B82F6;
+    --color-primary-dark:  #2563EB;
+    --color-primary-light: #EFF6FF;
+
+    /* Semantic */
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger:  #ef4444;
+
+    /* Surface */
+    --color-bg:      #fdfaf7;
+    --color-text:    #334155;
+    --color-card:    #ffffff;
+    --color-border:  #e2e8f0;
+    --color-muted:   #64748b;
+    --color-input-bg:#f8fafc;
+
+    /* Layout */
+    --max-width: 1200px;
+
+    /* Motion */
+    --duration-fast:   150ms;
+    --duration-normal: 300ms;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DARK MODE
+   ════════════════════════════════════════════════════════════════════════════ */
+
+body.dark-mode {
+    --color-bg:           #0f172a;
+    --color-text:         #e2e8f0;
+    --color-card:         #1e293b;
+    --color-border:       #334155;
+    --color-muted:        #94a3b8;
+    --color-input-bg:     #0f172a;
+    --color-primary-light:#1e3a5f;
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+/* ── Layout ── */
+body.dark-mode .tabs {
+    background: #1e293b;
+}
+body.dark-mode .tab {
+    color: var(--color-muted);
+}
+body.dark-mode .tab.active {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: #fff;
+}
+body.dark-mode .tab:hover:not(.active) {
+    background: #334155;
+    color: var(--color-text);
+}
+
+body.dark-mode .bottom-nav {
+    background: rgba(15, 23, 42, 0.98);
+    border-top-color: #334155;
+}
+body.dark-mode .bottom-nav-item {
+    color: #64748b;
+}
+
+body.dark-mode .mobile-menu {
+    background: #1e293b;
+    box-shadow: -5px 0 25px rgba(0,0,0,0.5);
+}
+body.dark-mode .mobile-menu-item {
+    color: var(--color-text);
+    border-bottom-color: #334155;
+}
+body.dark-mode .mobile-menu-item i { color: #64748b; }
+body.dark-mode .mobile-menu-item:hover,
+body.dark-mode .mobile-menu-item:active {
+    background: #334155;
+    color: #93c5fd;
+}
+body.dark-mode .mobile-menu-item:hover i { color: #93c5fd; }
+
+/* ── Cards ── */
+body.dark-mode .card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+body.dark-mode .card h2,
+body.dark-mode .card h3,
+body.dark-mode .card p,
+body.dark-mode .card span,
+body.dark-mode .card label,
+body.dark-mode .card strong,
+body.dark-mode .card small {
+    color: var(--color-text);
+}
+body.dark-mode .card code {
+    background: #0f172a;
+    color: #93c5fd;
+}
+
+body.dark-mode .stat-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+body.dark-mode .stat-card .stat-label { color: var(--color-muted); }
+
+body.dark-mode .campaign-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+body.dark-mode .campaign-card,
+body.dark-mode .campaign-card * { color: var(--color-text); }
+
+/* ── Tables ── */
+body.dark-mode th {
+    background: #0f172a;
+    color: var(--color-muted);
+    border-bottom-color: #334155;
+}
+body.dark-mode td {
+    border-bottom-color: #334155;
+    color: var(--color-text);
+}
+body.dark-mode tr { border-color: #334155; }
+body.dark-mode table tr:hover { background: #1e293b; }
+body.dark-mode td::before { color: var(--color-muted); }
+
+@media (max-width: 768px) {
+    body.dark-mode tr {
+        border-color: #334155;
+        background: #1e293b;
+    }
+    body.dark-mode td { border-bottom-color: #334155; }
+}
+
+/* ── Toast ── */
+body.dark-mode .toast {
+    background: #1e293b;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+body.dark-mode .toast-title   { color: var(--color-text); }
+body.dark-mode .toast-message { color: var(--color-muted); }
+
+/* ── Forms ── */
+body.dark-mode .form-group label { color: var(--color-text); }
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea,
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: var(--color-text) !important;
+}
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus {
+    background: #0f172a !important;
+    border-color: var(--color-primary) !important;
+}
+
+body.dark-mode .logo-uploader,
+body.dark-mode .logo-paste-area,
+body.dark-mode .menu-image-uploader,
+body.dark-mode .menu-paste-area {
+    background: #0f172a;
+    border-color: #334155;
+    color: var(--color-muted);
+}
+body.dark-mode .logo-uploader:hover,
+body.dark-mode .logo-paste-area:hover,
+body.dark-mode .logo-paste-area:focus,
+body.dark-mode .menu-image-uploader:hover,
+body.dark-mode .menu-paste-area:hover,
+body.dark-mode .menu-paste-area:focus {
+    background: #1e3a5f;
+    border-color: var(--color-primary);
+}
+body.dark-mode .upload-placeholder { color: var(--color-muted); }
+body.dark-mode .upload-placeholder i { color: #64748b; }
+
+/* ── Modals ── */
+body.dark-mode .modal-content {
+    background: #1e293b;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+body.dark-mode .modal-header {
+    background: #1e293b;
+    border-bottom-color: #334155;
+    color: var(--color-text);
+}
+body.dark-mode .modal-header h3 { color: var(--color-text); }
+body.dark-mode .modal-footer {
+    background: #1e293b;
+    border-top-color: #334155;
+}
+body.dark-mode .modal-body-scroll { color: var(--color-text); }
+
+body.dark-mode .close {
+    background: #334155;
+    color: var(--color-muted);
+}
+body.dark-mode .close:hover {
+    background: #475569;
+    color: var(--color-text);
+}
+
+body.dark-mode .notification-title   { color: var(--color-text); }
+body.dark-mode .notification-message { color: var(--color-muted); }
+body.dark-mode .notification-btn.secondary {
+    background: #334155;
+    color: var(--color-text);
+}
+body.dark-mode .notification-btn.secondary:hover { background: #475569; }
+
+/* ── Inline style overrides (elements using hardcoded background colors) ── */
+body.dark-mode [style*="background: #f1f5f9"],
+body.dark-mode [style*="background:#f1f5f9"],
+body.dark-mode [style*="background: #f8fafc"],
+body.dark-mode [style*="background:#f8fafc"],
+body.dark-mode [style*="background: white"],
+body.dark-mode [style*="background:white"],
+body.dark-mode [style*="background: rgba(255,255,255"],
+body.dark-mode [style*="background:rgba(255,255,255"] {
+    background: #0f172a !important;
+    color: var(--color-text) !important;
+}
+body.dark-mode [style*="color: #64748b"],
+body.dark-mode [style*="color:#64748b"],
+body.dark-mode [style*="color: #475569"],
+body.dark-mode [style*="color:#475569"] {
+    color: var(--color-muted) !important;
+}
+body.dark-mode [style*="border: 1px solid #e2e8f0"],
+body.dark-mode [style*="border:1px solid #e2e8f0"],
+body.dark-mode [style*="border-bottom: 1px solid #e2e8f0"] {
+    border-color: #334155 !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DARK MODE TOGGLE SWITCH
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.dark-toggle-switch {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.dark-toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.dark-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #cbd5e1;
+    border-radius: 999px;
+    transition: background var(--duration-normal);
+}
+
+.dark-toggle-switch input:checked + .dark-toggle-track {
+    background: var(--color-primary);
+}
+
+.dark-toggle-thumb {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform var(--duration-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #f59e0b;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    pointer-events: none;
+}
+
+.dark-toggle-switch input:checked ~ .dark-toggle-thumb {
+    transform: translateX(24px);
+    color: #64748b;
+}

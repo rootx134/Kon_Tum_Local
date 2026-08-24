@@ -1,0 +1,25 @@
+RewriteEngine On
+
+# Disable LiteSpeed / OnePanel Anti-CC & Bot verification for API requests
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/api/ [NC]
+    RewriteRule .* - [E=verifyip:off,E=anti-cc:off,E=waf:off,E=nocheck:1]
+</IfModule>
+
+# Route API v1 requests to api/v1/index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/v1/(?:external/)?(.*)$ api/v1/index.php?route=$1 [L,QSA]
+
+# Route short paths (like /PT198G277) to e.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([A-Za-z0-9]{5,20})$ e.php?id=$1 [L,QSA]
+
+# JS modules — no cache so updates are always picked up immediately
+<LocationMatch "^/assets/js/modules/">
+    Header set Cache-Control "no-store, no-cache, must-revalidate"
+    Header set Pragma "no-cache"
+    Header unset ETag
+</LocationMatch>

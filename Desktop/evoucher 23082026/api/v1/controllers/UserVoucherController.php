@@ -156,28 +156,28 @@ class UserVoucherController
         foreach ($campaigns as $camp) {
             $short = $camp['sponsor_short'];
             if (!empty($short) && stripos($voucherCode, $short) === 0) {
-                $codeOnly = substr($voucherCode, strlen($short));
+                $codeOnly = ltrim(substr($voucherCode, strlen($short)), '-_/# ');
                 $stmt = $pdo->prepare("
-                    SELECT v.id, v.code, v.status, v.used_at, v.campaign_id, c.sponsor_name, c.sponsor_short, c.description, c.end_date
+                    SELECT v.id, v.code, v.status, v.used_at, v.campaign_id, v.issued_to_user_ref, c.sponsor_name, c.sponsor_short, c.description, c.end_date
                     FROM vouchers v
                     JOIN campaigns c ON v.campaign_id = c.id
-                    WHERE c.id = ? AND v.code = ?
+                    WHERE c.id = ? AND (v.code = ? OR v.code = ?)
                 ");
-                $stmt->execute([$camp['id'], $codeOnly]);
+                $stmt->execute([$camp['id'], $codeOnly, $voucherCode]);
                 $voucher = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($voucher) break;
             }
         }
 
         if (!$voucher) {
-            // Direct search by code
+            // Direct search by code or full prefix
             $stmt = $pdo->prepare("
-                SELECT v.id, v.code, v.status, v.used_at, v.campaign_id, c.sponsor_name, c.sponsor_short, c.description, c.end_date
+                SELECT v.id, v.code, v.status, v.used_at, v.campaign_id, v.issued_to_user_ref, c.sponsor_name, c.sponsor_short, c.description, c.end_date
                 FROM vouchers v
                 JOIN campaigns c ON v.campaign_id = c.id
-                WHERE v.code = ?
+                WHERE v.code = ? OR CONCAT(c.sponsor_short, '-', v.code) = ?
             ");
-            $stmt->execute([$voucherCode]);
+            $stmt->execute([$voucherCode, $voucherCode]);
             $voucher = $stmt->fetch(PDO::FETCH_ASSOC);
         }
 

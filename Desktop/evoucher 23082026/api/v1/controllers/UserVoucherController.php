@@ -68,7 +68,10 @@ class UserVoucherController
                 c.sponsor_short,
                 c.description,
                 c.logo,
-                c.end_date
+                c.end_date,
+                c.start_date,
+                c.guide_content,
+                c.menu_content
             FROM vouchers v
             JOIN campaigns c ON v.campaign_id = c.id
             $whereSql
@@ -107,6 +110,9 @@ class UserVoucherController
                 'claimed_at' => $row['issued_via_api_at'],
                 'used_at' => $row['used_at'],
                 'expiry_date' => $row['end_date'],
+                'start_date' => $row['start_date'] ?? null,
+                'guide_content' => $row['guide_content'] ?? null,
+                'menu_content' => $row['menu_content'] ?? null,
             ];
         }, $rows);
 

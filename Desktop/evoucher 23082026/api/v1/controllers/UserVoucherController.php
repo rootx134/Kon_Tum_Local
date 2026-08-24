@@ -23,6 +23,11 @@ class UserVoucherController
             ApiResponse::error('INVALID_PARAMS', 'Thiếu tham số user_ref_id', 400);
         }
 
+        // Add HTTP Cache Header for performance
+        if (!headers_sent()) {
+            header('Cache-Control: private, max-age=10, stale-while-revalidate=20');
+        }
+
         // Build WHERE clause
         $whereSql = "WHERE v.issued_to_user_ref = ?";
         $params = [$userRefId];

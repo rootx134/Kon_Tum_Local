@@ -14,6 +14,10 @@ class RewardController
      */
     public static function getCatalog(PDO $pdo): void
     {
+        if (!headers_sent()) {
+            header('Cache-Control: public, max-age=15, stale-while-revalidate=30');
+        }
+
         $stmt = $pdo->query("
             SELECT 
                 c.id,
